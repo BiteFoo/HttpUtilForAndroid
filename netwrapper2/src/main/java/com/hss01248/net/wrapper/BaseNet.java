@@ -152,36 +152,27 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
         configInfo.url = url;
         configInfo.listener.url = url;
 
+        //todo 这里token还可能在请求头中,应加上此类情况的自定义.
         if (configInfo.isAppendToken){
-
             Tool.addToken(configInfo.params);
         }
 
         if (configInfo.loadingDialog != null && !configInfo.loadingDialog.isShowing()){
-            try {
+            try {//预防badtoken最简便和直接的方法
                 configInfo.loadingDialog.show();
             }catch (Exception e){
-
             }
-
         }
 
-       // configInfo.client = this;
-
-        if (getCache(configInfo)){
+        if (getCache(configInfo)){//异步,去拿缓存.
             return configInfo;
         }
-
-        T request = generateNewRequest(configInfo);
-
+        T request = generateNewRequest(configInfo);//根据类型生成/执行不同的请求对象
 
         /*
-
         这三个方式是给volley预留的
         setInfoToRequest(configInfo,request);
-
         cacheControl(configInfo,request);
-
         addToQunue(request);*/
 
         return configInfo;
@@ -198,8 +189,8 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
                 return newDownloadRequest(configInfo);
             case ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS:
                 return newUploadRequest(configInfo);
-            case ConfigInfo.TYPE_UPLOAD_NONE_PROGRESS:
-                return newUploadRequestWithoutProgress(configInfo);
+            /*case ConfigInfo.TYPE_UPLOAD_NONE_PROGRESS:
+                return newUploadRequestWithoutProgress(configInfo);*/
             default:return null;
         }
     }

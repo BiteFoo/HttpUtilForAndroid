@@ -147,9 +147,6 @@ public class RetrofitClient extends BaseNet<Call> {
                 call.cancel();
             }
         }
-
-
-
     }
 
     @Override
@@ -199,19 +196,14 @@ public class RetrofitClient extends BaseNet<Call> {
                 }else {
                     configInfo.listener.onError(response.code()+"");
                 }
-
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Tool.dismiss(configInfo.loadingDialog);
                 configInfo.listener.onError(t.toString());
-
             }
         });
-
-
-
 
         return call;
 
