@@ -19,9 +19,7 @@ import okio.Source;
  * Created by Administrator on 2016/9/5 0005.
  */
 public class ProgressResponseBody extends ResponseBody {
-
     private final ResponseBody responseBody;
-
     private BufferedSource bufferedSource;
     private String url;
 
@@ -56,13 +54,11 @@ public class ProgressResponseBody extends ResponseBody {
     private Source source(final Source source) {
         return new ForwardingSource(source) {
             long totalBytesRead = 0L;
-
             @Override
             public long read(Buffer sink, long byteCount) throws IOException {
                 long bytesRead = super.read(sink, byteCount);
                 totalBytesRead += bytesRead != -1 ? bytesRead : 0;
                 timeNow = System.currentTimeMillis();
-
                 if (timeNow - timePre > NetDefaultConfig.PROGRESS_INTERMEDIATE || totalBytesRead == responseBody.contentLength()){//至少300ms才更新一次状态
                     timePre = timeNow;
                     EventBus.getDefault().post(new ProgressEvent(totalBytesRead,responseBody.contentLength(),
@@ -72,5 +68,4 @@ public class ProgressResponseBody extends ResponseBody {
             }
         };
     }
-
 }

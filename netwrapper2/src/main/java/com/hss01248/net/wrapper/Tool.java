@@ -114,9 +114,7 @@ public class Tool {
                 || "{}".equals(data) || "null".equals(data)) {
             return true;
         }
-
         return false;
-
     }
 
     public static void dismiss(Dialog dialog) {
@@ -149,7 +147,6 @@ public class Tool {
                 configInfo.listener.onError("json 格式异常");
                 return;
             }
-
             String key_data = TextUtils.isEmpty(configInfo.key_data) ? NetDefaultConfig.KEY_DATA : configInfo.key_data;
             String key_code = TextUtils.isEmpty(configInfo.key_code) ? NetDefaultConfig.KEY_CODE : configInfo.key_code;
             String key_msg = TextUtils.isEmpty(configInfo.key_msg) ? NetDefaultConfig.KEY_MSG : configInfo.key_msg;
@@ -185,7 +182,6 @@ public class Tool {
 
         if (code == codeSuccess){
             if (isJsonEmpty(data)){
-
                 if(configInfo.isResponseJsonArray()){
                     configInfo.listener.onEmpty();
                 }else {
@@ -195,31 +191,24 @@ public class Tool {
                 try{
                     if (data.startsWith("{")){
                         final E bean =  MyJson.parseObject(data,configInfo.clazz);
-
-                                configInfo.listener.onSuccessObj(bean ,response,data,code,msg);
+                         configInfo.listener.onSuccessObj(bean ,response,data,code,msg);
 
                         cacheResponse(response, configInfo);
                     }else if (data.startsWith("[")){
                         final List<E> beans =  MyJson.parseArray(data,configInfo.clazz);
-
-                                configInfo.listener.onSuccessArr(beans,response,data,code,msg);
+                         configInfo.listener.onSuccessArr(beans,response,data,code,msg);
 
 
                         cacheResponse(response, configInfo);
                     }else {//如果data的值是一个字符串,而不是标准json,那么直接返回
                         if (String.class.equals(configInfo.clazz) ){//此时,E也是String类型.如果有误,会抛出到下面catch里
-
-                                    configInfo.listener.onSuccess((E) data,data);
+                           configInfo.listener.onSuccess((E) data,data);
 
 
                         }else {
-
-
-                                    configInfo.listener.onError("不是标准的json数据");
-
+                            configInfo.listener.onError("不是标准的json数据");
                         }
                     }
-
                 }catch (final Exception e){
                     e.printStackTrace();
                     configInfo.listener.onError(e.toString());
@@ -227,18 +216,13 @@ public class Tool {
                 }
             }
         }else if (code == codeUnFound){
-
-
-                    configInfo.listener.onUnFound();
-
+           configInfo.listener.onUnFound();
         }else if (code == codeUnlogin){
             configInfo.client.autoLogin(new MyNetListener() {
                 @Override
                 public void onSuccess(Object response, String resonseStr) {
-
                     configInfo.client.resend(configInfo);
                 }
-
                 @Override
                 public void onError(String error) {
                     super.onError(error);
@@ -246,9 +230,8 @@ public class Tool {
                 }
             });
         }else {
-                    configInfo.listener.onCodeError(msg,"",code);
+           configInfo.listener.onCodeError(msg,"",code);
         }
-
     }
 
 
@@ -373,25 +356,17 @@ public class Tool {
     public static  void parseStringByType(final String string, final ConfigInfo configInfo) {
         switch (configInfo.type){
             case ConfigInfo.TYPE_STRING:
-
                 //缓存
                 cacheResponse(string, configInfo);
-
                 //处理结果
-
                  configInfo.listener.onSuccess(string, string);
-
                 break;
             case ConfigInfo.TYPE_JSON:
-
                  parseCommonJson(string,configInfo);
-
-
                 break;
             case ConfigInfo.TYPE_JSON_FORMATTED:
                 parseStandJsonStr(string, configInfo);
                 break;
-
         }
     }
 
@@ -414,12 +389,10 @@ public class Tool {
     }
 
     private static <E> void parseCommonJson( String string, ConfigInfo<E> configInfo) {
-
         if (isJsonEmpty(string)){
             configInfo.listener.onEmpty();
         }else {
             try{
-
                 if (string.startsWith("{")){
                     E bean =  MyJson.parseObject(string,configInfo.clazz);
                     configInfo.listener.onSuccessObj(bean ,string,string,0,"");
@@ -431,7 +404,6 @@ public class Tool {
                 }else {
                     configInfo.listener.onError("不是标准json格式");
                 }
-
             }catch (Exception e){
                 e.printStackTrace();
                 configInfo.listener.onError(e.toString());

@@ -19,12 +19,9 @@ import okio.Sink;
  * Created by Administrator on 2016/9/21 0021.
  */
 public class UploadFileRequestBody extends RequestBody {
-
     private RequestBody mRequestBody;
     private BufferedSink bufferedSink;
     private String url;
-
-
     public UploadFileRequestBody(File file,String mimeType,String url) {
        // this.mRequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         this.mRequestBody = RequestBody.create(MediaType.parse(mimeType), file);

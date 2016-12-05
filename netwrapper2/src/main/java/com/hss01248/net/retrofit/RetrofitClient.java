@@ -1,8 +1,11 @@
 package com.hss01248.net.retrofit;
 
+import android.net.SSLCertificateSocketFactory;
 import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.HttpMethod;
 import com.hss01248.net.config.NetDefaultConfig;
@@ -18,11 +21,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -62,6 +68,8 @@ public class RetrofitClient extends BaseNet<Call> {
                 //.addInterceptor(new ProgressInterceptor())//下载时更新进度
                 .addNetworkInterceptor(new NoCacheInterceptor())//request和resoponse都加上nocache,
                 .addInterceptor(new UseragentInterceptor())
+               /* .sslSocketFactory(new SSLCertificateSocketFactory(), new X509TrustManager() {
+                })*/
                 .build();
 
         retrofit = new Retrofit
@@ -229,23 +237,17 @@ public class RetrofitClient extends BaseNet<Call> {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
-
                 if (!response.isSuccessful()){
-
                             configInfo.listener.onError(response.code()+"");
                     Tool.dismiss(configInfo.loadingDialog);
-
-
                     return;
                 }
                 //开子线程将文件写到指定路径中
                 SimpleTask<Boolean> simple = new SimpleTask<Boolean>() {
-
                     @Override
                     protected Boolean doInBackground() {
                         return writeResponseBodyToDisk(response.body(),configInfo.filePath);
                     }
-
                     @Override
                     protected void onPostExecute(Boolean result) {
                         Tool.dismiss(configInfo.loadingDialog);
@@ -254,7 +256,6 @@ public class RetrofitClient extends BaseNet<Call> {
                         }else {
                             configInfo.listener.onError("文件下载失败");
                         }
-
                     }
                 };
                 simple.execute();
@@ -274,35 +275,20 @@ public class RetrofitClient extends BaseNet<Call> {
 
     @Override
     protected <E> Call newCommonStringRequest(final ConfigInfo<E> configInfo) {
-        Log.e("url","newCommonStringRequest:"+configInfo.url);
-
-
-
         Call<ResponseBody> call;
-
         if (configInfo.method == HttpMethod.GET){
             call = service.executGet(configInfo.url,configInfo.params);
         }else if (configInfo.method == HttpMethod.POST){
-
-            if(configInfo.paramsAsJson){
-
+            if(configInfo.paramsAsJson){//参数在请求体以json的形式发出
                 String jsonStr = MyJson.toJsonStr(configInfo.params);
-
                 Log.e("dd","jsonstr request:"+jsonStr);
-
-
-
                 RequestBody body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), jsonStr);
                 call = service.executeJsonPost(configInfo.url,body);
-
             }else {
                 call = service.executePost(configInfo.url,configInfo.params);
             }
-
-
-
         }else {
-            configInfo.listener.onError("不是get或post方法");
+            configInfo.listener.onError("不是get或post方法");//暂时不考虑其他方法
             call = null;
             return call;
         }
@@ -311,19 +297,32 @@ public class RetrofitClient extends BaseNet<Call> {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
+             /* String  string =  response.body().string();
+
+                Gson gson = new Gson();
+                Type objectType = new TypeToken<E>() {}.getType();
+                final E bean = gson.fromJson(string,objectType);
+                configInfo.listener.onSuccess(bean,string);*/
+
+
 
                 if (!response.isSuccessful()){
-                            configInfo.listener.onError(response.code()+"");
+                            configInfo.listener.onCodeError("http错误码为:"+response.code(),response.message(),response.code());
                     Tool.dismiss(configInfo.loadingDialog);
                     return;
                 }
-
                 String string = "";
+
+
+
+
+
+
+
+
+
                 try {
                     string =  response.body().string();
-                    final String finalString = string;
-                    //从这里开始,分类进行解析
-
                     Tool.parseStringByType(string,configInfo);
                     Tool.dismiss(configInfo.loadingDialog);
 
@@ -334,18 +333,14 @@ public class RetrofitClient extends BaseNet<Call> {
                     Tool.dismiss(configInfo.loadingDialog);
 
                 }
-
             }
-
             @Override
             public void onFailure(Call<ResponseBody> call, final Throwable t) {
 
                         configInfo.listener.onError(t.toString());
                 Tool.dismiss(configInfo.loadingDialog);
-
             }
         });
-
         return call;
     }
 
@@ -355,16 +350,12 @@ public class RetrofitClient extends BaseNet<Call> {
         try {
             // todo change the file location/name according to your needs
             File futureStudioIconFile = new File(path);
-
             InputStream inputStream = null;
             OutputStream outputStream = null;
-
             try {
                 byte[] fileReader = new byte[4096];
-
                 long fileSize = body.contentLength();
                 long fileSizeDownloaded = 0;
-
                 inputStream = body.byteStream();
                 outputStream = new FileOutputStream(futureStudioIconFile);
                 while (true) {
@@ -374,7 +365,7 @@ public class RetrofitClient extends BaseNet<Call> {
                     }
                     outputStream.write(fileReader, 0, read);
                     fileSizeDownloaded += read;
-                    Log.d("io", "file download: " + fileSizeDownloaded + " of " + fileSize);//// TODO: 2016/9/21  这里也可以实现进度监听
+                    Log.d("io", "file download: " + fileSizeDownloaded + " of " + fileSize);//  这里也可以实现进度监听
                 }
 
                 outputStream.flush();
