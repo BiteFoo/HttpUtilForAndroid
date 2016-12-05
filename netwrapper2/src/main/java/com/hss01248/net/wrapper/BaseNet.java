@@ -153,7 +153,6 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
         configInfo.listener.url = url;
 
         if (configInfo.isAppendToken){
-
             Tool.addToken(configInfo.params);
         }
 
@@ -161,9 +160,7 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
             try {
                 configInfo.loadingDialog.show();
             }catch (Exception e){
-
             }
-
         }
 
        // configInfo.client = this;

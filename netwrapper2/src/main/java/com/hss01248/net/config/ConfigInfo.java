@@ -208,8 +208,6 @@ public class ConfigInfo<T> {
                 }catch (Exception e){
 
                 }
-
-
             }
 
         }else {
