@@ -14,6 +14,8 @@ import retrofit2.http.Body;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.HeaderMap;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -28,7 +30,7 @@ import retrofit2.http.Url;
 public interface  ApiService {
 
     @GET()
-    Call<ResponseBody> executGet(@Url String url, @QueryMap Map<String, String> maps);
+    Call<ResponseBody> executGet(@Url String url, @QueryMap Map<String, String> maps, @HeaderMap Map<String, String> headers);
 
     /**
      * 注意:
@@ -43,7 +45,7 @@ public interface  ApiService {
      */
     @FormUrlEncoded
     @POST()
-    Call<ResponseBody> executePost(@Url String url, @FieldMap Map<String, String> map);
+    Call<ResponseBody> executePost(@Url String url, @FieldMap Map<String, String> map,@HeaderMap Map<String, String> headers);
 
 
     /**
@@ -53,18 +55,18 @@ public interface  ApiService {
      * @return
      */
     @POST()
-    Call<ResponseBody> executeJsonPost(@Url String url, @Body RequestBody body);
+    Call<ResponseBody> executeJsonPost(@Url String url, @Body RequestBody body,@HeaderMap Map<String, String> headers);
 
 
 
     @Streaming //流式下载,不加这个注解的话,会整个文件字节数组全部加载进内存,可能导致oom
     @GET
-    Call<ResponseBody> download(@Url String fileUrl);
+    Call<ResponseBody> download(@Url String fileUrl,@HeaderMap Map<String, String> headers);
 
 
     @Multipart
     @POST()
-    Call<ResponseBody> upload(@Url String url,@PartMap Map<String,RequestBody> params,@Part() List<MultipartBody.Part> parts);
+    Call<ResponseBody> upload(@Url String url,@PartMap Map<String,RequestBody> params,@Part() List<MultipartBody.Part> parts,@HeaderMap Map<String, String> headers);
 
 
     /**
@@ -74,7 +76,7 @@ public interface  ApiService {
      * @return
      */
     @POST()
-    Call<ResponseBody> upload(@Url String url,@Body MultipartBody multipartBody);
+    Call<ResponseBody> upload(@Url String url,@Body MultipartBody multipartBody,@HeaderMap Map<String, String> headers);
 
 
     /**
@@ -86,8 +88,9 @@ public interface  ApiService {
      */
     @POST()
     @Multipart
-    Call<ResponseBody> uploadWithProgress(@Url String url,@QueryMap Map<String, String> options,
-                                            @PartMap Map<String, RequestBody> externalFileParameters) ;
+    Call<ResponseBody> uploadWithProgress(@Url String url, @QueryMap Map<String, String> options,
+                                          @PartMap Map<String, RequestBody> externalFileParameters,
+                                          @HeaderMap Map<String, String> headers) ;
 
 
 

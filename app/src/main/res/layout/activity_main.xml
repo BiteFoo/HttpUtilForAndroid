@@ -63,8 +63,27 @@
         android:id="@+id/upload"/>
 
     <Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="post by json"
+    android:id="@+id/postbyjson"/>
+
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="post by json"
-        android:id="@+id/postbyjson"/>
+        android:text="test voice"
+        android:id="@+id/testvoice"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="bind"
+        android:id="@+id/testvoice2"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="unbind"
+        android:id="@+id/unbind"/>
+
 </LinearLayout>

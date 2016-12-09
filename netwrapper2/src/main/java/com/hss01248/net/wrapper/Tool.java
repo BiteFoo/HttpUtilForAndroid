@@ -166,6 +166,8 @@ public class Tool {
 
 
 
+
+
     /**
      * 解析标准json的方法
 
@@ -185,7 +187,11 @@ public class Tool {
                 if(configInfo.isResponseJsonArray()){
                     configInfo.listener.onEmpty();
                 }else {
-                    configInfo.listener.onError("数据为空");
+                    if(configInfo.isSuccessDataEmpty){
+                        configInfo.listener.onSuccess(null,TextUtils.isEmpty(msg)? "请求成功!" :msg);
+                    }else {
+                        configInfo.listener.onError("数据为空");
+                    }
                 }
             }else {
                 try{

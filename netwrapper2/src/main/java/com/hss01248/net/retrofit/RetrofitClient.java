@@ -67,7 +67,7 @@ public class RetrofitClient extends BaseNet<Call> {
                 .retryOnConnectionFailure(true)//重试
                 //.addInterceptor(new ProgressInterceptor())//下载时更新进度
                 .addNetworkInterceptor(new NoCacheInterceptor())//request和resoponse都加上nocache,
-                .addInterceptor(new UseragentInterceptor())
+               // .addInterceptor(new UseragentInterceptor())
                /* .sslSocketFactory(new SSLCertificateSocketFactory(), new X509TrustManager() {
                 })*/
                 .build();
@@ -190,7 +190,7 @@ public class RetrofitClient extends BaseNet<Call> {
             }
         }
 
-        Call<ResponseBody> call = service.uploadWithProgress(configInfo.url,configInfo.params,requestBodyMap);
+        Call<ResponseBody> call = service.uploadWithProgress(configInfo.url,configInfo.params,requestBodyMap,configInfo.headers);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -227,7 +227,7 @@ public class RetrofitClient extends BaseNet<Call> {
         if (serviceDownload == null){
             initDownload();
         }
-        Call<ResponseBody> call = serviceDownload.download(configInfo.url);
+        Call<ResponseBody> call = serviceDownload.download(configInfo.url,configInfo.headers);
         configInfo.listener.registEventBus();
 
         configInfo.tagForCancle = call;
@@ -277,15 +277,15 @@ public class RetrofitClient extends BaseNet<Call> {
     protected <E> Call newCommonStringRequest(final ConfigInfo<E> configInfo) {
         Call<ResponseBody> call;
         if (configInfo.method == HttpMethod.GET){
-            call = service.executGet(configInfo.url,configInfo.params);
+            call = service.executGet(configInfo.url,configInfo.params,configInfo.headers);
         }else if (configInfo.method == HttpMethod.POST){
             if(configInfo.paramsAsJson){//参数在请求体以json的形式发出
                 String jsonStr = MyJson.toJsonStr(configInfo.params);
                 Log.e("dd","jsonstr request:"+jsonStr);
                 RequestBody body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), jsonStr);
-                call = service.executeJsonPost(configInfo.url,body);
+                call = service.executeJsonPost(configInfo.url,body,configInfo.headers);
             }else {
-                call = service.executePost(configInfo.url,configInfo.params);
+                call = service.executePost(configInfo.url,configInfo.params,configInfo.headers);
             }
         }else {
             configInfo.listener.onError("不是get或post方法");//暂时不考虑其他方法

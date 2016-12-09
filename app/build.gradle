@@ -50,4 +50,6 @@ dependencies {
     compile 'com.github.glassLake:MyVolleyPlus:1.0.0'*/
     compile project(path: ':netwrapper2')
     compile 'com.github.orhanobut:logger:1.12'
+
+    compile 'com.mylhyl:acp:1.0.0'
 }

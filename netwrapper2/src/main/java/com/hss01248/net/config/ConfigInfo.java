@@ -11,6 +11,8 @@ import com.hss01248.net.interfaces.INet;
 import com.hss01248.net.wrapper.MyNetApi;
 import com.hss01248.net.wrapper.MyNetListener;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -120,6 +122,15 @@ public class ConfigInfo<T> {
     //是否拼接token
     public boolean isAppendToken = true;
 
+    //状态为成功时,data对应的字段是否为空
+    public boolean isSuccessDataEmpty = true;
+    public ConfigInfo<T> setFailWhenDataIsEmpty(){
+        this.isSuccessDataEmpty = false;
+        return this;
+    }
+
+
+
 
 
     public ConfigInfo<T> setIsAppendToken(boolean isAppendToken){
@@ -129,13 +140,65 @@ public class ConfigInfo<T> {
 
 
 
-    //请求头
-    public Map<String,String> headers ;
+    //请求头  http://tools.jb51.net/table/http_header
+    public Map<String,String> headers = new HashMap<>();
 
-    public ConfigInfo<T> setHeaders(Map<String,String> headers){
+   /* public ConfigInfo<T> setHeaders(Map<String,String> headers){
         this.headers = headers;
         return this;
+    }*/
+
+    public ConfigInfo<T> addHeaderOfContentType(String contentType){
+        this.headers.put("Content-Type",contentType);
+        return this;
     }
+
+    public ConfigInfo<T> addHeaderOfAcceptType(String acceptType){
+        this.headers.put("Accept",acceptType);
+        return this;
+    }
+
+    public ConfigInfo<T> addHeaderOfAuthorization(String authorizationMsg){
+        this.headers.put("Authorization",authorizationMsg);
+        return this;
+    }
+
+    public ConfigInfo<T> addHeaderOfContentLength(long contentLength){
+        this.headers.put("Content-Length",contentLength+"");
+        return this;
+    }
+    public ConfigInfo<T> addHeaderOfContentLength(String contentStr){
+        this.headers.put("Content-Length",contentStr.getBytes().length+"");
+        return this;
+    }
+
+    /**
+     * 文件上传时调用
+     * @param file
+     * @return
+     */
+    public ConfigInfo<T> addHeaderOfContentLength(File file){
+        this.headers.put("Content-Length",file.length()+"");
+        return this;
+    }
+
+
+    public ConfigInfo<T> addHeaderOfRange(long from,long to){
+        this.headers.put("Range","bytes="+from+"-"+to);
+        return this;
+    }
+    public ConfigInfo<T> addHeaderOfUserAgent(String agent){
+        this.headers.put("User-Agent",agent);
+        return this;
+    }
+
+
+
+
+
+
+
+
 
 
 
@@ -236,6 +299,12 @@ public class ConfigInfo<T> {
     //用于取消请求用的
     public Object tagForCancle = "";
 
+    /**
+     *
+     * @param tagForCancle
+     * @return
+
+     */
     public ConfigInfo<T> setTagForCancle(Object tagForCancle){
         this.tagForCancle = tagForCancle;
         return this;
@@ -255,6 +324,8 @@ public class ConfigInfo<T> {
      * @param shouldCacheResponse 是否缓存response  内部已做判断,只会缓存状态是成功的那些请求
      * @param cacheTimeInSeconds 缓存的时间,单位是秒
      * @return
+     *
+
      */
     public ConfigInfo<T> setCacheControl(boolean shouldReadCache,boolean shouldCacheResponse,long cacheTimeInSeconds){
         this.shouldReadCache = shouldReadCache;

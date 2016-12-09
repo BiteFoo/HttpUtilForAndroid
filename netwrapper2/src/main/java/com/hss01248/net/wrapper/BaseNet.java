@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.hss01248.net.cache.ACache;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.HttpMethod;
+import com.hss01248.net.config.NetDefaultConfig;
 import com.hss01248.net.interfaces.ILoginManager;
 import com.hss01248.net.interfaces.INet;
 
@@ -167,6 +168,10 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
         if (getCache(configInfo)){//异步,去拿缓存.
             return configInfo;
         }
+
+        addHeaders(configInfo);//添加请求头
+
+
         T request = generateNewRequest(configInfo);//根据类型生成/执行不同的请求对象
 
         /*
@@ -176,6 +181,54 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
         addToQunue(request);*/
 
         return configInfo;
+    }
+
+    private <E> void addHeaders(ConfigInfo<E> configInfo) {
+        //configInfo.addHeaderOfAuthorization("");
+        configInfo.addHeaderOfAcceptType("application/json");
+        configInfo.addHeaderOfUserAgent(NetDefaultConfig.USER_AGENT);
+
+
+        /*int method = configInfo.method;
+        if(method== HttpMethod.GET){
+            int requestType = configInfo.type;
+            switch (requestType){
+                case ConfigInfo.TYPE_STRING:
+                    break;
+                case ConfigInfo.TYPE_JSON:
+                    break;
+                case ConfigInfo.TYPE_JSON_FORMATTED:
+                    break;
+                case ConfigInfo.TYPE_DOWNLOAD:
+                    break;
+                case ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS:
+                    break;
+                default:break;
+            }
+        }else if (method== HttpMethod.POST){
+            int requestType = configInfo.type;
+            switch (requestType){
+                case ConfigInfo.TYPE_STRING:
+                case ConfigInfo.TYPE_JSON:
+                case ConfigInfo.TYPE_JSON_FORMATTED:
+                    if(configInfo.paramsAsJson){//作为json发送
+                        String jsonStr = MyJson.toJsonStr(configInfo.params);
+                        configInfo.addHeaderOfContentLength(jsonStr);//okhttp是否自动计算?是的,所以无需我们外层计算.
+
+                    }else {//普通&=发送
+
+                    }
+                    break;
+                case ConfigInfo.TYPE_DOWNLOAD:
+                    break;
+                case ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS:
+
+                    break;
+                default:break;
+            }
+        }*/
+
+
     }
 
     private <E> T generateNewRequest(ConfigInfo<E> configInfo) {
