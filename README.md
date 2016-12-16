@@ -14,13 +14,9 @@
 
 缓存完全由客户端自行控制(ACache),利用http请求头来完全屏蔽okhttp的缓存体系
 
-上传和下载的进度回调(填了很大的坑)
-
-指定请求回调的最短时间
+上传和下载的进度回调
 
 自动登录和登录状态接口
-
-
 
 post提交一个json数据
 
@@ -56,15 +52,9 @@ post提交一个json数据
 
 
 
-3.token在header中的情况
-
-4.自定义header时一个个添加怎么实现
-
 5.下载api有时也需要参数(如七牛的加参数的私有链接下载)
 
-6.上传文件时的无参上传api(存在吗?)
-
-7.异步框架改写成Rxjava
+6.异步框架改写成Rxjava
 
 
 
@@ -87,14 +77,13 @@ allprojects {
         maven { url "https://jitpack.io" }
     }
 }
-
 ```
 
 Step 2. Add the dependency
 
 ```java
 dependencies {
-        compile 'com.github.hss01248:NetWrapper:0.1.4'
+        compile 'com.github.hss01248:NetWrapper:1.0.0'
 }
 ```
 
@@ -141,6 +130,10 @@ getCommonJson( String url,  Map map, Class clazz, MyNetListener listener).start(
 download(String url, String savedpath, MyNetListener listener).start()
 
 upLoad(String url, Map<String,String> params,Map<String,String> files, MyNetListener callback).start()
+
+//上传接口没有其他字段,而且文件对应的key为默认("file")时,可使用此简化接口
+upLoad(String url, String filePath, MyNetListener callback)
+
 
 //自动登录相关:
 autoLogin();
@@ -321,4 +314,6 @@ public ConfigInfo<T> setCacheControl(boolean shouldReadCache,boolean shouldCache
 # blog
 
 [基于retrofit的网络框架的终极封装(一):第一层参数组装层的API设计](http://gold.xitu.io/post/583e9c39ac502e006c365801)
+
+[基于retrofit的网络框架的终极封装(二)-与retrofit的对接与解耦,以及遇到的坑](https://gold.xitu.io/post/5843b3e70ce463005778185c)
 

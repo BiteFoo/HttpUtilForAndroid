@@ -9,6 +9,7 @@ import com.hss01248.net.config.NetDefaultConfig;
 import com.hss01248.net.interfaces.ILoginManager;
 import com.hss01248.net.retrofit.RetrofitClient;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -110,5 +111,19 @@ public class MyNetApi {
 
     public static ConfigInfo upLoad(String url, Map<String,String> params,Map<String,String> files, MyNetListener callback){
       return   adapter.upLoad(url,params,files,callback);
+    }
+
+    /**
+     * 上传接口没有其他字段,而且文件对应的key为默认("file")时,可使用此简化接口
+     * @param url
+     * @param filePath
+     * @param callback
+     * @return
+     */
+    public static ConfigInfo upLoad(String url, String filePath, MyNetListener callback){
+        Map<String,String> params = new HashMap<String, String>();
+        Map<String,String> files = new HashMap<String, String>();
+        files.put("file",filePath);
+        return   adapter.upLoad(url,params,files,callback);
     }
 }
