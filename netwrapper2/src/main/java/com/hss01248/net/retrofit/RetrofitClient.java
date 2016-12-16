@@ -1,11 +1,7 @@
 package com.hss01248.net.retrofit;
 
-import android.net.SSLCertificateSocketFactory;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.HttpMethod;
 import com.hss01248.net.config.NetDefaultConfig;
@@ -21,14 +17,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-
-import javax.net.ssl.X509TrustManager;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -172,7 +164,9 @@ public class RetrofitClient extends BaseNet<Call> {
             initUpload();
         }
         configInfo.listener.registEventBus();
-        Map<String, RequestBody> requestBodyMap = new HashMap<>();
+        Map<String, RequestBody> filesMap = new HashMap<>();
+
+        //将文件放进map中
         if (configInfo.files != null && configInfo.files.size() >0){
             Map<String,String> files = configInfo.files;
             int count = files.size();
@@ -185,12 +179,30 @@ public class RetrofitClient extends BaseNet<Call> {
                     String type = Tool.getMimeType(file);
                     Log.e("type","mimetype:"+type);
                     UploadFileRequestBody fileRequestBody = new UploadFileRequestBody(file, type,configInfo.url);
-                    requestBodyMap.put(key+"\"; filename=\"" + file.getName(), fileRequestBody);
+                    filesMap.put(key+"\"; filename=\"" + file.getName(), fileRequestBody);
+                }
+            }
+        }
+        //将key-value放进body中:
+        Map<String, RequestBody> paramsMap = new HashMap<>();
+        if (configInfo.params != null && configInfo.params.size() >0){
+            Map<String,String> params = configInfo.params;
+            int count = params.size();
+            if (count>0){
+                Set<Map.Entry<String,String>> set = params.entrySet();
+                for (Map.Entry<String,String> entry : set){
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    String type = "text/plain";
+                    RequestBody fileRequestBody = RequestBody.create(MediaType.parse(type),value);
+                    paramsMap.put(key, fileRequestBody);
                 }
             }
         }
 
-        Call<ResponseBody> call = service.uploadWithProgress(configInfo.url,configInfo.params,requestBodyMap,configInfo.headers);
+
+
+        Call<ResponseBody> call = serviceUpload.uploadWithProgress(configInfo.url,paramsMap,filesMap,configInfo.headers);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

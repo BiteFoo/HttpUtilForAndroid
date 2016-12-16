@@ -139,7 +139,6 @@ public class MainActivity extends Activity {
             case R.id.get_standard_json:
 
                 /*	聚合api:笑话大全
-
                     sort	string	是	类型，desc:指定时间之前发布的，asc:指定时间之后发布的
                     page	int	否	当前页数,默认1
                     pagesize	int	否	每次返回条数,默认1,最大20
@@ -209,19 +208,19 @@ public class MainActivity extends Activity {
                     @Override
                     public void onProgressChange(long fileSize, long downloadedSize) {
                         super.onProgressChange(fileSize, downloadedSize);
-                        Logger.e("progress:"+downloadedSize);
+                        Logger.e("progress:"+downloadedSize+"--filesize:"+fileSize);
                     }
                 }).setShowLoadingDialog(MainActivity.this,"下载中...").start();
                 break;
             case R.id.upload:
 
                 Map<String,String> map6 = new HashMap<>();
-               // map6.put("uploadFile","1474363536041.jpg");
-               // map6.put("api_secret",app_secert);
+               map6.put("uploadFile555","1474363536041.jpg");
+                map6.put("api_secret777","898767hjk");
 
 
                 Map<String,String> map7 = new HashMap<>();
-                map7.put("uploadFile","/storage/emulated/0/app-debug.apk");///storage/emulated/0/DCIM/1474363536041.jpg  /storage/emulated/0/apkpure_downcc.apk  application/vnd.android.package-archive
+                map7.put("uploadFile","/storage/emulated/0/qxinli.apk");///storage/emulated/0/DCIM/1474363536041.jpg  /storage/emulated/0/apkpure_downcc.apk  application/vnd.android.package-archive
 
                 MyNetApi.upLoad("http://192.168.1.100:8080/gm/file/q_uploadAndroidApk.do",
                         map6,map7, new MyNetListener<String>() {

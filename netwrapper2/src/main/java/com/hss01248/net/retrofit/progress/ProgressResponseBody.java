@@ -61,7 +61,7 @@ public class ProgressResponseBody extends ResponseBody {
                 timeNow = System.currentTimeMillis();
                 if (timeNow - timePre > NetDefaultConfig.PROGRESS_INTERMEDIATE || totalBytesRead == responseBody.contentLength()){//至少300ms才更新一次状态
                     timePre = timeNow;
-                    EventBus.getDefault().post(new ProgressEvent(totalBytesRead,responseBody.contentLength(),
+                    EventBus.getDefault().post(new ProgressEvent(responseBody.contentLength(),totalBytesRead,
                             totalBytesRead == responseBody.contentLength(),url));
                 }
                 return bytesRead;
