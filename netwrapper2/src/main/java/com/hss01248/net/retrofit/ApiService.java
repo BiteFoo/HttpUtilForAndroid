@@ -90,6 +90,9 @@ public interface  ApiService {
                                           @PartMap Map<String, RequestBody> files,
                                           @HeaderMap Map<String, String> headers) ;
 
+    @POST()
+    Call<ResponseBody> uploadWithProgress2(@Url String url, @Body RequestBody body,@HeaderMap Map<String, String> headers) ;
+
 
     /*@POST()
     @Multipart

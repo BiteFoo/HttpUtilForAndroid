@@ -213,11 +213,9 @@ public class MainActivity extends Activity {
                 }).setShowLoadingDialog(MainActivity.this,"下载中...").start();
                 break;
             case R.id.upload:
-
                 Map<String,String> map6 = new HashMap<>();
-               map6.put("uploadFile555","1474363536041.jpg");
+                map6.put("uploadFile555","1474363536041.jpg");
                 map6.put("api_secret777","898767hjk");
-
 
                 Map<String,String> map7 = new HashMap<>();
                 map7.put("uploadFile","/storage/emulated/0/qxinli.apk");///storage/emulated/0/DCIM/1474363536041.jpg  /storage/emulated/0/apkpure_downcc.apk  application/vnd.android.package-archive

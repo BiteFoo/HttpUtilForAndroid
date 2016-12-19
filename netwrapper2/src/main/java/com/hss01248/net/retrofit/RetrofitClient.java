@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -160,6 +161,11 @@ public class RetrofitClient extends BaseNet<Call> {
 
     @Override
     protected  Call newUploadRequest(final ConfigInfo configInfo) {
+        if(configInfo == null){//用于测试第二种方法
+            return  uploadWithProgress2(configInfo);
+        }
+
+
         if (serviceUpload == null){
             initUpload();
         }
@@ -203,6 +209,76 @@ public class RetrofitClient extends BaseNet<Call> {
 
 
         Call<ResponseBody> call = serviceUpload.uploadWithProgress(configInfo.url,paramsMap,filesMap,configInfo.headers);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Tool.dismiss(configInfo.loadingDialog);
+
+                if (response.isSuccessful()){
+                    try {
+                        String string = response.body().string();
+                        configInfo.listener.onSuccess(string,string);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        onFailure(call,e);
+                    }
+
+                }else {
+                    configInfo.listener.onError(response.code()+"");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Tool.dismiss(configInfo.loadingDialog);
+                configInfo.listener.onError(t.toString());
+            }
+        });
+
+        return call;
+
+    }
+
+    public Call uploadWithProgress2(final ConfigInfo configInfo){
+
+        if (serviceUpload == null){
+            initUpload();
+        }
+        configInfo.listener.registEventBus();
+
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+
+        if (configInfo.params != null && configInfo.params.size() >0){
+            Map<String,String> params = configInfo.params;
+            int count = params.size();
+            if (count>0){
+                Set<Map.Entry<String,String>> set = params.entrySet();
+                for (Map.Entry<String,String> entry : set){
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    builder.addFormDataPart(key,value);
+                }
+            }
+        }
+
+        if (configInfo.files != null && configInfo.files.size() >0){
+            Map<String,String> files = configInfo.files;
+            int count = files.size();
+            if (count>0){
+                Set<Map.Entry<String,String>> set = files.entrySet();
+                for (Map.Entry<String,String> entry : set){
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    File file = new File(value);
+                    String type = Tool.getMimeType(file);
+                    UploadFileRequestBody fileRequestBody = new UploadFileRequestBody(file, type,configInfo.url);
+                    builder.addFormDataPart(key,file.getName(),fileRequestBody);
+                }
+            }
+        }
+
+        MultipartBody body = builder.build();
+        Call<ResponseBody> call = serviceUpload.uploadWithProgress2(configInfo.url,body,configInfo.headers);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
