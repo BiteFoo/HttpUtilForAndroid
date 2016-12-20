@@ -4,11 +4,14 @@ import android.util.Log;
 
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.HttpMethod;
+import com.hss01248.net.config.HttpsConfig;
 import com.hss01248.net.config.NetDefaultConfig;
+import com.hss01248.net.retrofit.https.HttpsUtil;
 import com.hss01248.net.retrofit.progress.ProgressInterceptor;
 import com.hss01248.net.retrofit.progress.UploadFileRequestBody;
 import com.hss01248.net.wrapper.BaseNet;
 import com.hss01248.net.wrapper.MyJson;
+import com.hss01248.net.wrapper.MyNetApi;
 import com.hss01248.net.wrapper.Tool;
 import com.litesuits.android.async.SimpleTask;
 
@@ -55,6 +58,13 @@ public class RetrofitClient extends BaseNet<Call> {
         //并且只能够接受ResponseBody类型的参数作为@body
 
         OkHttpClient.Builder httpBuilder=new OkHttpClient.Builder();
+
+        //https:
+        setHttps(httpBuilder);
+
+
+
+
         OkHttpClient client=httpBuilder.readTimeout(15, TimeUnit.SECONDS)
                 .connectTimeout(10, TimeUnit.SECONDS).writeTimeout(15, TimeUnit.SECONDS) //设置超时
                 .retryOnConnectionFailure(true)//重试
@@ -75,6 +85,18 @@ public class RetrofitClient extends BaseNet<Call> {
         service = retrofit.create(ApiService.class);
     }
 
+    private void setHttps(OkHttpClient.Builder httpBuilder) {
+        if(HttpsConfig.certificates != null && HttpsConfig.certificates.size()>0){
+            httpBuilder.socketFactory(HttpsUtil.getSSLSocketFactory(MyNetApi.context, HttpsConfig.certificates));
+        }
+
+        if(HttpsConfig.hostUrls != null &&  HttpsConfig.hostUrls.size() >0){
+            httpBuilder.hostnameVerifier(HttpsUtil.getHostnameVerifier(HttpsConfig.hostUrls));
+        }
+
+
+    }
+
     private static RetrofitClient instance;
 
     private RetrofitClient(){
@@ -84,12 +106,12 @@ public class RetrofitClient extends BaseNet<Call> {
 
     private void initDownload() {
         OkHttpClient.Builder httpBuilder=new OkHttpClient.Builder();
+        setHttps(httpBuilder);
         OkHttpClient client=httpBuilder.readTimeout(0, TimeUnit.SECONDS)
                 .connectTimeout(30, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
                 .retryOnConnectionFailure(false)//重试
                 .addInterceptor(new UseragentInterceptor())
                 .addInterceptor(new ProgressInterceptor())//下载时更新进度
-
                 .build();
 
         retrofitDownload = new Retrofit
@@ -104,6 +126,7 @@ public class RetrofitClient extends BaseNet<Call> {
 
     private void initUpload() {
         OkHttpClient.Builder httpBuilder=new OkHttpClient.Builder();
+        setHttps(httpBuilder);
         OkHttpClient client=httpBuilder.readTimeout(0, TimeUnit.SECONDS)
                 .connectTimeout(0, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
                 .retryOnConnectionFailure(false)//重试

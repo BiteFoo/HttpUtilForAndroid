@@ -5,10 +5,12 @@ import android.util.Log;
 
 import com.hss01248.net.config.BaseNetBean;
 import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.config.HttpsConfig;
 import com.hss01248.net.config.NetDefaultConfig;
 import com.hss01248.net.interfaces.ILoginManager;
 import com.hss01248.net.retrofit.RetrofitClient;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +40,7 @@ public class MyNetApi {
 
     /**
      * 指定标准格式json的三个字段.比如聚合api的三个字段分别是error_code(但有的又是resultcode),reason,result,error_code
+     * 如果几个code没有,可以设为负值
      * @param tokenName
      * @param data
      * @param code
@@ -54,7 +57,22 @@ public class MyNetApi {
         BaseNetBean.CODE_SUCCESS = codeSuccess;
         BaseNetBean.CODE_UNLOGIN = codeUnlogin;
         BaseNetBean.CODE_UN_FOUND = codeUnfound;
+    }
 
+    /**
+     * 添加
+     * @param hostUrl
+     * @param cerFileInRaw  证书要放在raw目录下
+     */
+    public static void initAddHttps(String hostUrl,int cerFileInRaw){
+        if(HttpsConfig.hostUrls == null ){
+            HttpsConfig.hostUrls = new ArrayList<>();
+        }
+        HttpsConfig.hostUrls.add(hostUrl);
+        if(HttpsConfig.certificates == null ){
+            HttpsConfig.certificates = new ArrayList<>();
+        }
+        HttpsConfig.certificates.add(cerFileInRaw);
     }
 
 

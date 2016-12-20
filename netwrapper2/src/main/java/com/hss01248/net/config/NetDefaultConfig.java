@@ -28,6 +28,9 @@ public class NetDefaultConfig {
     public static  String KEY_CODE = "code";
     public static  String KEY_MSG = "msg";
 
+    //https
+
+
 
     /**
      * copy自volley

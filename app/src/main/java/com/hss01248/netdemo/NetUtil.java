@@ -35,6 +35,10 @@ public class NetUtil {
        MyNetApi.initAppDefault(tokenName,data,code,msg,codeSuccess,codeUnlogin,codeUnfound);
     }
 
+    public static void initAddHttps(String hostUrl,int cerFileInRaw){
+        MyNetApi.initAddHttps(hostUrl,cerFileInRaw);
+    }
+
 
     public static ConfigInfo getString(String url, Map map, MyNetListener listener) {
         return MyNetApi.getString(url,map,listener);

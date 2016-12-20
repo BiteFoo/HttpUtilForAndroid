@@ -78,6 +78,8 @@ public class MainActivity extends Activity {
         });
 
         NetUtil.initAppDefault("session_id","data","code","msg",0,5,2);
+        NetUtil.initAddHttps("https://kyfw.12306.cn",R.raw.srca);
+
     }
 
     @OnClick({R.id.get_string, R.id.post_string, R.id.get_json, R.id.post_json, R.id.get_standard_json,
@@ -85,7 +87,7 @@ public class MainActivity extends Activity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.get_string:
-                MyNetApi.getString("http://www.qxinli.com/Application/about/androidAbout.html", new HashMap(),  new MyNetListener<String>() {
+                MyNetApi.getString("https://kyfw.12306.cn/otn/regist/init", new HashMap(),  new MyNetListener<String>() {
                     @Override
                     public void onSuccess(String response, String resonseStr) {
                         Logger.e(response);
@@ -95,6 +97,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void onError(String error) {
                         super.onError(error);
+                        Logger.e(error);
                     }
                 }).start();
                 break;
