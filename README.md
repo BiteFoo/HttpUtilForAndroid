@@ -8,7 +8,7 @@
 
 # update
 
-
+[点击查看更新日志](https://github.com/hss01248/NetWrapper/blob/master/updatelog.md)
 
 
 
@@ -21,6 +21,8 @@
 自动登录和登录状态接口
 
 post提交一个json数据
+
+对https的支持:全局配证书或者单个请求忽略校验
 
 
 
