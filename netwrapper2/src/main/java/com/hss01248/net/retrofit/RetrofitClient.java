@@ -53,6 +53,14 @@ public class RetrofitClient extends BaseNet<Call> {
     ApiService serviceUpload;
     Retrofit retrofitUpload;
 
+    //完全忽略证书校验的client,用于某些额外的单次请求中
+    ApiService serviceIgnoreSSL;
+    Retrofit retrofitIgnoreSSL;
+
+
+
+
+
     private void init() {
         //默认情况下，Retrofit只能够反序列化Http体为OkHttp的ResponseBody类型
         //并且只能够接受ResponseBody类型的参数作为@body
@@ -61,8 +69,6 @@ public class RetrofitClient extends BaseNet<Call> {
 
         //https:
         setHttps(httpBuilder);
-
-
 
 
         OkHttpClient client=httpBuilder.readTimeout(15, TimeUnit.SECONDS)
@@ -87,12 +93,10 @@ public class RetrofitClient extends BaseNet<Call> {
 
     private void setHttps(OkHttpClient.Builder httpBuilder) {
         if(HttpsConfig.certificates != null && HttpsConfig.certificates.size()>0){
-            httpBuilder.socketFactory(HttpsUtil.getSSLSocketFactory(MyNetApi.context, HttpsConfig.certificates));
+            httpBuilder.sslSocketFactory(HttpsUtil.getSSLSocketFactory(MyNetApi.context, HttpsConfig.certificates));
         }
 
-        if(HttpsConfig.hostUrls != null &&  HttpsConfig.hostUrls.size() >0){
-            httpBuilder.hostnameVerifier(HttpsUtil.getHostnameVerifier(HttpsConfig.hostUrls));
-        }
+
 
 
     }
@@ -140,14 +144,34 @@ public class RetrofitClient extends BaseNet<Call> {
                 })*/
                 .build();
 
-        retrofitUpload = new Retrofit
+        retrofitDownload = new Retrofit
                 .Builder()
                 .baseUrl(NetDefaultConfig.baseUrl)
                 .client(client)
                 .build();
 
-        serviceUpload = retrofitUpload.create(ApiService.class);
+        serviceDownload = retrofitUpload.create(ApiService.class);
     }
+
+
+    private void initSSLIgnore() {
+        OkHttpClient.Builder httpBuilder=new OkHttpClient.Builder();
+        HttpsUtil.setAllCerPass(httpBuilder);
+        OkHttpClient client=httpBuilder.readTimeout(0, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
+                .retryOnConnectionFailure(false)//重试
+                .build();
+
+        retrofitIgnoreSSL = new Retrofit
+                .Builder()
+                .baseUrl(NetDefaultConfig.baseUrl)
+                .client(client)
+                .build();
+
+        serviceIgnoreSSL = retrofitIgnoreSSL.create(ApiService.class);
+    }
+
+
 
     public static  RetrofitClient getInstance(){
         if (instance == null){
@@ -188,10 +212,22 @@ public class RetrofitClient extends BaseNet<Call> {
             return  uploadWithProgress2(configInfo);
         }
 
+        ApiService service = null;
 
-        if (serviceUpload == null){
-            initUpload();
+        if(configInfo.isIgnoreCer()){
+            if(serviceIgnoreSSL == null){
+                initSSLIgnore();
+            }
+            service = serviceIgnoreSSL;
+        }else {
+            if (serviceUpload == null){
+                initUpload();
+            }
+            service = serviceUpload;
         }
+
+
+
         configInfo.listener.registEventBus();
         Map<String, RequestBody> filesMap = new HashMap<>();
 
@@ -231,7 +267,7 @@ public class RetrofitClient extends BaseNet<Call> {
 
 
 
-        Call<ResponseBody> call = serviceUpload.uploadWithProgress(configInfo.url,paramsMap,filesMap,configInfo.headers);
+        Call<ResponseBody> call = service.uploadWithProgress(configInfo.url,paramsMap,filesMap,configInfo.headers);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -264,8 +300,18 @@ public class RetrofitClient extends BaseNet<Call> {
 
     public Call uploadWithProgress2(final ConfigInfo configInfo){
 
-        if (serviceUpload == null){
-            initUpload();
+        ApiService service = null;
+
+        if(configInfo.isIgnoreCer()){
+            if(serviceIgnoreSSL == null){
+                initSSLIgnore();
+            }
+            service = serviceIgnoreSSL;
+        }else {
+            if (serviceUpload == null){
+                initUpload();
+            }
+            service = serviceUpload;
         }
         configInfo.listener.registEventBus();
 
@@ -301,7 +347,7 @@ public class RetrofitClient extends BaseNet<Call> {
         }
 
         MultipartBody body = builder.build();
-        Call<ResponseBody> call = serviceUpload.uploadWithProgress2(configInfo.url,body,configInfo.headers);
+        Call<ResponseBody> call = service.uploadWithProgress2(configInfo.url,body,configInfo.headers);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -334,11 +380,21 @@ public class RetrofitClient extends BaseNet<Call> {
 
     @Override
     protected  Call newDownloadRequest(final ConfigInfo configInfo) {
-        final long time = System.currentTimeMillis();
-        if (serviceDownload == null){
-            initDownload();
+
+        ApiService service = null;
+
+        if(configInfo.isIgnoreCer()){
+            if(serviceIgnoreSSL == null){
+                initSSLIgnore();
+            }
+            service = serviceIgnoreSSL;
+        }else {
+            if (serviceDownload == null){
+                initUpload();
+            }
+            service = serviceDownload;
         }
-        Call<ResponseBody> call = serviceDownload.download(configInfo.url,configInfo.headers);
+        Call<ResponseBody> call = service.download(configInfo.url,configInfo.headers);
         configInfo.listener.registEventBus();
 
         configInfo.tagForCancle = call;
@@ -386,17 +442,38 @@ public class RetrofitClient extends BaseNet<Call> {
 
     @Override
     protected <E> Call newCommonStringRequest(final ConfigInfo<E> configInfo) {
+
+
+        ApiService service2 = null;
+
+        if(configInfo.isIgnoreCer()){
+            if(serviceIgnoreSSL == null){
+                initSSLIgnore();
+            }
+            service2 = serviceIgnoreSSL;
+        }else {
+            if (service == null){
+                init();
+            }
+            service2 = service;
+        }
+
+
+
+
+
+
         Call<ResponseBody> call;
         if (configInfo.method == HttpMethod.GET){
-            call = service.executGet(configInfo.url,configInfo.params,configInfo.headers);
+            call = service2.executGet(configInfo.url,configInfo.params,configInfo.headers);
         }else if (configInfo.method == HttpMethod.POST){
             if(configInfo.paramsAsJson){//参数在请求体以json的形式发出
                 String jsonStr = MyJson.toJsonStr(configInfo.params);
                 Log.e("dd","jsonstr request:"+jsonStr);
                 RequestBody body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), jsonStr);
-                call = service.executeJsonPost(configInfo.url,body,configInfo.headers);
+                call = service2.executeJsonPost(configInfo.url,body,configInfo.headers);
             }else {
-                call = service.executePost(configInfo.url,configInfo.params,configInfo.headers);
+                call = service2.executePost(configInfo.url,configInfo.params,configInfo.headers);
             }
         }else {
             configInfo.listener.onError("不是get或post方法");//暂时不考虑其他方法
@@ -415,22 +492,12 @@ public class RetrofitClient extends BaseNet<Call> {
                 final E bean = gson.fromJson(string,objectType);
                 configInfo.listener.onSuccess(bean,string);*/
 
-
-
                 if (!response.isSuccessful()){
                             configInfo.listener.onCodeError("http错误码为:"+response.code(),response.message(),response.code());
                     Tool.dismiss(configInfo.loadingDialog);
                     return;
                 }
                 String string = "";
-
-
-
-
-
-
-
-
 
                 try {
                     string =  response.body().string();

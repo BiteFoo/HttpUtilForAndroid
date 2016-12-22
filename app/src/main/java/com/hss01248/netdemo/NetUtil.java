@@ -35,8 +35,8 @@ public class NetUtil {
        MyNetApi.initAppDefault(tokenName,data,code,msg,codeSuccess,codeUnlogin,codeUnfound);
     }
 
-    public static void initAddHttps(String hostUrl,int cerFileInRaw){
-        MyNetApi.initAddHttps(hostUrl,cerFileInRaw);
+    public static void initAddHttps(int cerFileInRaw){
+        MyNetApi.addCer(cerFileInRaw);
     }
 
 

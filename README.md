@@ -85,7 +85,7 @@ Step 2. Add the dependency
 
 ```java
 dependencies {
-        compile 'com.github.hss01248:NetWrapper:1.0.0'
+        compile 'com.github.hss01248:NetWrapper:1.0.1'
 }
 ```
 

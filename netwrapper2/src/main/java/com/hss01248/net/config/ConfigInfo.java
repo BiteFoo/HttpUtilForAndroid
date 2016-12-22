@@ -3,12 +3,9 @@ package com.hss01248.net.config;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.text.TextUtils;
 
-
 import com.hss01248.net.interfaces.INet;
-import com.hss01248.net.wrapper.MyNetApi;
 import com.hss01248.net.wrapper.MyNetListener;
 
 import java.io.File;
@@ -64,6 +61,20 @@ public class ConfigInfo<T> {
     public ConfigInfo<T> setParamsAsJson() {
         this.paramsAsJson = true;
         return this;
+    }
+
+
+//本次请求是否忽略证书校验--也就是通过所有证书.
+// 这个属性没有全局配置,也不建议全局配置. 如果是自签名,放置证书到raw下,并在初始化前addCer方法,即可全局使用https
+    private boolean ignoreCer = false;
+
+    public ConfigInfo<T> setIgnoreCer() {
+        this.ignoreCer = true;
+        return this;
+    }
+
+    public boolean isIgnoreCer() {
+        return ignoreCer;
     }
 
 

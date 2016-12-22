@@ -23,6 +23,23 @@ public class MyNetApi {
     public static BaseNet adapter;
 
 
+    /**
+     * 添加证书.如果有,一定要在init方法前面调用:在init方法后面调用无效
+     * @param cerFileInRaw  证书要放在raw目录下
+     */
+    public static void addCer(int cerFileInRaw){
+        if(HttpsConfig.certificates == null ){
+            HttpsConfig.certificates = new ArrayList<>();
+        }
+        HttpsConfig.certificates.add(cerFileInRaw);
+    }
+
+    /**
+     * 注意:如果要添加https的自签名证书,一定要在此方法之前调用addcer方法
+     * @param context
+     * @param baseUrl
+     * @param loginManager
+     */
     public static void init(Context context,String baseUrl,ILoginManager loginManager){
         MyNetApi.context = context;
         NetDefaultConfig.baseUrl = baseUrl;
@@ -59,21 +76,7 @@ public class MyNetApi {
         BaseNetBean.CODE_UN_FOUND = codeUnfound;
     }
 
-    /**
-     * 添加
-     * @param hostUrl
-     * @param cerFileInRaw  证书要放在raw目录下
-     */
-    public static void initAddHttps(String hostUrl,int cerFileInRaw){
-        if(HttpsConfig.hostUrls == null ){
-            HttpsConfig.hostUrls = new ArrayList<>();
-        }
-        HttpsConfig.hostUrls.add(hostUrl);
-        if(HttpsConfig.certificates == null ){
-            HttpsConfig.certificates = new ArrayList<>();
-        }
-        HttpsConfig.certificates.add(cerFileInRaw);
-    }
+
 
 
     public static ConfigInfo getString(String url, Map map, MyNetListener listener) {

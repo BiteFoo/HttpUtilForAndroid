@@ -9,6 +9,5 @@ import java.util.List;
 public class HttpsConfig {
 
     public static List<Integer> certificates;
-    public static List<String> hostUrls;
 
 }

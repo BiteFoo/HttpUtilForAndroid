@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         Logger.init("netapi");
+       // NetUtil.initAddHttps(R.raw.srca);//添加12306的证书
         NetUtil.init(this,"http://www.qxinli.com:9001/api/", new ILoginManager() {
             @Override
             public boolean isLogin() {
@@ -78,7 +79,7 @@ public class MainActivity extends Activity {
         });
 
         NetUtil.initAppDefault("session_id","data","code","msg",0,5,2);
-        NetUtil.initAddHttps("https://kyfw.12306.cn",R.raw.srca);
+
 
     }
 
@@ -99,7 +100,7 @@ public class MainActivity extends Activity {
                         super.onError(error);
                         Logger.e(error);
                     }
-                }).start();
+                }).setIgnoreCer().start();
                 break;
             case R.id.post_string:
                 Map<String,String> map = new HashMap<>();
@@ -194,7 +195,7 @@ public class MainActivity extends Activity {
                 break;
             case R.id.download:
                 File dir = Environment.getExternalStorageDirectory();
-                final File file = new File(dir,"qxinli.apk");
+                final File file = new File(dir,"2.jpg");
                 if (file.exists()){
                     try {
                         file.createNewFile();
@@ -202,7 +203,9 @@ public class MainActivity extends Activity {
                         e.printStackTrace();
                     }
                 }
-                MyNetApi.download("http://www.qxinli.com/download/qxinli.apk", file.getAbsolutePath(), new MyNetListener() {
+                String url = "https://travel.12306.cn/imgs/resources/uploadfiles/images/fed7d5b4-37d3-4f32-bacc-e9b942cb721d_product_W572_H370.jpg";
+                String url2 = "http://test.qxinli.com/download/qxinli.apk";
+                MyNetApi.download(url, file.getAbsolutePath(), new MyNetListener() {
                     @Override
                     public void onSuccess(Object response, String onSuccess) {
                         Logger.e("onSuccess:"+onSuccess);
@@ -213,7 +216,13 @@ public class MainActivity extends Activity {
                         super.onProgressChange(fileSize, downloadedSize);
                         Logger.e("progress:"+downloadedSize+"--filesize:"+fileSize);
                     }
-                }).setShowLoadingDialog(MainActivity.this,"下载中...").start();
+
+                    @Override
+                    public void onError(String msgCanShow) {
+                        super.onError(msgCanShow);
+                        Logger.e(msgCanShow);
+                    }
+                }).setShowLoadingDialog(MainActivity.this,"下载中...").setIgnoreCer().start();
                 break;
             case R.id.upload:
                 Map<String,String> map6 = new HashMap<>();
