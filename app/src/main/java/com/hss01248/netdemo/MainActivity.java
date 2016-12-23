@@ -81,6 +81,14 @@ public class MainActivity extends Activity {
         NetUtil.initAppDefault("session_id","data","code","msg",0,5,2);
 
 
+
+
+
+
+
+
+
+
     }
 
     @OnClick({R.id.get_string, R.id.post_string, R.id.get_json, R.id.post_json, R.id.get_standard_json,

@@ -43,7 +43,7 @@ public class MyNetApi {
     public static void init(Context context,String baseUrl,ILoginManager loginManager){
         MyNetApi.context = context;
         NetDefaultConfig.baseUrl = baseUrl;
-        MyNetApi.adapter = RetrofitClient.getInstance();
+        MyNetApi.adapter = RetrofitClient.getInstance();//如果要使用rxjava,将RetrofitClient改成RxRetrofitClient即可.
         if (loginManager instanceof  BaseNet){
             throw  new RuntimeException("please implement ILoginManager independently");
             //避免可能的无限循环调用
