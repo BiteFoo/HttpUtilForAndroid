@@ -95,10 +95,6 @@ public class RetrofitClient extends BaseNet<Call> {
         if(HttpsConfig.certificates != null && HttpsConfig.certificates.size()>0){
             httpBuilder.sslSocketFactory(HttpsUtil.getSSLSocketFactory(MyNetApi.context, HttpsConfig.certificates));
         }
-
-
-
-
     }
 
     private static RetrofitClient instance;
@@ -289,8 +285,10 @@ public class RetrofitClient extends BaseNet<Call> {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Tool.dismiss(configInfo.loadingDialog);
-                configInfo.listener.onError(t.toString());
+
+
+               Tool.handleError(t,configInfo);
+
             }
         });
 
@@ -369,8 +367,7 @@ public class RetrofitClient extends BaseNet<Call> {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Tool.dismiss(configInfo.loadingDialog);
-                configInfo.listener.onError(t.toString());
+                Tool.handleError(t,configInfo);
             }
         });
 
@@ -431,8 +428,9 @@ public class RetrofitClient extends BaseNet<Call> {
             @Override
             public void onFailure(Call<ResponseBody> call, final Throwable t) {
 
-                        configInfo.listener.onError(t.toString());
-                Tool.dismiss(configInfo.loadingDialog);
+
+
+                Tool.handleError(t,configInfo);
 
             }
         });
@@ -515,8 +513,7 @@ public class RetrofitClient extends BaseNet<Call> {
             @Override
             public void onFailure(Call<ResponseBody> call, final Throwable t) {
 
-                        configInfo.listener.onError(t.toString());
-                Tool.dismiss(configInfo.loadingDialog);
+                Tool.handleError(t,configInfo);
             }
         });
         return call;

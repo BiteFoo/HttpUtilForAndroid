@@ -158,18 +158,27 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
             Tool.addToken(configInfo.params);
         }
 
-        if (configInfo.loadingDialog != null && !configInfo.loadingDialog.isShowing()){
-            try {//预防badtoken最简便和直接的方法
-                configInfo.loadingDialog.show();
-            }catch (Exception e){
-            }
-        }
+
 
         if (getCache(configInfo)){//异步,去拿缓存.
             return configInfo;
         }
 
+        //没有网络时,直接返回错误
+        if(!Tool.isNetworkAvailable()){
+            configInfo.listener.onNoNetwork();
+            return configInfo;
+        }
+
         addHeaders(configInfo);//添加请求头
+
+        if (configInfo.loadingDialog != null && !configInfo.loadingDialog.isShowing()){
+            try {//预防badtoken最简便和直接的方法
+                configInfo.loadingDialog.show();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
 
         T request = generateNewRequest(configInfo);//根据类型生成/执行不同的请求对象

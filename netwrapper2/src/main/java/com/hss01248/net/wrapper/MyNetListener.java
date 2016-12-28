@@ -29,6 +29,14 @@ public abstract class MyNetListener<T> implements IListener<T> {
 
     public void onPreExecute() {}
 
+    public void onNoNetwork(){
+        onError("当前没有网络");
+    }
+
+    public void onTimeout(){
+        onError("连接超时,请检查网络");
+    }
+
 
 
     /** Called when response success. */

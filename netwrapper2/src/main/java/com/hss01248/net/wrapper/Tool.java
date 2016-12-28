@@ -2,6 +2,9 @@ package com.hss01248.net.wrapper;
 
 import android.app.Dialog;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -40,6 +43,34 @@ public class Tool {
             map.put(NetDefaultConfig.TOKEN, NetDefaultConfig.getToken());//每一个请求都传递sessionid
         }
 
+    }
+
+    public static void handleError(Throwable t,ConfigInfo configInfo){
+        dismiss(configInfo.loadingDialog);
+        String str = t.toString();
+        if(str.contains("timeout")){
+            configInfo.listener.onTimeout();
+        }else {
+            configInfo.listener.onError(str);
+        }
+    }
+
+    public static boolean isNetworkAvailable() {
+        ConnectivityManager connectivity = (ConnectivityManager) MyNetApi.context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo info = connectivity.getActiveNetworkInfo();
+            if (info != null && info.isConnected())
+            {
+                // 当前网络是连接的
+                if (info.getState() == NetworkInfo.State.CONNECTED)
+                {
+                    // 当前所连接的网络可用
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
