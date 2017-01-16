@@ -2,6 +2,7 @@ package com.hss01248.net.config;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.text.TextUtils;
 
@@ -45,6 +46,7 @@ public class ConfigInfo<T> {
     public int code_unFound;
 
     public boolean isCustomCodeSet;
+    private String savedPath;
 
     public boolean isResponseJsonArray() {
         return isResponseJsonArray;
@@ -280,6 +282,7 @@ public class ConfigInfo<T> {
                 try {
                     this.loadingDialog = ProgressDialog.show(activity, "", msg,false, true);
                 }catch (Exception e){
+                    e.printStackTrace();
 
                 }
             }
@@ -346,8 +349,6 @@ public class ConfigInfo<T> {
 
     }
 
-
-
     public boolean isFromCache = false;//内部控制,不让外部设置
 
     //優先級,备用 volley使用
@@ -410,5 +411,351 @@ public class ConfigInfo<T> {
         HIGH,
         IMMEDIATE
     }*/
+
+
+    /**
+     * 以下是更新的版本的api
+    * */
+
+    public ConfigInfo<T> addParams(String key,String value){
+        if(params == null){
+            params = new HashMap<>();
+        }
+        params.put(key,value);
+        return this;
+    }
+
+    public ConfigInfo<T> addFile(String desc,String filePath){
+        if(files == null){
+            files = new HashMap<>();
+        }
+        files.put(desc,filePath);
+        return this;
+    }
+
+    public ConfigInfo<T> get(){
+        method = NetDefaultConfig.Method.GET;
+        client.start(this);
+        return this;
+    }
+    public ConfigInfo<T> post(){
+        method = NetDefaultConfig.Method.POST;
+        client.start(this);
+        return this;
+    }
+
+    public ConfigInfo<T> callback(MyNetListener<T> listener){
+        this.listener = listener;
+        return this;
+    }
+
+    public ConfigInfo<T> url(String url ){
+        this.url = url;
+        return this;
+    }
+
+    public ConfigInfo<T> savedPath(String path ){
+        this.savedPath = path;
+        return this;
+    }
+
+
+    /**
+     * 每个请求都会有的共性设置
+     * @param <T>
+     */
+    class BaseNetBuilder<T>{
+        private Map<String,String> params;
+        private Map<String,String> headers;
+        private MyNetListener<T> listener;
+        private String url;
+
+
+        //todo 以下是http请求基本组成
+        public BaseNetBuilder<T> addHeader(String key,String value){
+            if(headers == null){
+                headers = new HashMap<>();
+            }
+            headers.put(key,value);
+            return this;
+        }
+
+        public BaseNetBuilder<T> addParams(String key,String value){
+            if(params == null){
+                params = new HashMap<>();
+            }
+            params.put(key,value);
+            return this;
+        }
+
+        public BaseNetBuilder<T> callback(MyNetListener<T> listener){
+            this.listener = listener;
+            return this;
+        }
+
+        public BaseNetBuilder<T> url(String url ){
+            this.url = url;
+            return this;
+        }
+
+        public BaseNetBuilder<T> get(){
+            method = NetDefaultConfig.Method.GET;
+            //client.start(this);
+            return this;
+        }
+
+        public BaseNetBuilder<T> post(){
+            method = NetDefaultConfig.Method.POST;
+           // client.start(this);
+            return this;
+        }
+
+
+
+        //TODO 以下是UI显示控制
+        private Dialog loadingDialog;
+        public BaseNetBuilder<T> setShowLoadingDialog( Activity activity,String loadingMsg){
+            return setShowLoadingDialog(null,loadingMsg,activity);
+        }
+        /**
+         *
+         * @return
+         */
+        public BaseNetBuilder<T> setShowLoadingDialog(Dialog loadingDialog){
+
+            return  setShowLoadingDialog(loadingDialog,"",null);
+        }
+
+        private BaseNetBuilder<T> setShowLoadingDialog(Dialog loadingDialog, String msg, Activity activity){
+            if (loadingDialog == null){
+                if (TextUtils.isEmpty(msg)){
+                    msg = "加载中...";
+                }
+                if (activity == null){
+                    this.loadingDialog = null;//todo 生成dialog,先不显示
+                }else {
+                    try {
+                        this.loadingDialog = ProgressDialog.show(activity, "", msg,false, true);
+                    }catch (Exception e){
+                        e.printStackTrace();
+
+                    }
+                }
+
+            }else {
+                this.loadingDialog = loadingDialog;
+            }
+
+      /*  this.isForceMinTime = true;
+
+        if (minTime >NetDefaultConfig.TIME_MINI){
+            this.minTime = minTime;
+        }else {
+            this.minTime = NetDefaultConfig.TIME_MINI;
+        }*/
+
+            return this;
+        }
+
+        //todo 以下是缓存控制策略
+        public boolean shouldReadCache = false;
+        public boolean shouldCacheResponse = false;
+        public long cacheTime = NetDefaultConfig.CACHE_TIME; //单位秒
+        public boolean isFromCache = false;//内部控制,不让外部设置
+        /**
+         * 只支持String和json类型的请求,不支持文件下载的缓存.
+         * @param shouldReadCache 是否先去读缓存
+         * @param shouldCacheResponse 是否缓存response  内部已做判断,只会缓存状态是成功的那些请求
+         * @param cacheTimeInSeconds 缓存的时间,单位是秒
+         * @return
+         *
+
+         */
+        public BaseNetBuilder<T> setCacheControl(boolean shouldReadCache,boolean shouldCacheResponse,long cacheTimeInSeconds){
+            this.shouldReadCache = shouldReadCache;
+            this.shouldCacheResponse = shouldCacheResponse;
+            this.cacheTime = cacheTimeInSeconds;
+            return this;
+
+        }
+
+
+
+
+        //todo 以下是超时以及重试策略
+        private int retryCount = NetDefaultConfig.RETRY_TIME;
+        private int timeout = NetDefaultConfig.TIME_OUT;
+
+        public BaseNetBuilder<T> setRetryCount(int retryCount){
+            this.retryCount = retryCount;
+            return this;
+        }
+
+        public BaseNetBuilder<T> setTimeout(int timeoutInMills){
+            this.timeout = timeoutInMills;
+            return this;
+        }
+
+        //TODO https自签名证书的处理策略
+        private boolean ignoreCer = false;
+
+        public BaseNetBuilder<T> setIgnoreCer() {
+            this.ignoreCer = true;
+            return this;
+        }
+
+        public boolean isIgnoreCer() {
+            return ignoreCer;
+        }
+
+
+
+        //TODO token身份验证字段的拼接
+       public boolean isAppendToken = false;//默认没有token验证
+        public boolean isInHeaderOrParam = false;//默认在参数体中传递
+        public BaseNetBuilder<T> setIsAppendToken(boolean isAppendToken,boolean isInHeaderOrParam){
+            this.isAppendToken = isAppendToken;
+            this.isInHeaderOrParam = isInHeaderOrParam;
+            return this;
+        }
+
+
+
+
+
+    }
+
+    class StringRequestBuilder<T> extends BaseNetBuilder{
+
+        //todo 请求以什么形式,key=value&key=value还是json形式
+        public boolean paramsAsJson = false;
+        public StringRequestBuilder<T> setParamsAsJson() {
+            this.paramsAsJson = true;
+            return this;
+        }
+
+
+
+
+
+
+    }
+
+    class JsonRequestBuilder<T> extends StringRequestBuilder{
+
+        public Class<T> clazz;
+        public JsonRequestBuilder<T> setJsonClazz(Class<T> clazz) {
+            this.clazz = clazz;
+            return this;
+        }
+
+
+        //TODO 预期的响应是否为arr
+        private boolean isResponseJsonArray = false;
+        public JsonRequestBuilder<T> setResponseJsonArray() {
+            isResponseJsonArray = true;
+            return this;
+        }
+
+
+
+    }
+    class StandardJsonRequestBuilder<T> extends JsonRequestBuilder{
+
+        //todo 设置标准格式json本次响应的不同字段
+        public String key_data = "";
+        public String key_code = "";
+        public String key_msg = "";
+        // public String key_isSuccess = "";
+
+        public int code_success;
+        public int code_unlogin;
+        public int code_unFound;
+
+        /**
+         * 单个请求的
+         * @param keyData
+         * @param keyCode
+         * @param keyMsg
+
+         * @return
+         */
+        public StandardJsonRequestBuilder<T> setStandardJsonKey(String keyData,String keyCode,String keyMsg){
+            this.key_data = keyData;
+            this.key_code = keyCode;
+            this.key_msg = keyMsg;
+            return this;
+        }
+
+        /**
+         * 单个请求的code的key可能会不一样
+         * @param keyCode
+         * @return
+         */
+        public StandardJsonRequestBuilder<T> setStandardJsonKeyCode(String keyCode){
+            this.key_code = keyCode;
+            return this;
+
+        }
+
+        /**
+         * 单个请求用到的code的具体值
+         * @param code_success
+         * @param code_unlogin
+         * @param code_unFound
+         * @return
+         */
+        public StandardJsonRequestBuilder<T> setCustomCodeValue(int code_success,int code_unlogin,int code_unFound){
+            this.code_success = code_success;
+            this.code_unlogin = code_unlogin;
+            this.code_unFound = code_unFound;
+            isCustomCodeSet = true;
+            return this;
+        }
+
+
+        //todo 状态为成功时,data对应的字段是否为空
+        public boolean isSuccessDataEmpty = true;
+        public StandardJsonRequestBuilder<T> setFailWhenDataIsEmpty(){
+            this.isSuccessDataEmpty = false;
+            return this;
+        }
+
+    }
+    class DownloadBuilder<T> extends BaseNetBuilder{
+
+
+
+        private String savedPath;
+
+        public DownloadBuilder<T> savedPath(String path ){
+            this.savedPath = path;
+            return this;
+        }
+
+        @Override
+        public BaseNetBuilder get() {
+            return super.get();
+        }
+    }
+
+    class UploadRequestBuilder<T> extends BaseNetBuilder{
+        public UploadRequestBuilder<T> addFile(String desc,String filePath){
+            if(files == null){
+                files = new HashMap<>();
+            }
+            files.put(desc,filePath);
+            return this;
+        }
+
+        @Override
+        public BaseNetBuilder post() {
+            return super.post();
+        }
+    }
+
+
+
+
 
 }

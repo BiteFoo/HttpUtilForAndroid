@@ -42,4 +42,8 @@ public interface INet extends ILoginManager{//extends ILoginManager
     <E> ConfigInfo<E> start(ConfigInfo<E> tConfigInfo);
 
 
+
+
+
+
 }
