@@ -1,7 +1,6 @@
 package com.hss01248.net.wrapper;
 
 import android.app.Dialog;
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimerTask;
 
 /**
  * Created by Administrator on 2016/9/21.
@@ -46,6 +44,9 @@ public class Tool {
     }
 
     public static void handleError(Throwable t,ConfigInfo configInfo){
+        if(t != null){
+            t.printStackTrace();
+        }
         dismiss(configInfo.loadingDialog);
         String str = t.toString();
         if(str.contains("timeout")){

@@ -3,6 +3,8 @@ package com.hss01248.net.builder;
 import android.app.Activity;
 import android.app.Dialog;
 
+import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.config.NetDefaultConfig;
 import com.hss01248.net.wrapper.MyNetListener;
 
 import java.util.HashMap;
@@ -13,6 +15,12 @@ import java.util.Map;
  */
 public class UploadRequestBuilder <T> extends BaseNetBuilder{
     public Map<String,String> files;
+
+    public UploadRequestBuilder(){
+        type = ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS;
+    }
+
+
     public UploadRequestBuilder<T> addFile(String desc,String filePath){
         if(files == null){
             files = new HashMap<>();
@@ -21,10 +29,12 @@ public class UploadRequestBuilder <T> extends BaseNetBuilder{
         return this;
     }
 
-
-
-
-
+    @Override
+    protected ConfigInfo execute() {
+        method = NetDefaultConfig.Method.POST;
+        headers.put("Content-Type","multipart/form-data");
+        return new ConfigInfo(this);
+    }
 
     //todo 以下的都是复写基类的方法,强转成子类
 

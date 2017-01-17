@@ -1,17 +1,10 @@
 package com.hss01248.net.builder;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.text.TextUtils;
 
-import com.hss01248.net.config.HttpMethod;
 import com.hss01248.net.config.NetDefaultConfig;
-import com.hss01248.net.interfaces.INet;
 import com.hss01248.net.wrapper.MyNetListener;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -49,38 +42,67 @@ public class NetConfig<T> {
     public boolean isCustomCodeSet;
     private String savedPath;
 
+    public BaseNetBuilder getBuilder() {
+        return builder;
+    }
+
+    private BaseNetBuilder builder;
+
+    //请求的客户端对象
+    public IClient client;
+
+    public Object request;
+
+    public NetConfig<T> start(){
+        // client.start(this);
+        return this;
+    }
+
 
     //TODO builder的字段拷贝.其中默认值应该在各builder中初始化好,而不是这里初始化
-    public NetConfig (StringRequestBuilder stringRequestBuilder){
-
-        start();
-
-    }
-    public NetConfig (JsonRequestBuilder jsonRequestBuilder){
-
-        start();
-
-    }
-    public NetConfig (StandardJsonRequestBuilder standardJsonRequestBuilder){
-
-        start();
-
-    }
-    public NetConfig (DownloadBuilder stringRequestBuilder){
-
-        start();
-
-    }
-    public NetConfig (UploadRequestBuilder stringRequestBuilder){
-
-        start();
-    }
-    public NetConfig (BaseNetBuilder stringRequestBuilder){
+   /* public NetConfig (StringRequestBuilder builder){
 
 
         start();
     }
+    public NetConfig (JsonRequestBuilder builder){
 
+        start();
+
+    }
+    public NetConfig (StandardJsonRequestBuilder builder){
+
+        start();
+
+    }
+    public NetConfig (DownloadBuilder builder){
+
+        start();
+
+    }
+    public NetConfig (UploadRequestBuilder builder){
+
+        start();
+    }*/
+    public NetConfig (BaseNetBuilder builder){
+        this.builder = builder;
+        start();
+    }
+
+    private void assginValues(BaseNetBuilder builder) {
+        this.url = builder.url;
+        this.method = builder.method;
+        this.params = builder.params;
+        this.headers = builder.headers;
+
+        this.cacheTime = builder.cacheTime;
+        this.isFromCache = builder.isFromCache;
+        this.shouldCacheResponse = builder.shouldCacheResponse;
+        this.ignoreCer = builder.ignoreCer;
+        this.listener = builder.listener;
+        this.retryCount = builder.retryCount;
+        this.timeout = builder.timeout;
+    }
 
 
     public boolean isResponseJsonArray() {
@@ -110,13 +132,7 @@ public class NetConfig<T> {
 
 
 
-    //请求的客户端对象
-    public INet client;
 
-    public NetConfig<T> start(){
-       // client.start(this);
-        return this;
-    }
 
 
     //是否拼接token

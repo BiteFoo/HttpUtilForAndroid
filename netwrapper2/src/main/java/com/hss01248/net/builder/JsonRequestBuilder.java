@@ -18,7 +18,7 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
 
 
     //TODO 预期的响应是否为arr
-    private boolean isResponseJsonArray = false;
+    public boolean isResponseJsonArray = false;
     public JsonRequestBuilder<T> setResponseJsonArray() {
         isResponseJsonArray = true;
         return this;

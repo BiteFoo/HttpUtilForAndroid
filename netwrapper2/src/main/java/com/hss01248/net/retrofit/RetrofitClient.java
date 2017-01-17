@@ -9,6 +9,8 @@ import com.hss01248.net.config.NetDefaultConfig;
 import com.hss01248.net.retrofit.https.HttpsUtil;
 import com.hss01248.net.retrofit.progress.ProgressInterceptor;
 import com.hss01248.net.retrofit.progress.UploadFileRequestBody;
+import com.hss01248.net.utils.EncryptUtils;
+import com.hss01248.net.utils.FileUtils;
 import com.hss01248.net.wrapper.BaseNet;
 import com.hss01248.net.wrapper.MyJson;
 import com.hss01248.net.wrapper.MyNetApi;
@@ -140,13 +142,13 @@ public class RetrofitClient extends BaseNet<Call> {
                 })*/
                 .build();
 
-        retrofitDownload = new Retrofit
+        retrofitUpload = new Retrofit
                 .Builder()
                 .baseUrl(NetDefaultConfig.baseUrl)
                 .client(client)
                 .build();
 
-        serviceDownload = retrofitUpload.create(ApiService.class);
+        serviceUpload = retrofitUpload.create(ApiService.class);
     }
 
 
@@ -210,7 +212,7 @@ public class RetrofitClient extends BaseNet<Call> {
 
         ApiService service = null;
 
-        if(configInfo.isIgnoreCer()){
+        if(configInfo.isIgnoreCer() && configInfo.url.startsWith("https")){
             if(serviceIgnoreSSL == null){
                 initSSLIgnore();
             }
@@ -300,7 +302,7 @@ public class RetrofitClient extends BaseNet<Call> {
 
         ApiService service = null;
 
-        if(configInfo.isIgnoreCer()){
+        if(configInfo.isIgnoreCer() && configInfo.url.startsWith("https")){
             if(serviceIgnoreSSL == null){
                 initSSLIgnore();
             }
@@ -380,14 +382,14 @@ public class RetrofitClient extends BaseNet<Call> {
 
         ApiService service = null;
 
-        if(configInfo.isIgnoreCer()){
+        if(configInfo.isIgnoreCer() && configInfo.url.startsWith("https")){
             if(serviceIgnoreSSL == null){
                 initSSLIgnore();
             }
             service = serviceIgnoreSSL;
         }else {
             if (serviceDownload == null){
-                initUpload();
+                initDownload();
             }
             service = serviceDownload;
         }
@@ -415,11 +417,31 @@ public class RetrofitClient extends BaseNet<Call> {
                     @Override
                     protected void onPostExecute(Boolean result) {
                         Tool.dismiss(configInfo.loadingDialog);
-                        if (result){
-                            configInfo.listener.onSuccess(configInfo.filePath,configInfo.filePath);
-                        }else {
+                        if (!result){
                             configInfo.listener.onError("文件下载失败");
+                            return;
                         }
+
+                        //文件校验
+                        if(configInfo.isVerify){
+                            String str = "";
+                            if(configInfo.verfyByMd5OrShar1){//md5
+                                str = EncryptUtils.encryptMD5File2String(configInfo.filePath);
+
+                            }else {//sha1
+                                str = EncryptUtils.encryptSHA1ToString(configInfo.filePath);//todo 缺少shar1文件的算法
+                            }
+                            if(str.equalsIgnoreCase(configInfo.verifyStr)){//校验通过
+                                configInfo.listener.onSuccess(configInfo.filePath,configInfo.filePath);
+                                handleMedia(configInfo);
+                            }else {
+                                configInfo.listener.onError("文件下载失败:校验不一致");
+                            }
+                        }else {
+                            configInfo.listener.onSuccess(configInfo.filePath,configInfo.filePath);
+                            handleMedia(configInfo);
+                        }
+
                     }
                 };
                 simple.execute();
@@ -427,16 +449,27 @@ public class RetrofitClient extends BaseNet<Call> {
 
             @Override
             public void onFailure(Call<ResponseBody> call, final Throwable t) {
-
-
-
                 Tool.handleError(t,configInfo);
-
             }
         });
         return call;
     }
-    
+
+    private void handleMedia(ConfigInfo configInfo) {
+        if(configInfo.isNotifyMediaCenter){
+            FileUtils.refreshMediaCenter(MyNetApi.context,configInfo.filePath);
+        }else {
+            if(configInfo.isHideFolder){
+                FileUtils.hideFile(new File(configInfo.filePath));
+            }
+        }
+
+        if(configInfo.isOpenAfterSuccess){
+            FileUtils.openFile(MyNetApi.context,new File(configInfo.filePath));
+        }
+
+    }
+
 
     @Override
     protected <E> Call newCommonStringRequest(final ConfigInfo<E> configInfo) {
@@ -444,7 +477,7 @@ public class RetrofitClient extends BaseNet<Call> {
 
         ApiService service2 = null;
 
-        if(configInfo.isIgnoreCer()){
+        if(configInfo.isIgnoreCer() && configInfo.url.startsWith("https")){
             if(serviceIgnoreSSL == null){
                 initSSLIgnore();
             }

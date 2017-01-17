@@ -2,25 +2,116 @@ package com.hss01248.net.builder;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.os.Environment;
+import android.text.TextUtils;
+import android.util.Log;
+import android.webkit.URLUtil;
 
+import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.config.NetDefaultConfig;
 import com.hss01248.net.wrapper.MyNetListener;
+
+import java.io.File;
+import java.util.UUID;
 
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
 public class DownloadBuilder <T> extends BaseNetBuilder{
 
+    public DownloadBuilder(){
+        this.type = ConfigInfo.TYPE_DOWNLOAD;
+    }
+
+    public String savedPath;
 
 
-    private String savedPath;
+
+    //是否打開,是否讓媒体库扫描,是否隐藏文件夹
+    public boolean isOpenAfterSuccess = false;//默认不扫描
+    public boolean isHideFolder = false;
+    public boolean isNotifyMediaCenter = true;//媒体文件下载后,默认:通知mediacenter扫描
+
+
+    //文件校验相关设置(默认不校验)MD5,SHA1,CRC32三种校验方法,任选一种即可
+    public boolean isVerify = false;//是否校驗文件
+    public String verifyStr;
+    public boolean verfyByMd5OrShar1 = false;
+
+
+    public DownloadBuilder<T> setNotifyMediaCenter(boolean notifyMediaCenter) {
+        isNotifyMediaCenter = notifyMediaCenter;
+        return this;
+    }
+    public DownloadBuilder<T> setOpenAfterSuccess(boolean openAfterSuccess) {
+        isOpenAfterSuccess = openAfterSuccess;
+        return this;
+    }
+    public DownloadBuilder<T> setHideFile(boolean hideFile) {
+        isHideFolder = hideFile;
+        return this;
+    }
+
 
     public DownloadBuilder<T> savedPath(String path ){
         this.savedPath = path;
         return this;
     }
 
+    public DownloadBuilder<T> verifyMd5(String md5Str ){
+        this.isVerify = true;
+        verfyByMd5OrShar1 = true;
+        this.verifyStr = md5Str;
+        return this;
+    }
+
+    public DownloadBuilder<T> verifyShar1(String shar1Str ){
+        this.isVerify = true;
+        verfyByMd5OrShar1 = false;
+        this.verifyStr = shar1Str;
+        return this;
+    }
 
 
+
+    @Override
+    protected ConfigInfo execute() {
+        method = NetDefaultConfig.Method.GET;
+        this.type = ConfigInfo.TYPE_DOWNLOAD;
+        if(TextUtils.isEmpty(savedPath) ){
+            savedPath = getDefaultSavedPath();
+        }
+        Log.e("dd","savedPath:"+savedPath);
+        Log.e("dd","url:"+url);
+        return new ConfigInfo(this);
+    }
+
+    /**
+     * 默认保存到download/retrofit文件夹下
+     * @return
+     */
+    private String getDefaultSavedPath() {
+        String fileName =  URLUtil.guessFileName(url,"","");
+        if(TextUtils.isEmpty(fileName)){
+            fileName = UUID.randomUUID().toString();
+        }
+       File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"retrofit");
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        File file = new File(dir,fileName);
+       /* if(file.exists()){
+            file.delete();
+        }else {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }*/
+
+        return file.getAbsolutePath();
+    }
 
     //todo 以下的都是复写基类的方法,强转成子类
 
