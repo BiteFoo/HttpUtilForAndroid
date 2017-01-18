@@ -218,9 +218,10 @@ public class MainActivityNew extends Activity {
                 String url = "https://travel.12306.cn/imgs/resources/uploadfiles/images/fed7d5b4-37d3-4f32-bacc-e9b942cb721d_product_W572_H370.jpg";
                 String url2 = "http://www.qxinli.com/download/qxinli.apk";
                 MyNetApi2.buildDownloadRequest(url2)
-                        .showLoadingDialog(MainActivityNew.this)
-                        .setIgnoreCer()
-                        .setOpenAfterSuccess(true)
+                        .showLoadingDialog(MainActivityNew.this)//显示下载进度dialog
+                        .setOpenAfterSuccess()//下载完成后打开
+                        .setHideFile()//隐藏该文件
+                        .verifyMd5("djso8d89dsjd9s7dsfj")//下载完后校验md5
                         .callback(new MyNetListener() {
                             @Override
                             public void onSuccess(Object response, String onSuccess) {

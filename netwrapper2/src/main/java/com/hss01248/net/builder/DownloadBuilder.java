@@ -47,12 +47,12 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
         isNotifyMediaCenter = notifyMediaCenter;
         return this;
     }
-    public DownloadBuilder<T> setOpenAfterSuccess(boolean openAfterSuccess) {
-        isOpenAfterSuccess = openAfterSuccess;
+    public DownloadBuilder<T> setOpenAfterSuccess() {
+        isOpenAfterSuccess = true;
         return this;
     }
-    public DownloadBuilder<T> setHideFile(boolean hideFile) {
-        isHideFolder = hideFile;
+    public DownloadBuilder<T> setHideFile() {
+        isHideFolder = true;
         return this;
     }
 
