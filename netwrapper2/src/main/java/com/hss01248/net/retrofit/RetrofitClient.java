@@ -489,11 +489,6 @@ public class RetrofitClient extends BaseNet<Call> {
             service2 = service;
         }
 
-
-
-
-
-
         Call<ResponseBody> call;
         if (configInfo.method == HttpMethod.GET){
             call = service2.executGet(configInfo.url,configInfo.params,configInfo.headers);

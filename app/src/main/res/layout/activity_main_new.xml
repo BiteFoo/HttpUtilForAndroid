@@ -71,7 +71,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="test voice"
+        android:text="force read cache"
         android:id="@+id/testvoice"/>
 
     <Button

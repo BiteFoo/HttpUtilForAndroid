@@ -415,6 +415,7 @@ public class Tool {
                 @Override
                 protected Void doInBackground() {
                     ACache.get(MyNetApi.context).put(getCacheKey(configInfo),string, (int) (configInfo.cacheTime));
+                    MyLog.d("caching resonse:"+string);
                     return null;
                 }
 

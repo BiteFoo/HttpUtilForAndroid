@@ -8,7 +8,6 @@ import com.hss01248.net.config.HttpMethod;
 import com.hss01248.net.config.NetDefaultConfig;
 import com.hss01248.net.interfaces.ILoginManager;
 import com.hss01248.net.interfaces.INet;
-
 import com.litesuits.android.async.SimpleTask;
 
 import java.util.HashMap;
@@ -154,6 +153,8 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
         configInfo.listener.url = url;
         configInfo.listener.configInfo = configInfo;
 
+        MyLog.i("url:"+url);
+
         //todo 这里token还可能在请求头中,应加上此类情况的自定义.
         if (configInfo.isAppendToken){
             Tool.addToken(configInfo.params);
@@ -171,7 +172,7 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
             return configInfo;
         }
 
-        addHeaders(configInfo);//添加请求头
+       // addHeaders(configInfo);//添加请求头
 
         if (configInfo.loadingDialog != null && !configInfo.loadingDialog.isShowing()){
             try {//预防badtoken最简便和直接的方法
@@ -180,6 +181,8 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
                 e.printStackTrace();
             }
         }
+
+        MyLog.i("really request http-----------");
 
 
         T request = generateNewRequest(configInfo);//根据类型生成/执行不同的请求对象
@@ -292,6 +295,8 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
                 if (configInfo.shouldReadCache){
 
 
+
+
                     SimpleTask<String> simple = new SimpleTask<String>() {
 
                         @Override
@@ -301,6 +306,8 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
 
                         @Override
                         protected void onPostExecute(String result) {
+                            MyLog.i("read cache:"+result);
+
 
                             if (TextUtils.isEmpty(result)){
                                 configInfo.shouldReadCache = false;
@@ -314,6 +321,7 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
                         }
                     };
                     simple.execute();
+                    return true;
                 }else {
                     return false;
                 }

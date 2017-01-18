@@ -491,6 +491,7 @@ public class ConfigInfo<T> {
         this.cacheTime = builder.cacheTime;
         this.isFromCache = builder.isFromCache;
         this.shouldCacheResponse = builder.shouldCacheResponse;
+        this.shouldReadCache = builder.shouldReadCache;
         this.ignoreCer = builder.ignoreCer;
         this.listener = builder.listener;
         this.retryCount = builder.retryCount;
