@@ -320,6 +320,8 @@ public class ConfigInfo<T> {
    // public boolean isForceMinTime = false;
 
     public Dialog loadingDialog;
+    public boolean isLoadingDialogHorizontal;
+    public boolean updateProgress ;
 
 
 
@@ -551,12 +553,18 @@ public class ConfigInfo<T> {
         this.isVerify = builder.isVerify;
         this.verifyStr = builder.verifyStr;
 
+        this.updateProgress = builder.updateProgress;
+        this.isLoadingDialogHorizontal = builder.isLoadingDialogHorizontal;
+
         start();
 
     }
     public ConfigInfo (UploadRequestBuilder builder){
         assginValues(builder);
         this.files = builder.files;
+
+        this.updateProgress = builder.updateProgress;
+        this.isLoadingDialogHorizontal = builder.isLoadingDialogHorizontal;
 
 
         start();

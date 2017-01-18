@@ -3,12 +3,34 @@ package com.hss01248.net.builder;
 import android.app.Activity;
 import android.app.Dialog;
 
+import com.hss01248.net.config.BaseNetBean;
+import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.config.NetDefaultConfig;
 import com.hss01248.net.wrapper.MyNetListener;
 
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
 public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
+
+
+    public StandardJsonRequestBuilder(){
+        this.type = ConfigInfo.TYPE_JSON_FORMATTED;
+        this.key_code = NetDefaultConfig.KEY_CODE;
+        this.key_data = NetDefaultConfig.KEY_DATA;
+        this.key_msg = NetDefaultConfig.KEY_MSG;
+        this.code_success = BaseNetBean.CODE_SUCCESS;
+        this.code_unlogin = BaseNetBean.CODE_UNLOGIN;
+        this.code_unFound = BaseNetBean.CODE_UN_FOUND;
+        isCustomCodeSet = false;
+        isSuccessDataEmpty = true;
+    }
+
+
+
+
+
+
 
     //todo 设置标准格式json本次响应的不同字段
     public String key_data = "";
@@ -20,7 +42,7 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     public int code_unlogin;
     public int code_unFound;
 
-    public boolean isCustomCodeSet = false;
+    public boolean isCustomCodeSet ;
 
     /**
      * 单个请求的
@@ -65,10 +87,22 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
 
 
     //todo 状态为成功时,data对应的字段是否为空
-    public boolean isSuccessDataEmpty = true;
+    public boolean isSuccessDataEmpty ;
     public StandardJsonRequestBuilder<T> setFailWhenDataIsEmpty(){
         this.isSuccessDataEmpty = false;
         return this;
+    }
+
+
+    @Override
+    protected ConfigInfo execute() {
+        //做一些参数合理性校验
+        if(clazz ==null){
+            throw new RuntimeException("没有设置clazz参数");
+        }
+
+
+        return new ConfigInfo(this);
     }
 
 

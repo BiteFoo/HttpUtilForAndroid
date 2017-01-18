@@ -3,12 +3,19 @@ package com.hss01248.net.builder;
 import android.app.Activity;
 import android.app.Dialog;
 
+import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.wrapper.MyNetListener;
 
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
 public class JsonRequestBuilder<T> extends StringRequestBuilder{
+
+    public JsonRequestBuilder(){
+        this.type = ConfigInfo.TYPE_JSON;
+        isResponseJsonArray = false;
+    }
+
 
     public Class<T> clazz;
     public JsonRequestBuilder<T> setJsonClazz(Class<T> clazz) {
@@ -18,12 +25,22 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
 
 
     //TODO 预期的响应是否为arr
-    public boolean isResponseJsonArray = false;
+    public boolean isResponseJsonArray ;
     public JsonRequestBuilder<T> setResponseJsonArray() {
         isResponseJsonArray = true;
         return this;
     }
 
+    @Override
+    protected ConfigInfo execute() {
+        //做一些参数合理性校验
+        if(clazz ==null){
+            throw new RuntimeException("没有设置clazz参数");
+        }
+
+
+        return new ConfigInfo(this);
+    }
 
     //todo 以下的都是复写基类的方法,强转成子类
 

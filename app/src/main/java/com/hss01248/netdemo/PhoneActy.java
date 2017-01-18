@@ -68,7 +68,7 @@ public class PhoneActy extends Activity {
         super.onCreate(savedInstanceState);
         activity = this;
         Logger.init("dd");
-        NetUtil.init(this,"http://www.qxinli.com:9001/api/", new ILoginManager() {
+        NetUtil.init(getApplication(),"http://www.qxinli.com:9001/api/", new ILoginManager() {
             @Override
             public boolean isLogin() {
                 return false;

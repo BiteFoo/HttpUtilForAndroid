@@ -152,6 +152,7 @@ public  abstract class BaseNet<T> implements INet {//T: 请求类  call或者是
         String url = Tool.appendUrl(configInfo.url, isAppendUrl());
         configInfo.url = url;
         configInfo.listener.url = url;
+        configInfo.listener.configInfo = configInfo;
 
         //todo 这里token还可能在请求头中,应加上此类情况的自定义.
         if (configInfo.isAppendToken){

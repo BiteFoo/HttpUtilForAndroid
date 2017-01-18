@@ -13,8 +13,10 @@ import java.util.Map;
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
-public class UploadRequestBuilder <T> extends BaseNetBuilder{
+public class UploadRequestBuilder <T> extends ProgressBaseBuilder{
     public Map<String,String> files;
+
+
 
     public UploadRequestBuilder(){
         type = ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS;
@@ -58,11 +60,24 @@ public class UploadRequestBuilder <T> extends BaseNetBuilder{
         return (UploadRequestBuilder) super.callback(listener);
     }
 
-
-
     @Override
     public UploadRequestBuilder showLoadingDialog(Activity activity, String loadingMsg) {
-        return (UploadRequestBuilder) super.showLoadingDialog(activity, loadingMsg);
+        return (UploadRequestBuilder) showLoadingDialog(activity,loadingMsg,true,true);
+    }
+
+
+    public UploadRequestBuilder showLoadingDialog(Activity activity) {
+        return  showLoadingDialog(activity,"文件上传中");
+    }
+
+    @Override
+    protected UploadRequestBuilder setShowLoadingDialog(Dialog loadingDialog, String msg, Activity activity, boolean updateProgress, boolean horizontal) {
+        return (UploadRequestBuilder) super.setShowLoadingDialog(loadingDialog, msg, activity, updateProgress, horizontal);
+    }
+
+    @Override
+    public UploadRequestBuilder showLoadingDialog(Activity activity, String loadingMsg, boolean updateProgress, boolean horizontal) {
+        return (UploadRequestBuilder) super.showLoadingDialog(activity, loadingMsg, updateProgress, horizontal);
     }
 
     @Override

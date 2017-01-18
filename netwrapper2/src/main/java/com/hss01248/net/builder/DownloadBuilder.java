@@ -17,13 +17,17 @@ import java.util.UUID;
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
-public class DownloadBuilder <T> extends BaseNetBuilder{
+public class DownloadBuilder <T> extends ProgressBaseBuilder{
 
     public DownloadBuilder(){
+        super();
         this.type = ConfigInfo.TYPE_DOWNLOAD;
+
     }
 
     public String savedPath;
+
+
 
 
 
@@ -135,7 +139,14 @@ public class DownloadBuilder <T> extends BaseNetBuilder{
         return (DownloadBuilder) super.callback(listener);
     }
 
+    @Override
+    public DownloadBuilder showLoadingDialog(Activity activity, String loadingMsg, boolean updateProgress, boolean horizontal) {
+        return (DownloadBuilder) super.showLoadingDialog(activity, loadingMsg, updateProgress, horizontal);
+    }
 
+    public DownloadBuilder showLoadingDialog(Activity activity) {
+        return (DownloadBuilder) showLoadingDialog(activity,"文件下载中",updateProgress,isLoadingDialogHorizontal);
+    }
 
     @Override
     public DownloadBuilder showLoadingDialog(Activity activity, String loadingMsg) {

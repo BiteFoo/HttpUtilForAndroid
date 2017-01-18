@@ -13,7 +13,6 @@ import com.blankj.utilcode.utils.TimeUtils;
 import com.blankj.utilcode.utils.ToastUtils;
 import com.hss01248.net.wrapper.MyJson;
 import com.hss01248.net.wrapper.MyNetApi;
-import com.hss01248.net.wrapper.MyNetApi2;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.netdemo.bean.AskPhoneInfo;
 import com.hss01248.netdemo.bean.GetCommonJsonBean;
@@ -59,9 +58,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        Logger.init("netapi");
-        MyNetApi.context = getApplicationContext();
-        MyNetApi2.context = getApplicationContext();
+        Logger.init("netapi").methodCount(5);
+
+
         /*NetUtil.initAddHttps(R.raw.srca);//添加12306的证书
         NetUtil.init(this,"http://www.qxinli.com:9001/api/", new ILoginManager() {
             @Override

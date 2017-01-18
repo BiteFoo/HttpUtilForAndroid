@@ -30,6 +30,7 @@ public class BaseNetBuilder<T> {
         headers.put("Accept","*/*");
         headers.put("Connection","Keep-Alive");
 
+
     }
 
 
@@ -77,8 +78,10 @@ public class BaseNetBuilder<T> {
 
     //TODO 以下是UI显示控制
     public Dialog loadingDialog;
+
+
     public BaseNetBuilder<T> showLoadingDialog(Activity activity, String loadingMsg){
-        return setShowLoadingDialog(null,loadingMsg,activity);
+        return setShowLoadingDialog(null,loadingMsg,activity,false,false);
     }
     /**
      *
@@ -86,10 +89,10 @@ public class BaseNetBuilder<T> {
      */
     public BaseNetBuilder<T> showLoadingDialog(Dialog loadingDialog){
 
-        return  setShowLoadingDialog(loadingDialog,"",null);
+        return  setShowLoadingDialog(loadingDialog,"",null,false,false);
     }
 
-    private BaseNetBuilder<T> setShowLoadingDialog(Dialog loadingDialog, String msg, Activity activity){
+    protected BaseNetBuilder<T> setShowLoadingDialog(Dialog loadingDialog, String msg, Activity activity,boolean updateProgress,boolean horizontal){
         if (loadingDialog == null){
             if (TextUtils.isEmpty(msg)){
                 msg = "加载中...";
@@ -98,7 +101,15 @@ public class BaseNetBuilder<T> {
                 this.loadingDialog = null;//todo 生成dialog,先不显示
             }else {
                 try {
-                    this.loadingDialog = ProgressDialog.show(activity, "", msg,false, true);
+                    new ProgressDialog(activity).setTitle("");
+                   // this.loadingDialog = ProgressDialog.show(activity, "", msg,!updateProgress, true);
+                    ProgressDialog dialog = new ProgressDialog(activity);
+                    dialog.setTitle("");
+                    dialog.setMessage(msg);
+                    dialog.setProgressStyle(horizontal ? ProgressDialog.STYLE_HORIZONTAL:ProgressDialog.STYLE_SPINNER);
+                    dialog.setIndeterminate(!updateProgress);
+                    dialog.setCancelable(true);
+                    this.loadingDialog = dialog;
                 }catch (Exception e){
                     e.printStackTrace();
                 }

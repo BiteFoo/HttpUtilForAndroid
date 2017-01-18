@@ -57,7 +57,7 @@ public class MainActivityNew extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_new);
         ButterKnife.bind(this);
-        Logger.init("netapi");
+       // Logger.init("netapi");
         //MyNetApi2.initAddHttps(R.raw.srca);//添加12306的证书
         MyNetApi2.init(getApplicationContext(),"http://www.qxinli.com:9001/api/", new ILoginManager() {
             @Override
@@ -223,7 +223,7 @@ public class MainActivityNew extends Activity {
                 String url = "https://travel.12306.cn/imgs/resources/uploadfiles/images/fed7d5b4-37d3-4f32-bacc-e9b942cb721d_product_W572_H370.jpg";
                 String url2 = "http://www.qxinli.com/download/qxinli.apk";
                 MyNetApi2.buildDownloadRequest(url2)
-                        .showLoadingDialog(MainActivityNew.this,"下载中...")
+                        .showLoadingDialog(MainActivityNew.this)
                         .setIgnoreCer()
                         .setOpenAfterSuccess(true)
                         .callback(new MyNetListener() {
@@ -253,7 +253,7 @@ public class MainActivityNew extends Activity {
                         .addFile("uploadFile","/storage/emulated/0/Download/retrofit/qxinli.apk")
                         .addParams("uploadFile555","1474363536041.jpg")
                         .addParams("api_secret777","898767hjk")
-                        .showLoadingDialog(this,"")
+                        .showLoadingDialog(this,"文件上传",true,false)
                         .callback(new MyNetListener<String>() {
                             @Override
                             public void onSuccess(String response, String resonseStr) {

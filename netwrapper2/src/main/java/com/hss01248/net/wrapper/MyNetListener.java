@@ -1,8 +1,10 @@
 package com.hss01248.net.wrapper;
 
 
+import android.app.ProgressDialog;
 import android.text.TextUtils;
 
+import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.interfaces.IListener;
 import com.hss01248.net.retrofit.progress.ProgressEvent;
 
@@ -18,6 +20,7 @@ import java.util.List;
 public abstract class MyNetListener<T> implements IListener<T> {
 
     public String url;
+    public ConfigInfo configInfo;
 
 
 
@@ -119,10 +122,48 @@ public abstract class MyNetListener<T> implements IListener<T> {
         EventBus.getDefault().unregister(this);
     }
 
+    private long lastProgress;
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void  onMessage(ProgressEvent event){
         if (event.url.equals(url)){
+             if(lastProgress >= event.totalBytesRead){
+                return;
+            }
+
+            lastProgress = event.totalBytesRead;
             onProgressChange(event.totalLength,event.totalBytesRead);
+
+
+            //进度更新: 数据太会出现
+            if(configInfo != null && configInfo.loadingDialog instanceof ProgressDialog){
+                ProgressDialog dialog = (ProgressDialog) configInfo.loadingDialog;
+                if(configInfo.updateProgress){
+                    if(configInfo.isLoadingDialogHorizontal){
+
+                        if(event.totalLength > Integer.MAX_VALUE){
+                            dialog.setProgress((int) (event.totalBytesRead*0.00001));
+                            dialog.setMax((int) (event.totalLength*0.00001));
+                        }else {
+                            dialog.setProgress((int) event.totalBytesRead);
+                            dialog.setMax((int) event.totalLength);
+                        }
+
+
+
+
+                    }else {
+                        String str = "加载中...";
+                        if(configInfo.type == ConfigInfo.TYPE_DOWNLOAD){
+                            str = "下载载中...";
+                        }else  if(configInfo.type == ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS) {
+                            str = "文件上传...";
+                        }
+                        dialog.setMessage(str+(event.totalBytesRead*100/event.totalLength)+"%");
+                    }
+                }
+            }
+
             if (event.done){
                 unRegistEventBus();
                 onFinish();

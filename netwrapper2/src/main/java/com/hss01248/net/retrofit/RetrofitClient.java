@@ -281,7 +281,7 @@ public class RetrofitClient extends BaseNet<Call> {
                     }
 
                 }else {
-                    configInfo.listener.onError(response.code()+"");
+                    configInfo.listener.onCodeError("http错误码为:"+response.code(),response.message(),response.code());
                 }
             }
 
@@ -363,7 +363,7 @@ public class RetrofitClient extends BaseNet<Call> {
                     }
 
                 }else {
-                    configInfo.listener.onError(response.code()+"");
+                    configInfo.listener.onCodeError("http错误码为:"+response.code(),response.message(),response.code());
                 }
             }
 
@@ -404,7 +404,7 @@ public class RetrofitClient extends BaseNet<Call> {
             @Override
             public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
                 if (!response.isSuccessful()){
-                            configInfo.listener.onError(response.code()+"");
+                    configInfo.listener.onCodeError("http错误码为:"+response.code(),response.message(),response.code());
                     Tool.dismiss(configInfo.loadingDialog);
                     return;
                 }
@@ -532,6 +532,7 @@ public class RetrofitClient extends BaseNet<Call> {
 
                 try {
                     string =  response.body().string();
+                    Log.e("string",string);
                     Tool.parseStringByType(string,configInfo);
                     Tool.dismiss(configInfo.loadingDialog);
 
