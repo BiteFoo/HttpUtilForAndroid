@@ -1,6 +1,12 @@
-# NetWrapper
+# HttpUtilForAndroid
 
-基于retrofit封装,面向接口,链式调用,使用时不设计retrofit中的类.可继承BaseNet类来无缝切换到其他网络,如volley.
+面向接口,完全脱离具体的下层框架api
+
+链式调用,傻瓜式使用
+
+提供了okhttp和retrofit两个实现.
+
+api设计上结合http协议和android平台特点来实现
 
 [![](https://jitpack.io/v/hss01248/NetWrapper.svg)](https://jitpack.io/#hss01248/NetWrapper)
 
@@ -10,23 +16,79 @@
 
 [点击查看更新日志](https://github.com/hss01248/NetWrapper/blob/master/updatelog.md)
 
-
-
-# 已完成
-
-缓存完全由客户端自行控制(ACache),利用http请求头来完全屏蔽okhttp的缓存体系
-
-上传和下载的进度回调
-
-自动登录和登录状态接口
-
-post提交一个json数据
-
-对https的支持:全局配证书或者单个请求忽略校验
+[老的api说明文档](/README_OLD.MD)
 
 
 
-# todo
+# 初始化配置
+
+```
+init(String baseUrl,Context context,boolean isDebug)
+initAppDefault(String tokenName,String data,String code,String msg,int codeSuccess,int codeUnlogin,int codeUnfound)
+```
+
+
+
+# 几个入口方法
+
+```
+public  static <E> StringRequestBuilder<E> requestString(String url) 
+
+public static <E> JsonRequestBuilder<E> requestJson(String url, Class clazz)
+
+public static <E> StandardJsonRequestBuilder<E> reqeustStandardJson(String url, Class<E> clazz)
+
+public static <E> DownloadBuilder<E> download(String url)
+
+public static <E> UploadRequestBuilder<E> upload(String url, String fileDesc, String filePath)
+```
+
+# 通用配置
+
+# http方法
+
+```
+getAsync(MyNetListener<T> listener)
+postAsync(MyNetListener<T> listener)
+```
+
+# url
+
+> 一般由上方httpUtil的初始化时设置以及入口方法传入.
+>
+> 如果入口方法中传入的url含有http或者https,则不会拼接初始化设置的baseUrl.
+
+## http请求参数
+
+### 两种设置形式
+
+```
+paramsStr(String paramsStr)//将一整个key=value形式或者json形式的字符串设置进来
+
+addParams(String key,String value)//添加参数键值对
+```
+
+### 两种传输形式
+
+> post请求时,在请求体中,可以key=value&key=value的形式传输,也可以json字符串的形式传输
+
+```
+setParamsAsJson()//默认为key=value的形式,调用此方法,改成以json形式传输
+```
+
+
+
+# http头
+
+```
+addHeader(String key,String value)
+```
+
+## 缓存控制
+
+```
+setCacheControl(boolean shouldReadCache,boolean shouldCacheResponse,long cacheTimeInSeconds)
+```
 
 ## 1.下载
 
@@ -96,55 +158,7 @@ dependencies {
 ## api
 
 ```
-getString(String url, Map map, MyNetListener listener).setXxx()....start();
 
-//中间的setXxx可以没有,如:
-
- MyNetApi.getString("http://www.qxinli.com/Application/about/androidAbout.html", 
- new HashMap(),  
- new MyNetListener<String>() {
-                    @Override
-                    public void onSuccess(String response, String resonseStr) {
-                        Logger.e(response);
-
-                    }
-                }).start();
-                
-其他api:
-
-postString( String url,  Map map,  MyNetListener listener).start()
-
-
-
-//标准json
-
-postStandardJson( String url,  Map map, Class clazz, MyNetListener listener).start()
-
-getStandardJson( String url,  Map map, Class clazz, MyNetListener listener).start()
-
-
-//普通jsonObject和JsonArray
-
-postCommonJson( String url,  Map map, Class clazz, MyNetListener listener).start()
-
-getCommonJson( String url,  Map map, Class clazz, MyNetListener listener).start()
-
-//上传和下载
-
-download(String url, String savedpath, MyNetListener listener).start()
-
-upLoad(String url, Map<String,String> params,Map<String,String> files, MyNetListener callback).start()
-
-//上传接口没有其他字段,而且文件对应的key为默认("file")时,可使用此简化接口
-upLoad(String url, String filePath, MyNetListener callback)
-
-
-//自动登录相关:
-autoLogin();
-
-autoLogin(MyNetListener myNetListener);
-
-boolean isLogin();
 ```
 
 
