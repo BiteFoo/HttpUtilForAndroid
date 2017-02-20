@@ -53,7 +53,7 @@ public class MainActivityNew extends Activity {
         setContentView(R.layout.activity_main_new);
         ButterKnife.bind(this);
        // Logger.init("netapi");
-        //MyNetApi2.initAddHttps(R.raw.srca);//添加12306的证书
+        //HttpUtil.initAddHttps(R.raw.srca);//添加12306的证书
         MyNetApi2.init(getApplicationContext(),"http://www.qxinli.com:9001/api/", new ILoginManager() {
             @Override
             public boolean isLogin() {
@@ -301,7 +301,7 @@ public class MainActivityNew extends Activity {
             case R.id.testvoice:
 
 
-               /* MyNetApi2.buildJsonRequest("version/latestVersion/v1.json",GetCommonJsonBean.class)
+               /* HttpUtil.buildJsonRequest("version/latestVersion/v1.json",GetCommonJsonBean.class)
                         .setCacheControl(true,true,60)
                         .showLoadingDialog(MainActivityNew.this,"")
                         .callback(new MyNetListener<GetCommonJsonBean>() {
