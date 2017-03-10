@@ -305,15 +305,15 @@ public class BaseNetBuilder<T> {
     }
 
     //TODO https自签名证书的处理策略:单个请求是否忽略
-    public boolean ignoreCer = false;
+    public boolean ignoreCertificateVerify = false;
 
-    public BaseNetBuilder<T> setIgnoreCer() {
-        this.ignoreCer = true;
+    public BaseNetBuilder<T> setIgnoreCertificateVerify() {
+        this.ignoreCertificateVerify = true;
         return this;
     }
 
-    public boolean isIgnoreCer() {
-        return ignoreCer;
+    public boolean isIgnoreCertificateVerify() {
+        return ignoreCertificateVerify;
     }
 
 

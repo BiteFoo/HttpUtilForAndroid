@@ -190,8 +190,8 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
     }
 
     @Override
-    public DownloadBuilder setIgnoreCer() {
-        return (DownloadBuilder) super.setIgnoreCer();
+    public DownloadBuilder setIgnoreCertificateVerify() {
+        return (DownloadBuilder) super.setIgnoreCertificateVerify();
     }
 
     @Override

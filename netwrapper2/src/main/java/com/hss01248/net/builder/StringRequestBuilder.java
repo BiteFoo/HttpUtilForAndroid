@@ -99,8 +99,8 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
     }
 
     @Override
-    public StringRequestBuilder setIgnoreCer() {
-        return (StringRequestBuilder) super.setIgnoreCer();
+    public StringRequestBuilder setIgnoreCertificateVerify() {
+        return (StringRequestBuilder) super.setIgnoreCertificateVerify();
     }
 
     @Override

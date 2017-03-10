@@ -129,7 +129,7 @@ public class HttpUtil {
     public static void cancelRquest(Object tag){
         getClient().cancleRequest(tag);
     }
-    public static void cancelAll(){
+    public static void cancleAllRequest(){
         getClient().cancleAllRequest();
     }
 

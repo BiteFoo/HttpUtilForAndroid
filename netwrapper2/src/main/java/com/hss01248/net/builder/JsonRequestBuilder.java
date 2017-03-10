@@ -109,8 +109,8 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
     }
 
     @Override
-    public JsonRequestBuilder setIgnoreCer() {
-        return (JsonRequestBuilder) super.setIgnoreCer();
+    public JsonRequestBuilder setIgnoreCertificateVerify() {
+        return (JsonRequestBuilder) super.setIgnoreCertificateVerify();
     }
 
     @Override

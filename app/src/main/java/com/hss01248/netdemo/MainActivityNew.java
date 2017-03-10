@@ -86,7 +86,7 @@ public class MainActivityNew extends Activity {
                                         Logger.e(error);
                                     }
                             })
-                        .setIgnoreCer().getAsync();
+                        .setIgnoreCertificateVerify().getAsync();
                 break;
             case R.id.post_string:
 
@@ -200,10 +200,11 @@ public class MainActivityNew extends Activity {
                 String url2 = "http://www.qxinli.com/download/qxinli.apk";
                 HttpUtil.buildDownloadRequest(url2)
                         .showLoadingDialog(MainActivityNew.this)//显示下载进度dialog
+                        //.savedPath(path)
                         .setOpenAfterSuccess()//下载完成后打开
                         .setHideFile()//隐藏该文件
-                       // .verifyMd5("djso8d89dsjd9s7dsfj")//下载完后校验md5
-                        //.callback()
+                        .setNotifyMediaCenter(false)
+                        .verifyMd5("djso8d89dsjd9s7dsfj")//下载完后校验md5,如果
                         .getAsync(new MyNetListener() {
                             @Override
                             public void onSuccess(Object response, String onSuccess) {
@@ -231,7 +232,6 @@ public class MainActivityNew extends Activity {
                         .addParam("uploadFile555","1474363536041.jpg")
                         .addParam("api_secret777","898767hjk")
                         .showLoadingDialog(this)
-                        //.callback()
                         .postAsync(new MyNetListener<String>() {
                                             @Override
                                             public void onSuccess(String response, String resonseStr) {

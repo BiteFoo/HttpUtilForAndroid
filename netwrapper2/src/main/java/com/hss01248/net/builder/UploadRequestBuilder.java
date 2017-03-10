@@ -116,8 +116,8 @@ public class UploadRequestBuilder <T> extends ProgressBaseBuilder{
     }
 
     @Override
-    public UploadRequestBuilder setIgnoreCer() {
-        return (UploadRequestBuilder) super.setIgnoreCer();
+    public UploadRequestBuilder setIgnoreCertificateVerify() {
+        return (UploadRequestBuilder) super.setIgnoreCertificateVerify();
     }
 
     @Override

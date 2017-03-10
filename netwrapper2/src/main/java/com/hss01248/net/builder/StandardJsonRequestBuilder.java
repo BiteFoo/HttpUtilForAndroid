@@ -172,8 +172,8 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     }
 
     @Override
-    public StandardJsonRequestBuilder setIgnoreCer() {
-        return (StandardJsonRequestBuilder) super.setIgnoreCer();
+    public StandardJsonRequestBuilder setIgnoreCertificateVerify() {
+        return (StandardJsonRequestBuilder) super.setIgnoreCertificateVerify();
     }
 
     @Override
