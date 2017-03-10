@@ -396,7 +396,7 @@ Step 2. Add the dependency
 
 ```java
 dependencies {
-        compile 'com.github.hss01248:NetWrapper:2.0.0'
+        compile 'com.github.hss01248:HttpUtilForAndroid:2.0.0'
 }
 ```
 
