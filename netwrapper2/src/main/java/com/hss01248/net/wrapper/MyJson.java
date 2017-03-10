@@ -2,10 +2,8 @@ package com.hss01248.net.wrapper;
 
 
 import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2016/4/24.
@@ -24,8 +22,8 @@ public class MyJson {
     }
 
     public static <T> T  parse(String str,Class<T> clazz){
-        return new Gson().fromJson(str,clazz);
-        // return JSON.parseObject(str,clazz);
+       // return new Gson().fromJson(str,clazz);
+         return JSON.parseObject(str,clazz);
     }
 
     public static  <E> List<E> parseArray(String str,Class<E> clazz){
