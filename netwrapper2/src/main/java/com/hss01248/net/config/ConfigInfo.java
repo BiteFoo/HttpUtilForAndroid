@@ -1,23 +1,26 @@
 package com.hss01248.net.config;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.text.TextUtils;
+import android.content.DialogInterface;
 
 import com.hss01248.net.builder.BaseNetBuilder;
 import com.hss01248.net.builder.DownloadBuilder;
+import com.hss01248.net.builder.IClient;
 import com.hss01248.net.builder.JsonRequestBuilder;
 import com.hss01248.net.builder.StandardJsonRequestBuilder;
 import com.hss01248.net.builder.StringRequestBuilder;
 import com.hss01248.net.builder.UploadRequestBuilder;
-import com.hss01248.net.interfaces.INet;
-import com.hss01248.net.wrapper.MyNetApi2;
+import com.hss01248.net.interfaces.HttpMethod;
+import com.hss01248.net.wrapper.HttpUtil;
+import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.MyNetListener;
+import com.hss01248.net.wrapper.Tool;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
+import okhttp3.internal.http.HttpDate;
 
 /**
  * Created by Administrator on 2016/9/3.
@@ -27,12 +30,13 @@ public class ConfigInfo<T> {
     public ConfigInfo(){
 
     }
-
+    public Object request;//跟具体client有关的请求对象
 
     //核心参数
     public int method = HttpMethod.GET;
     public String url;
     public Map params ;
+    public String paramsStr;
 
 
 
@@ -58,90 +62,87 @@ public class ConfigInfo<T> {
     public boolean isCustomCodeSet;
 
 
-    public boolean isResponseJsonArray() {
-        return isResponseJsonArray;
-    }
-
-    public ConfigInfo<T> setResponseJsonArray() {
-        isResponseJsonArray = true;
-        return this;
-    }
-
-    private boolean isResponseJsonArray = false;
 
 
-    public ConfigInfo<T> setParamsAsJson() {
-        this.paramsAsJson = true;
-        return this;
-    }
+
+
+    public boolean isResponseJsonArray = false;
+
+
+
+
+    public    int cacheMode;
+    public int cookieMode;
 
 
 //本次请求是否忽略证书校验--也就是通过所有证书.
 // 这个属性没有全局配置,也不建议全局配置. 如果是自签名,放置证书到raw下,并在初始化前addCer方法,即可全局使用https
-    private boolean ignoreCer = false;
-
-    public ConfigInfo<T> setIgnoreCer() {
-        this.ignoreCer = true;
-        return this;
-    }
-
-    public boolean isIgnoreCer() {
-        return ignoreCer;
-    }
+    public boolean ignoreCer = false;
 
 
-    /**
-     * 单个请求的
-     * @param keyData
-     * @param keyCode
-     * @param keyMsg
 
-     * @return
-     */
-    public ConfigInfo<T> setStandardJsonKey(String keyData,String keyCode,String keyMsg){
-        this.key_data = keyData;
-        this.key_code = keyCode;
-        this.key_msg = keyMsg;
-        return this;
-    }
 
-    /**
-     * 单个请求的code的key可能会不一样
-     * @param keyCode
-     * @return
-     */
-    public ConfigInfo<T> setStandardJsonKeyCode(String keyCode){
-        this.key_code = keyCode;
-        return this;
-
-    }
-
-    /**
-     * 单个请求用到的code的具体值
-     * @param code_success
-     * @param code_unlogin
-     * @param code_unFound
-     * @return
-     */
-    public ConfigInfo<T> setCustomCodeValue(int code_success,int code_unlogin,int code_unFound){
-        this.code_success = code_success;
-        this.code_unlogin = code_unlogin;
-        this.code_unFound = code_unFound;
-        isCustomCodeSet = true;
-        return this;
-    }
 
 
 
     //请求的客户端对象
-    public INet client;
+    public IClient client;
 
     public ConfigInfo<T> start(){
         if(client == null){
-            client = MyNetApi2.adapter;
+            client = HttpUtil.getClient();
         }
+        validata();
         client.start(this);
         return this;
+    }
+
+    /**
+     * 参数逻辑校验
+     */
+    private void validata() {
+        String url = Tool.appendUrl(this.url, true);//todo 自动拼接url功能
+        this.url = url;
+        this.listener.url = url;
+        this.listener.configInfo = this;
+
+
+        //todo 自己实现缓存或者利用okhttp的缓存功能
+
+        //打印调试
+       /* MyLog.json(url);
+        MyLog.e("headers-----------------------------------");
+        MyLog.json(headers);
+        MyLog.e("params-----------------------------------");
+        MyLog.json(params);
+        MyLog.json(paramsStr);*/
+
+        //todo 看上传文件在不在
+
+
+        //todo 看下载路径在不在
+
+
+        //todo dialog的取消网络请求
+        //Tool.(loadingDialog)
+        if(loadingDialog!=null ){
+
+            if(tagForCancle ==null){
+                tagForCancle = UUID.randomUUID().toString();
+            }
+
+
+
+            loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    MyLog.i("取消请求中.......");
+                    HttpUtil.cancelRquest(tagForCancle);
+                   // listener.onCancel();//这里不需要回调,因为在执行过程中相应地方都会有回调
+
+                }
+            });
+        }
     }
 
 
@@ -150,117 +151,30 @@ public class ConfigInfo<T> {
 
     //状态为成功时,data对应的字段是否为空
     public boolean isSuccessDataEmpty = true;
-    public ConfigInfo<T> setFailWhenDataIsEmpty(){
+    /*public ConfigInfo<T> setFailWhenDataIsEmpty(){
         this.isSuccessDataEmpty = false;
         return this;
-    }
+    }*/
 
 
 
 
 
-    public ConfigInfo<T> setIsAppendToken(boolean isAppendToken){
-        this.isAppendToken = isAppendToken;
-        return this;
-    }
+
 
 
 
     //请求头  http://tools.jb51.net/table/http_header
     public Map<String,String> headers = new HashMap<>();
 
-   /* public ConfigInfo<T> setHeaders(Map<String,String> headers){
-        this.headers = headers;
-        return this;
-    }*/
-
-    public ConfigInfo<T> addHeaderOfContentType(String contentType){
-        this.headers.put("Content-Type",contentType);
-        return this;
-    }
-
-    public ConfigInfo<T> addHeaderOfAcceptType(String acceptType){
-        this.headers.put("Accept",acceptType);
-        return this;
-    }
-
-    public ConfigInfo<T> addHeaderOfAuthorization(String authorizationMsg){
-        this.headers.put("Authorization",authorizationMsg);
-        return this;
-    }
-
-    public ConfigInfo<T> addHeaderOfContentLength(long contentLength){
-        this.headers.put("Content-Length",contentLength+"");
-        return this;
-    }
-    public ConfigInfo<T> addHeaderOfContentLength(String contentStr){
-        this.headers.put("Content-Length",contentStr.getBytes().length+"");
-        return this;
-    }
-
-    /**
-     * 文件上传时调用
-     * @param file
-     * @return
-     */
-    public ConfigInfo<T> addHeaderOfContentLength(File file){
-        this.headers.put("Content-Length",file.length()+"");
-        return this;
-    }
-
-
-    public ConfigInfo<T> addHeaderOfRange(long from,long to){
-        this.headers.put("Range","bytes="+from+"-"+to);
-        return this;
-    }
-    public ConfigInfo<T> addHeaderOfUserAgent(String agent){
-        this.headers.put("User-Agent",agent);
-        return this;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 
     //重試次數
-    public int retryCount = NetDefaultConfig.RETRY_TIME;
-
-    public ConfigInfo<T> setRetryCount(int retryCount){
-        this.retryCount = retryCount;
-        return this;
-    }
+    public int retryCount ;
 
 
-    //超時設置,ms
-    public int timeout = NetDefaultConfig.TIME_OUT;
-
-    public ConfigInfo<T> setTimeout(int timeoutInMills){
-        this.timeout = timeoutInMills;
-        return this;
-    }
+    public int timeout ;
 
 
-   /* //強制控制回調的最短時間,默認不控制,如果需要,則自己寫.单位毫秒
-    public  int minTime = 0;
-
-    public long startTime;
-
-    public ConfigInfo<T> setDialogMinShowTime(int minTime){
-        if (minTime >NetDefaultConfig.TIME_MINI){
-            this.minTime = minTime;
-        }else {
-            this.minTime = NetDefaultConfig.TIME_MINI;
-        }
-        return this;
-    }*/
 
 
     /**
@@ -268,15 +182,15 @@ public class ConfigInfo<T> {
      * @param loadingMsg 提示语
      * @param activity  Context ,最好传入activity,当然context也可以
      * @return
-     */
+     *//*
     public ConfigInfo<T> setShowLoadingDialog( Activity activity,String loadingMsg){
         return setShowLoadingDialog(null,loadingMsg,activity,0);
     }
 
-    /**
+    *//**
      *
      * @return
-     */
+     *//*
     public ConfigInfo<T> setShowLoadingDialog(Dialog loadingDialog){
 
         return  setShowLoadingDialog(loadingDialog,"",null,0);
@@ -304,16 +218,16 @@ public class ConfigInfo<T> {
             this.loadingDialog = loadingDialog;
         }
 
-      /*  this.isForceMinTime = true;
+      *//*  this.isForceMinTime = true;
 
         if (minTime >NetDefaultConfig.TIME_MINI){
             this.minTime = minTime;
         }else {
             this.minTime = NetDefaultConfig.TIME_MINI;
-        }*/
+        }*//*
 
         return this;
-    }
+    }*/
 
 
 
@@ -326,43 +240,19 @@ public class ConfigInfo<T> {
 
 
     //用于取消请求用的
-    public Object tagForCancle = "";
+    public Object tagForCancle ;
 
-    /**
-     *
-     * @param tagForCancle
-     * @return
 
-     */
-    public ConfigInfo<T> setTagForCancle(Object tagForCancle){
-        this.tagForCancle = tagForCancle;
-        return this;
-    }
 
 
     //緩存控制
    // public boolean forceGetNet = true;
     public boolean shouldReadCache = false;
     public boolean shouldCacheResponse = false;
-    public long cacheTime = NetDefaultConfig.CACHE_TIME; //单位秒
+    public long cacheTime = HttpDate.MAX_DATE; //单位秒
 
 
-    /**
-     * 只支持String和json类型的请求,不支持文件下载的缓存.
-     * @param shouldReadCache 是否先去读缓存
-     * @param shouldCacheResponse 是否缓存response  内部已做判断,只会缓存状态是成功的那些请求
-     * @param cacheTimeInSeconds 缓存的时间,单位是秒
-     * @return
-     *
 
-     */
-    public ConfigInfo<T> setCacheControl(boolean shouldReadCache,boolean shouldCacheResponse,long cacheTimeInSeconds){
-        this.shouldReadCache = shouldReadCache;
-        this.shouldCacheResponse = shouldCacheResponse;
-        this.cacheTime = cacheTimeInSeconds;
-        return this;
-
-    }
 
     public boolean isFromCache = false;//内部控制,不让外部设置
 
@@ -374,17 +264,7 @@ public class ConfigInfo<T> {
 
 
 
-    /**
-     * 下载的一些通用策略:  downloadStratege
 
-     * 1. 是否用url中的文件名作为最终的文件名,或者指定文件名
-     * 2.如果是图片,音频,视频等多媒体文件,是否在下载完成后让mediacenter扫描一下?
-     * 3. 如果是apk文件,是否在下载完成后打开?或者弹窗提示用户?
-     * 4. md5校验 : 是否预先提供md5 ,下载完后与文件md5比较,以确定所下载的文件的完整性?
-     * 5.断点续传的实现
-     * 6.下载队列和指定同时下载文件的个数
-     *
-     * */
     //下載文件的保存路徑
     public String filePath;
     //是否打開,是否讓媒体库扫描,是否隐藏文件夹
@@ -426,6 +306,9 @@ public class ConfigInfo<T> {
     public static final int Priority_IMMEDIATE = 3;
     public static final int Priority_HIGH = 4;
 
+    public boolean isSync;
+    public String responseCharset;
+
     //http方法
 
 
@@ -438,46 +321,7 @@ public class ConfigInfo<T> {
     }*/
 
 
-    /**
-     * 以下是更新的版本的api
-    * */
 
-    public ConfigInfo<T> addParams(String key,String value){
-        if(params == null){
-            params = new HashMap<>();
-        }
-        params.put(key,value);
-        return this;
-    }
-
-    public ConfigInfo<T> addFile(String desc,String filePath){
-        if(files == null){
-            files = new HashMap<>();
-        }
-        files.put(desc,filePath);
-        return this;
-    }
-
-    public ConfigInfo<T> get(){
-        method = NetDefaultConfig.Method.GET;
-        client.start(this);
-        return this;
-    }
-    public ConfigInfo<T> post(){
-        method = NetDefaultConfig.Method.POST;
-        client.start(this);
-        return this;
-    }
-
-    public ConfigInfo<T> callback(MyNetListener<T> listener){
-        this.listener = listener;
-        return this;
-    }
-
-    public ConfigInfo<T> url(String url ){
-        this.url = url;
-        return this;
-    }
 
 
 
@@ -498,6 +342,13 @@ public class ConfigInfo<T> {
         this.timeout = builder.timeout;
         this.type = builder.type;
         this.loadingDialog = builder.loadingDialog;
+        this.paramsStr = builder.paramsStr;
+        this.isSync = builder.isSync;
+        this.responseCharset = builder.responseCharset;
+        this.cookieMode = builder.cookieMode;
+        this.cacheMode = builder.cacheMode;
+        this.tagForCancle = builder.tagForCancle;
+
 
     }
 

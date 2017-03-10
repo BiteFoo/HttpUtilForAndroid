@@ -6,11 +6,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.blankj.utilcode.utils.EncryptUtils;
-import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.interfaces.ILoginManager;
+import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyJson;
-import com.hss01248.net.wrapper.MyNetApi;
-import com.hss01248.net.wrapper.MyNetApi2;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.netdemo.bean.GetCommonJsonBean;
 import com.hss01248.netdemo.bean.GetStandardJsonBean;
@@ -52,26 +49,11 @@ public class MainActivityNew extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_new);
         ButterKnife.bind(this);
-       // Logger.init("netapi");
+       Logger.init("netapi");
         //HttpUtil.initAddHttps(R.raw.srca);//添加12306的证书
-        MyNetApi2.init(getApplicationContext(),"http://www.qxinli.com:9001/api/", new ILoginManager() {
-            @Override
-            public boolean isLogin() {
-                return false;
-            }
+        HttpUtil.init(getApplicationContext(),"http://www.qxinli.com:9001/api/");
 
-            @Override
-            public <T> ConfigInfo<T> autoLogin() {
-                return null;
-            }
-
-            @Override
-            public <T> ConfigInfo<T> autoLogin(MyNetListener<T> listener) {
-                return null;
-            }
-        });
-
-        MyNetApi2.initAppDefault("session_id","data","code","msg",0,5,2);
+        //HttpUtil.initAppDefault("session_id","data","code","msg",0,5,2);
 
 
 
@@ -90,7 +72,7 @@ public class MainActivityNew extends Activity {
         switch (view.getId()) {
             case R.id.get_string:
 
-                MyNetApi2.buildStringRequest("https://kyfw.12306.cn/otn/regist/init")
+                HttpUtil.buildStringRequest("https://kyfw.12306.cn/otn/regist/init")
                         .callback(new MyNetListener<String>() {
                                     @Override
                                     public void onSuccess(String response, String resonseStr) {
@@ -104,25 +86,25 @@ public class MainActivityNew extends Activity {
                                         Logger.e(error);
                                     }
                             })
-                        .setIgnoreCer().get();
+                        .setIgnoreCer().getAsync();
                 break;
             case R.id.post_string:
 
-                MyNetApi2.buildStringRequest("article/getArticleCommentList/v1.json")
-                        .addParams("pageSize","30")
-                        .addParams("articleId","1738")
-                        .addParams("pageIndex","1")
+                HttpUtil.buildStringRequest("article/getArticleCommentList/v1.json")
+                        .addParam("pageSize","30")
+                        .addParam("articleId","1738")
+                        .addParam("pageIndex","1")
                         .callback(new MyNetListener<String>() {
                             @Override
                             public void onSuccess(String response, String resonseStr) {
                                 Logger.e(response);
                             }
-                        }).post();
+                        }).postAsync();
                 break;
             case R.id.get_json:
 
 
-                MyNetApi2.buildJsonRequest("version/latestVersion/v1.json",GetCommonJsonBean.class)
+                HttpUtil.buildJsonRequest("version/latestVersion/v1.json",GetCommonJsonBean.class)
                         .showLoadingDialog(MainActivityNew.this,"加载中...")
                         .callback(new MyNetListener<GetCommonJsonBean>() {
                             @Override
@@ -130,20 +112,20 @@ public class MainActivityNew extends Activity {
                                 Logger.json(MyJson.toJsonStr(response));
                             }
                         })
-                        .get();
+                        .getAsync();
                 break;
             case R.id.post_json:
 
-                MyNetApi2.buildJsonRequest("article/getArticleCommentList/v1.json",PostCommonJsonBean.class)
-                        .addParams("pageSize","30")
-                        .addParams("articleId","1738")
-                        .addParams("pageIndex","1")
+                HttpUtil.buildJsonRequest("article/getArticleCommentList/v1.json",PostCommonJsonBean.class)
+                        .addParam("pageSize","30")
+                        .addParam("articleId","1738")
+                        .addParam("pageIndex","1")
                         .callback(new MyNetListener<PostCommonJsonBean>() {
                             @Override
                             public void onSuccess(PostCommonJsonBean response, String resonseStr) {
                                 Logger.json(MyJson.toJsonStr(response));
                             }
-                        }).post();
+                        }).postAsync();
 
                 break;
             case R.id.get_standard_json:
@@ -162,12 +144,12 @@ public class MainActivityNew extends Activity {
                 map4.put("key","fuck you");
 
 
-                MyNetApi2.buildStandardJsonRequest("http://japi.juhe.cn/joke/content/list.from",GetStandardJsonBean.class)
-                        .addParams("sort","desc")
-                        .addParams("page","1")
-                        .addParams("pagesize","4")
-                        .addParams("time",System.currentTimeMillis()/1000+"")
-                        .addParams("key","fuck you")
+                HttpUtil.buildStandardJsonRequest("http://japi.juhe.cn/joke/content/list.from",GetStandardJsonBean.class)
+                        .addParam("sort","desc")
+                        .addParam("page","1")
+                        .addParam("pagesize","4")
+                        .addParam("time",System.currentTimeMillis()/1000+"")
+                        .addParam("key","fuck you")
                         .setStandardJsonKey("result","error_code","reason")
                         .setCustomCodeValue(0,2,-1)
                         .showLoadingDialog(MainActivityNew.this,"加载中...")
@@ -182,16 +164,16 @@ public class MainActivityNew extends Activity {
                                 Logger.e(error);
                             }
                         })
-                        .get();
+                        .getAsync();
                 break;
             case R.id.post_standard_json:
 
-                MyNetApi2.buildStandardJsonRequest("article/getArticleCommentList/v1.json",PostStandardJsonArray.class)
-                        .addParams("pageSize","30")
-                        .addParams("articleId","1738")
-                        .addParams("pageIndex","1")
+                HttpUtil.buildStandardJsonRequest("article/getArticleCommentList/v1.json",PostStandardJsonArray.class)
+                        .addParam("pageSize","30")
+                        .addParam("articleId","1738")
+                        .addParam("pageIndex","1")
                         .setResponseJsonArray()
-                        .callback(new MyNetListener<PostStandardJsonArray>() {
+                        .postAsync(new MyNetListener<PostStandardJsonArray>() {
                             @Override
                             public void onSuccess(PostStandardJsonArray response, String resonseStr) {
                                 //Logger.json(MyJson.toJsonStr(response));
@@ -202,8 +184,7 @@ public class MainActivityNew extends Activity {
                                 super.onSuccessArr(response, responseStr, data, code, msg);
                                 Logger.json(MyJson.toJsonStr(response));
                             }
-                        })
-                        .post();
+                        });
                 break;
             case R.id.download:
                 /*File dir = Environment.getExternalStorageDirectory();
@@ -217,12 +198,13 @@ public class MainActivityNew extends Activity {
                 }*/
                 String url = "https://travel.12306.cn/imgs/resources/uploadfiles/images/fed7d5b4-37d3-4f32-bacc-e9b942cb721d_product_W572_H370.jpg";
                 String url2 = "http://www.qxinli.com/download/qxinli.apk";
-                MyNetApi2.buildDownloadRequest(url2)
+                HttpUtil.buildDownloadRequest(url2)
                         .showLoadingDialog(MainActivityNew.this)//显示下载进度dialog
                         .setOpenAfterSuccess()//下载完成后打开
                         .setHideFile()//隐藏该文件
-                        .verifyMd5("djso8d89dsjd9s7dsfj")//下载完后校验md5
-                        .callback(new MyNetListener() {
+                       // .verifyMd5("djso8d89dsjd9s7dsfj")//下载完后校验md5
+                        //.callback()
+                        .getAsync(new MyNetListener() {
                             @Override
                             public void onSuccess(Object response, String onSuccess) {
                                 Logger.e("onSuccess:"+onSuccess);
@@ -239,43 +221,44 @@ public class MainActivityNew extends Activity {
                                 super.onError(msgCanShow);
                                 Logger.e(msgCanShow);
                             }
-                        })
-                        .get();
+                        });
                 break;
             case R.id.upload:
 
 
-                MyNetApi2.buildUpLoadRequest("http://192.168.1.100:8080/gm/file/q_uploadAndroidApk.do","uploadFile","/storage/emulated/0/qxinli.apk")
+                HttpUtil.buildUpLoadRequest("http://192.168.1.100:8080/gm/file/q_uploadAndroidApk.do","uploadFile","/storage/emulated/0/qxinli.apk")
                         .addFile("uploadFile","/storage/emulated/0/Download/retrofit/qxinli.apk")
-                        .addParams("uploadFile555","1474363536041.jpg")
-                        .addParams("api_secret777","898767hjk")
-                        .showLoadingDialog(this,"文件上传",true,false)
-                        .callback(new MyNetListener<String>() {
-                            @Override
-                            public void onSuccess(String response, String resonseStr) {
-                                Logger.e(resonseStr);
-                            }
+                        .addParam("uploadFile555","1474363536041.jpg")
+                        .addParam("api_secret777","898767hjk")
+                        .showLoadingDialog(this)
+                        //.callback()
+                        .postAsync(new MyNetListener<String>() {
+                                            @Override
+                                            public void onSuccess(String response, String resonseStr) {
+                                                Logger.e(resonseStr);
+                                            }
 
-                            @Override
-                            public void onError(String error) {
-                                super.onError(error);
-                                Logger.e("error:"+error);
-                            }
+                                            @Override
+                                            public void onError(String error) {
+                                                super.onError(error);
+                                                Logger.e("error:"+error);
+                                            }
 
-                            @Override
-                            public void onProgressChange(long fileSize, long downloadedSize) {
-                                super.onProgressChange(fileSize, downloadedSize);
-                                Logger.e("upload onProgressChange:"+downloadedSize + "  total:"+ fileSize +"  progress:"+downloadedSize*100/fileSize);
-                            }
-                        }).post();
+                                            @Override
+                                            public void onProgressChange(long downloadedSize, long fileSize) {
+                                                super.onProgressChange(fileSize, downloadedSize);
+                                                Logger.e("upload onProgressChange:"+downloadedSize + "  total:"+ fileSize +"  progress:"+downloadedSize*100/fileSize);
+                                            }
+                                        });
                 break;
 
             case R.id.postbyjson:
 
-                MyNetApi2.buildStandardJsonRequest("http://app.cimc.com:9090/app/appVersion/getLatestVersion",VersionInfo.class)
-                        .addParams("versionName","1.0.0")
-                        .addParams("appType","0")
+                HttpUtil.buildStandardJsonRequest("http://app.cimc.com:9090/app/appVersion/getLatestVersion",VersionInfo.class)
+                        .addParam("versionName","1.0.0")
+                        .addParam("appType","0")
                         .setParamsAsJson()
+                        .showLoadingDialog(MainActivityNew.this,"jiaxxx")
                         .setCustomCodeValue(1,2,3)
                         .callback(new MyNetListener<VersionInfo>() {
 
@@ -296,7 +279,7 @@ public class MainActivityNew extends Activity {
                                 Logger.e(msgCanShow);
                             }
                         })
-                        .post();
+                        .postAsync();
                 break;
             case R.id.testvoice:
 
@@ -312,10 +295,10 @@ public class MainActivityNew extends Activity {
                         })
                         .get();*/
 
-                MyNetApi2.buildStandardJsonRequest("article/getArticleCommentList/v1.json",PostStandardJsonArray.class)
-                        .addParams("pageSize","30")
-                        .addParams("articleId","1738")
-                        .addParams("pageIndex","1")
+                HttpUtil.buildStandardJsonRequest("article/getArticleCommentList/v1.json",PostStandardJsonArray.class)
+                        .addParam("pageSize","30")
+                        .addParam("articleId","1738")
+                        .addParam("pageIndex","1")
                         .setResponseJsonArray()
                         .setCacheControl(false,true,60)
                         .callback(new MyNetListener<PostStandardJsonArray>() {
@@ -330,7 +313,7 @@ public class MainActivityNew extends Activity {
                                 Logger.json(MyJson.toJsonStr(response));
                             }
                         })
-                        .post();
+                        .postAsync();
                 break;
             case R.id.testvoice2:{
 
@@ -375,7 +358,7 @@ public class MainActivityNew extends Activity {
                 map11.put("aparty",aparty);
                 map11.put("bparty",bparty);
 
-                MyNetApi.getStandardJson("http://api.mixcom.cn/v2/",
+               /* MyNetApi.getStandardJson("http://api.mixcom.cn/v2/",
                         map11, VersionInfo.class, new MyNetListener<VersionInfo>() {
                             @Override
                             public void onSuccess(VersionInfo response, String resonseStr) {
@@ -395,7 +378,7 @@ public class MainActivityNew extends Activity {
                         })
                         .setIsAppendToken(false)
                         .setCustomCodeValue(200,-1,-1)
-                        .start();
+                        .start();*/
             }
 
 

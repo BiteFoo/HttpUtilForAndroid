@@ -8,10 +8,11 @@ import android.util.Log;
 import android.webkit.URLUtil;
 
 import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.config.NetDefaultConfig;
+import com.hss01248.net.interfaces.HttpMethod;
 import com.hss01248.net.wrapper.MyNetListener;
 
 import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -80,7 +81,7 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
 
     @Override
     protected ConfigInfo execute() {
-        method = NetDefaultConfig.Method.GET;
+        method = HttpMethod.GET;
         this.type = ConfigInfo.TYPE_DOWNLOAD;
         if(TextUtils.isEmpty(savedPath) ){
             savedPath = getDefaultSavedPath();
@@ -130,8 +131,23 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
     }
 
     @Override
-    public DownloadBuilder addParams(String key, String value) {
-        return (DownloadBuilder) super.addParams(key, value);
+    public DownloadBuilder addParam(String key, String value) {
+        return (DownloadBuilder) super.addParam(key, value);
+    }
+
+    @Override
+    public DownloadBuilder addHeaders(Map headers) {
+        return (DownloadBuilder) super.addHeaders(headers);
+    }
+
+    @Override
+    public DownloadBuilder addParams(Map params) {
+        return (DownloadBuilder) super.addParams(params);
+    }
+
+    @Override
+    public DownloadBuilder addParamsInString(String paramsStr) {
+        return (DownloadBuilder) super.addParamsInString(paramsStr);
     }
 
     @Override

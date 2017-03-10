@@ -3,19 +3,25 @@ package com.hss01248.net.builder;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.text.TextUtils;
 
 import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.config.NetDefaultConfig;
+import com.hss01248.net.config.GlobalConfig;
+import com.hss01248.net.interfaces.HttpMethod;
+import com.hss01248.net.util.CollectionUtil;
+import com.hss01248.net.util.TextUtils;
 import com.hss01248.net.wrapper.MyNetListener;
+import com.hss01248.net.wrapper.Tool;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import okhttp3.internal.http.HttpDate;
 
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
 public class BaseNetBuilder<T> {
+
 
     public Map<String,String> params = new HashMap<>();
     public Map<String,String> headers = new HashMap<>();
@@ -23,26 +29,104 @@ public class BaseNetBuilder<T> {
     public String url;
     public int method ;
     public int type ;//= ConfigInfo.TYPE_STRING;
+    public String responseCharset;
 
     public BaseNetBuilder(){
-        headers = new HashMap<>();
-        headers.put("User-Agent",NetDefaultConfig.USER_AGENT);
-        headers.put("Accept","*/*");
+
+
+        headers = new HashMap<String,String>();
+        params = new HashMap<String,String>();
+        if(TextUtils.isNotEmpty(GlobalConfig.get().getUserAgent())){
+            headers.put("User-Agent", GlobalConfig.get().getUserAgent());
+        }
+        // headers.put("Accept","*/*");
         headers.put("Connection","Keep-Alive");
+        //headers.put("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)");
+        isSync = true;
+        responseCharset = "utf-8";
 
 
     }
+    public boolean isSync;
+    public boolean paramsAsJson = false;
+    public BaseNetBuilder setParamsPostAsJson() {
+        this.paramsAsJson = true;
+        return this;
+    }
+
+    /**
+     * 以已经成型的参数形式来设置
+     * @param paramsStr
+     */
+    public BaseNetBuilder addParamsInString(String paramsStr) {
+        this.paramsStr = paramsStr;
+        return this;
+    }
+
+    public BaseNetBuilder setResponseCharset(String responseCharset) {
+        this.responseCharset = responseCharset;
+        return this;
+    }
+
+    public String paramsStr;
+
+    public BaseNetBuilder setCacheMode(int cacheMode) {
+        this.cacheMode = cacheMode;
+        return this;
+    }
+
+    public BaseNetBuilder setCookieMode(int cookieMode) {
+        this.cookieMode = cookieMode;
+        return this;
+    }
+
+    public    int cacheMode;
+    public int cookieMode;
+
+
+
+
+
+
 
 
 
     //todo 以下是http请求基本组成
-    public BaseNetBuilder<T> addHeader(String key,String value){
-        headers.put(key,value);
+    //todo 以下是http请求基本组成
+    public BaseNetBuilder<T> addHeader(String key, String value){
+        if(key!=null && value!=null){
+            headers.put(key,value);
+        }
+
+        return this;
+    }
+    public BaseNetBuilder<T> addHeaders(Map<String,String> headers){
+        if(headers !=null){
+            this.headers.putAll(headers);
+        }
+
         return this;
     }
 
-    public BaseNetBuilder<T> addParams(String key,String value){
-        params.put(key,value);
+    public BaseNetBuilder<T> addParams(Map<String,String> params){
+        //todo url encode 一下
+
+
+        if(params!=null){
+            this.params.putAll(params);
+        }
+        return this;
+    }
+
+
+    /**
+     * 在此处完成urlencode功能
+     * */
+    public BaseNetBuilder<T> addParam(String key, String value){
+
+        if(key!=null && value!=null){
+            params.put(Tool.urlEncode(key), Tool.urlEncode(value));
+        }
         return this;
     }
 
@@ -56,22 +140,76 @@ public class BaseNetBuilder<T> {
         return this;
     }
 
-    public ConfigInfo<T> get(){
-        method = NetDefaultConfig.Method.GET;
+    @Deprecated
+    public ConfigInfo<T> getSync(){
+        method = HttpMethod.GET;
         //client.start(this);
-      return   execute();
+        return   execute();
 
     }
 
-    public ConfigInfo<T> post(){
-        method = NetDefaultConfig.Method.POST;
+    public ConfigInfo<T> getAsync(){
+        method = HttpMethod.GET;
+        isSync = false;
+        //client.start(this);
+        return   execute();
+
+    }
+
+    public ConfigInfo<T> getAsync(MyNetListener<T> listener){
+        method = HttpMethod.GET;
+        this.listener = listener;
+        isSync = false;
+        //client.start(this);
+        return   execute();
+
+    }
+    @Deprecated
+    public ConfigInfo<T> postSync(){
+        method = HttpMethod.POST;
+        // client.start(this);
+        return  execute();
+
+    }
+
+    public ConfigInfo<T> postAsync(){
+        method = HttpMethod.POST;
+        isSync = false;
+        // client.start(this);
+        return  execute();
+
+    }
+
+    public ConfigInfo<T> postAsync(MyNetListener<T> listener){
+        method = HttpMethod.POST;
+        this.listener = listener;
+        isSync = false;
         // client.start(this);
         return  execute();
 
     }
 
     protected ConfigInfo<T> execute(){
-        return new ConfigInfo<T>(this);
+        if(validate()){
+            return new ConfigInfo<T>(this);
+        }else {
+            return null;
+        }
+    }
+
+    protected boolean validate() {
+
+        CollectionUtil.filterMap(headers, new CollectionUtil.MapFilter<String, String>() {
+            public boolean isRemain(Map.Entry<String, String> entry) {
+                return entry.getValue() != null;
+            }
+        });
+        CollectionUtil.filterMap(params, new CollectionUtil.MapFilter<String, String>() {
+            public boolean isRemain(Map.Entry<String, String> entry) {
+                return entry.getValue() != null;
+            }
+        });
+        return true;
     }
 
 
@@ -109,6 +247,7 @@ public class BaseNetBuilder<T> {
                     dialog.setProgressStyle(horizontal ? ProgressDialog.STYLE_HORIZONTAL:ProgressDialog.STYLE_SPINNER);
                     dialog.setIndeterminate(!updateProgress);
                     dialog.setCancelable(true);
+                    dialog.setCanceledOnTouchOutside(false);
                     this.loadingDialog = dialog;
                 }catch (Exception e){
                     e.printStackTrace();
@@ -123,7 +262,7 @@ public class BaseNetBuilder<T> {
     //todo 以下是缓存控制策略
     public boolean shouldReadCache = false;
     public boolean shouldCacheResponse = false;
-    public long cacheTime = NetDefaultConfig.CACHE_TIME; //单位秒
+    public long cacheTime = HttpDate.MAX_DATE; //单位秒
     public boolean isFromCache = false;//内部控制,不让外部设置
     /**
      * 只支持String和json类型的请求,不支持文件下载的缓存.
@@ -146,8 +285,8 @@ public class BaseNetBuilder<T> {
 
 
     //todo 以下是超时以及重试策略
-    public int retryCount = NetDefaultConfig.RETRY_TIME;
-    public int timeout = NetDefaultConfig.TIME_OUT;
+    public int retryCount = GlobalConfig.get().getRetryCount();
+    public int timeout = GlobalConfig.get().getConnectTimeout();
 
     public void setTagForCancle(Object tagForCancle) {
         this.tagForCancle = tagForCancle;

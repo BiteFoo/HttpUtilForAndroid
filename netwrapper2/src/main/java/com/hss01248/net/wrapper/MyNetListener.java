@@ -1,23 +1,17 @@
 package com.hss01248.net.wrapper;
 
 
-import android.app.ProgressDialog;
-import android.text.TextUtils;
+import android.support.annotation.MainThread;
 
 import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.interfaces.IListener;
-import com.hss01248.net.retrofit.progress.ProgressEvent;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
 /**
  * Created by Administrator on 2016/4/15 0015.
  */
-public abstract class MyNetListener<T> implements IListener<T> {
+@MainThread
+public abstract class MyNetListener<T>  {
 
     public String url;
     public ConfigInfo configInfo;
@@ -45,11 +39,11 @@ public abstract class MyNetListener<T> implements IListener<T> {
     /** Called when response success. */
     public abstract void onSuccess(T response,String resonseStr);
 
-    public  void onSuccessArr(List<T> response,String resonseStr){
+    public  void onSuccessArr(List<T> response, String resonseStr){
 
     }
 
-    public  void onSuccessObj(T response,String responseStr,String data,int code,String msg){
+    public  void onSuccessObj(T response, String responseStr, String data, int code, String msg){
             onSuccess(response,responseStr);
     }
 
@@ -73,8 +67,8 @@ public abstract class MyNetListener<T> implements IListener<T> {
 
      * @param code
      */
-    public void onCodeError(String msgCanShow,String hiddenMsg,int code) {
-        if (TextUtils.isEmpty(msgCanShow)){
+    public void onCodeError(String msgCanShow, String hiddenMsg, int code) {
+        if (msgCanShow==null || msgCanShow.equals("")){
             onError("错误码为:"+code);
         }else {
             onError(msgCanShow);
@@ -82,7 +76,9 @@ public abstract class MyNetListener<T> implements IListener<T> {
     }
 
 
-    public void onCancel() {}
+    public void onCancel() {
+        onError("请求已取消");
+    }
 
     public void onUnFound() {
         onError("没有找到该内容");
@@ -96,7 +92,21 @@ public abstract class MyNetListener<T> implements IListener<T> {
     /**
      * 都是B作为单位
      */
-    public void onProgressChange(long fileSize, long downloadedSize) {}
+    public void onProgressChange(long transPortedBytes, long totalBytes) {
+        //MyLog.e("transPortedBytes:"+transPortedBytes+"--totalBytes:"+totalBytes);
+    }
+
+    /**
+     *
+     * @param transPortedBytes
+     * @param totalBytes
+     * @param fileIndex
+     * @param filesCount 总的上传文件数量
+     */
+    public void onFilesUploadProgress(long transPortedBytes, long totalBytes,int fileIndex,int filesCount) {
+        MyLog.e("FilesUploadprogress:"+transPortedBytes+"--totalBytes:"+totalBytes+"--fileIndex:"+fileIndex+"-----filecount:"+filesCount);
+        onProgressChange(transPortedBytes,totalBytes);
+    }
 
     public void onFinish(){}
 
@@ -105,7 +115,9 @@ public abstract class MyNetListener<T> implements IListener<T> {
 
     /** Inform when the cache already use,
      * it means http networking won't execute. */
+
     public void onUsedCache() {}
+
 
 
     public void onRetry() {}
@@ -114,7 +126,7 @@ public abstract class MyNetListener<T> implements IListener<T> {
     /**
      * 只需要在retrofit下载时调用
      */
-    public void registEventBus(){
+    /*public void registEventBus(){
         EventBus.getDefault().register(this);
     }
 
@@ -136,40 +148,14 @@ public abstract class MyNetListener<T> implements IListener<T> {
 
 
             //进度更新: 数据太会出现
-            if(configInfo != null && configInfo.loadingDialog instanceof ProgressDialog){
-                ProgressDialog dialog = (ProgressDialog) configInfo.loadingDialog;
-                if(configInfo.updateProgress){
-                    if(configInfo.isLoadingDialogHorizontal){
 
-                        if(event.totalLength > Integer.MAX_VALUE){
-                            dialog.setProgress((int) (event.totalBytesRead*0.00001));
-                            dialog.setMax((int) (event.totalLength*0.00001));
-                        }else {
-                            dialog.setProgress((int) event.totalBytesRead);
-                            dialog.setMax((int) event.totalLength);
-                        }
-
-
-
-
-                    }else {
-                        String str = "加载中...";
-                        if(configInfo.type == ConfigInfo.TYPE_DOWNLOAD){
-                            str = "下载载中...";
-                        }else  if(configInfo.type == ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS) {
-                            str = "文件上传...";
-                        }
-                        dialog.setMessage(str+(event.totalBytesRead*100/event.totalLength)+"%");
-                    }
-                }
-            }
 
             if (event.done){
                 unRegistEventBus();
                 onFinish();
             }
         }
-    }
+    }*/
 
 
 }

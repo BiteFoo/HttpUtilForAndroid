@@ -1,23 +1,52 @@
 package com.hss01248.net.builder;
 
+
+import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.interfaces.HttpMethod;
+import com.hss01248.net.wrapper.Tool;
+
+
 /**
- * Created by Administrator on 2017/1/17 0017.
+ * Created by Administrator on 2017/1/19 0019.
  */
+public abstract class IClient {
+    protected abstract <E> ConfigInfo<E> getString(ConfigInfo<E> info);
 
-public interface IClient {
+    protected abstract  <E> ConfigInfo<E> postString(ConfigInfo<E> info);
 
-    public <E> NetConfig<E> buildStringRequest(NetConfig<E> config);
+    protected abstract ConfigInfo download(ConfigInfo info);
 
-    public <E> NetConfig<E> buildJsonRequest(NetConfig<E> config);
+    protected abstract ConfigInfo upload(ConfigInfo info);
 
-    public <E> NetConfig<E> buildStandardJsonRequest(NetConfig<E> config);
+    public <E> ConfigInfo<E> start(ConfigInfo<E> info){
+        Tool.showDialog(info.loadingDialog);
 
-    public<E> NetConfig<E> buildDownloadRequest(NetConfig<E> config);
 
-    <E> NetConfig<E> buildUpLoadRequest(NetConfig<E> config);
+        switch (info.type){
 
-    <E> NetConfig<E> start(NetConfig<E> config);
+            case ConfigInfo.TYPE_STRING:
+            case ConfigInfo.TYPE_JSON:
+            case ConfigInfo.TYPE_JSON_FORMATTED:{
+                if(info.method == HttpMethod.GET){
+                    return getString(info);
+                }else if(info.method == HttpMethod.POST){
+                    return postString(info);
+                }
+            }
+            case ConfigInfo.TYPE_DOWNLOAD:
+                return download(info);
+            case ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS:
+                return upload(info);
+            default:
+                return info;
+        }
+    }
 
-    <E> NetConfig<E> cancel(NetConfig<E> config);
+    public abstract void cancleRequest(Object tag);
+    public abstract void cancleAllRequest();
+
+
+
+
 
 }

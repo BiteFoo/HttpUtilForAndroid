@@ -1,32 +1,18 @@
 package com.hss01248.net.wrapper;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.hss01248.net.config.BaseNetBean;
-import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.config.HttpsConfig;
-import com.hss01248.net.config.NetDefaultConfig;
-import com.hss01248.net.interfaces.ILoginManager;
-import com.hss01248.net.retrofit.RetrofitClient;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by Administrator on 2016/9/21.
  */
 public class MyNetApi {
 
-    public static Context context;
+    /*public static Context context;
     public static BaseNet adapter;
 
 
-    /**
+    *//**
      * 添加证书.如果有,一定要在init方法前面调用:在init方法后面调用无效
      * @param cerFileInRaw  证书要放在raw目录下
-     */
+     *//*
     public static void addCer(int cerFileInRaw){
         if(HttpsConfig.certificates == null ){
             HttpsConfig.certificates = new ArrayList<>();
@@ -34,12 +20,12 @@ public class MyNetApi {
         HttpsConfig.certificates.add(cerFileInRaw);
     }
 
-    /**
+    *//**
      * 注意:如果要添加https的自签名证书,一定要在此方法之前调用addcer方法
      * @param context
      * @param baseUrl
      * @param loginManager
-     */
+     *//*
     public static void init(Context context,String baseUrl,ILoginManager loginManager){
         MyNetApi.context = context;
         NetDefaultConfig.baseUrl = baseUrl;
@@ -55,7 +41,7 @@ public class MyNetApi {
     }
 
 
-    /**
+    *//**
      * 指定标准格式json的三个字段.比如聚合api的三个字段分别是error_code(但有的又是resultcode),reason,result,error_code
      * 如果几个code没有,可以设为负值
      * @param tokenName
@@ -65,7 +51,7 @@ public class MyNetApi {
      * @param codeSuccess
      * @param codeUnlogin
      * @param codeUnfound
-     */
+     *//*
     public static void initAppDefault(String tokenName,String data,String code,String msg,int codeSuccess,int codeUnlogin,int codeUnfound){
         NetDefaultConfig.TOKEN = tokenName;
         NetDefaultConfig.KEY_DATA = data;
@@ -134,17 +120,17 @@ public class MyNetApi {
       return   adapter.upLoad(url,params,files,callback);
     }
 
-    /**
+    *//**
      * 上传接口没有其他字段,而且文件对应的key为默认("file")时,可使用此简化接口
      * @param url
      * @param filePath
      * @param callback
      * @return
-     */
+     *//*
     public static ConfigInfo upLoad(String url, String filePath, MyNetListener callback){
         Map<String,String> params = new HashMap<String, String>();
         Map<String,String> files = new HashMap<String, String>();
         files.put("file",filePath);
         return   adapter.upLoad(url,params,files,callback);
-    }
+    }*/
 }

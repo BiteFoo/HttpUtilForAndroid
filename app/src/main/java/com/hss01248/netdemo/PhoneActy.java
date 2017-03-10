@@ -1,32 +1,6 @@
 package com.hss01248.netdemo;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import com.blankj.utilcode.utils.EncryptUtils;
-import com.blankj.utilcode.utils.ToastUtils;
-import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.interfaces.ILoginManager;
-import com.hss01248.net.wrapper.MyNetApi;
-import com.hss01248.net.wrapper.MyNetListener;
-import com.hss01248.netdemo.bean.VersionInfo;
-import com.orhanobut.logger.Logger;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by Administrator on 2016/12/9 0009.
@@ -34,7 +8,7 @@ import butterknife.OnClick;
 
 public class PhoneActy extends Activity {
 
-    Activity activity;
+ /*   Activity activity;
 
     String num1;
     String num2;
@@ -118,9 +92,9 @@ public class PhoneActy extends Activity {
         }
     }
 
-    /**
+    *//**
      * 请求权限
-     */
+     *//*
     private void dial() {
 
        // bind();
@@ -142,20 +116,20 @@ public class PhoneActy extends Activity {
 
 
 
-       /* Intent intent = new Intent(Intent.ACTION_DIAL);
+       *//* Intent intent = new Intent(Intent.ACTION_DIAL);
         Uri data = Uri.parse("tel:17092580665" );
         intent.setData(data);
-        startActivity(intent);*/
+        startActivity(intent);*//*
 
     }
 
     private void unbind() {
         num1 = etNum1.getText().toString().trim();
         num2 = etNum2.getText().toString().trim();
-       /* if (TextUtils.isEmpty(num1) && TextUtils.isEmpty(num2)) {
+       *//* if (TextUtils.isEmpty(num1) && TextUtils.isEmpty(num2)) {
             ToastUtils.showShortToast(activity, "输入为空");
             return;
-        }*/
+        }*//*
         aparty = "86" + num1;
         bparty = "86" + num2;
         String timeStamp2 = System.currentTimeMillis() / 1000 + "";
@@ -183,8 +157,8 @@ public class PhoneActy extends Activity {
         map11.put("time", timeStamp2);
 
         map11.put("virtualnumber", smallNum);
-       /* map11.put("aparty", aparty);
-        map11.put("bparty", bparty);*/
+       *//* map11.put("aparty", aparty);
+        map11.put("bparty", bparty);*//*
 
         MyNetApi.getStandardJson("http://api.mixcom.cn/v2/",
                 map11, VersionInfo.class, new MyNetListener<VersionInfo>() {
@@ -302,7 +276,7 @@ public class PhoneActy extends Activity {
 
     }
 
-
+*/
 
 
 }

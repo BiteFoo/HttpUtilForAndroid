@@ -6,6 +6,8 @@ import android.app.Dialog;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.wrapper.MyNetListener;
 
+import java.util.Map;
+
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
@@ -45,8 +47,23 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
     }
 
     @Override
-    public StringRequestBuilder addParams(String key, String value) {
-        return (StringRequestBuilder) super.addParams(key, value);
+    public StringRequestBuilder addParam(String key, String value) {
+        return (StringRequestBuilder) super.addParam(key, value);
+    }
+
+    @Override
+    public StringRequestBuilder addHeaders(Map headers) {
+        return (StringRequestBuilder) super.addHeaders(headers);
+    }
+
+    @Override
+    public StringRequestBuilder addParams(Map params) {
+        return (StringRequestBuilder) super.addParams(params);
+    }
+
+    @Override
+    public StringRequestBuilder addParamsInString(String paramsStr) {
+        return (StringRequestBuilder) super.addParamsInString(paramsStr);
     }
 
     @Override

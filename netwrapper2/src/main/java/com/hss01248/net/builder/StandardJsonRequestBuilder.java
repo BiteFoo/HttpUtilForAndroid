@@ -3,10 +3,11 @@ package com.hss01248.net.builder;
 import android.app.Activity;
 import android.app.Dialog;
 
-import com.hss01248.net.config.BaseNetBean;
 import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.config.NetDefaultConfig;
+import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.wrapper.MyNetListener;
+
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/1/16 0016.
@@ -16,12 +17,12 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
 
     public StandardJsonRequestBuilder(){
         this.type = ConfigInfo.TYPE_JSON_FORMATTED;
-        this.key_code = NetDefaultConfig.KEY_CODE;
-        this.key_data = NetDefaultConfig.KEY_DATA;
-        this.key_msg = NetDefaultConfig.KEY_MSG;
-        this.code_success = BaseNetBean.CODE_SUCCESS;
-        this.code_unlogin = BaseNetBean.CODE_UNLOGIN;
-        this.code_unFound = BaseNetBean.CODE_UN_FOUND;
+        this.key_code = GlobalConfig.get().getStandardJsonKeyCode();
+        this.key_data = GlobalConfig.get().getStandardJsonKeyData();
+        this.key_msg = GlobalConfig.get().getStandardJsonKeyMsg();
+        this.code_success = GlobalConfig.get().getCodeSuccess();
+        this.code_unlogin = GlobalConfig.get().getCodeUnlogin();
+        this.code_unFound = GlobalConfig.get().getCodeUnfound();
         isCustomCodeSet = false;
         isSuccessDataEmpty = true;
     }
@@ -119,8 +120,23 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     }
 
     @Override
-    public StandardJsonRequestBuilder addParams(String key, String value) {
-        return (StandardJsonRequestBuilder) super.addParams(key, value);
+    public StandardJsonRequestBuilder addParam(String key, String value) {
+        return (StandardJsonRequestBuilder) super.addParam(key, value);
+    }
+
+    @Override
+    public StandardJsonRequestBuilder addHeaders(Map headers) {
+        return (StandardJsonRequestBuilder) super.addHeaders(headers);
+    }
+
+    @Override
+    public StandardJsonRequestBuilder addParams(Map params) {
+        return (StandardJsonRequestBuilder) super.addParams(params);
+    }
+
+    @Override
+    public StandardJsonRequestBuilder addParamsInString(String paramsStr) {
+        return (StandardJsonRequestBuilder) super.addParamsInString(paramsStr);
     }
 
     @Override

@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 
 import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.config.NetDefaultConfig;
+import com.hss01248.net.interfaces.HttpMethod;
 import com.hss01248.net.wrapper.MyNetListener;
 
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class UploadRequestBuilder <T> extends ProgressBaseBuilder{
 
     @Override
     protected ConfigInfo execute() {
-        method = NetDefaultConfig.Method.POST;
+        method = HttpMethod.POST;
         headers.put("Content-Type","multipart/form-data");
         return new ConfigInfo(this);
     }
@@ -51,8 +51,23 @@ public class UploadRequestBuilder <T> extends ProgressBaseBuilder{
     }
 
     @Override
-    public UploadRequestBuilder addParams(String key, String value) {
-        return (UploadRequestBuilder) super.addParams(key, value);
+    public UploadRequestBuilder addParam(String key, String value) {
+        return (UploadRequestBuilder) super.addParam(key, value);
+    }
+
+    @Override
+    public UploadRequestBuilder addHeaders(Map headers) {
+        return (UploadRequestBuilder) super.addHeaders(headers);
+    }
+
+    @Override
+    public UploadRequestBuilder addParams(Map params) {
+        return (UploadRequestBuilder) super.addParams(params);
+    }
+
+    @Override
+    public UploadRequestBuilder addParamsInString(String paramsStr) {
+        return (UploadRequestBuilder) super.addParamsInString(paramsStr);
     }
 
     @Override

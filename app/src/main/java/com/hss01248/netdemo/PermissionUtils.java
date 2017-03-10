@@ -3,6 +3,7 @@ package com.hss01248.netdemo;
 import android.Manifest;
 import android.os.Build;
 
+import com.hss01248.net.wrapper.HttpUtil;
 import com.mylhyl.acp.Acp;
 import com.mylhyl.acp.AcpListener;
 import com.mylhyl.acp.AcpOptions;
@@ -27,7 +28,7 @@ public class PermissionUtils {
     private static void askPermission(final PermissionListener listener,String... permission){
         if (Build.VERSION.SDK_INT >= 23) {
             // Marshmallow+
-            Acp.getInstance(PhoneActy.getContext()).request(new AcpOptions.Builder()
+            Acp.getInstance(HttpUtil.context).request(new AcpOptions.Builder()
                             .setPermissions(permission)
 //                .setDeniedMessage()
 //                .setDeniedCloseBtn()

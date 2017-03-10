@@ -58,7 +58,7 @@ public class ProxyTools {
     public static <T> T getNetListenerProxy(final T realObj, final ConfigInfo configInfo){
 
         Log.e("jj",realObj.getClass().getSuperclass().toString());//class com.hss01248.net.wrapper.MyNetListener
-        Log.e("jj",realObj.getClass().getSuperclass().getInterfaces()[0].toString());//interface com.hss01248.net.interfaces.IListener
+        Log.e("jj",realObj.getClass().getSuperclass().getInterfaces()[0].toString());//interface com.hss01248.net.oldapi.IListener
         return (T) Proxy.newProxyInstance(realObj.getClass().getClassLoader(), realObj.getClass().getSuperclass().getInterfaces(), new InvocationHandler() {
             @Override
             public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
