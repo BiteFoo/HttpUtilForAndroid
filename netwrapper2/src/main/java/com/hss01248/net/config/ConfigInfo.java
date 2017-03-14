@@ -71,7 +71,7 @@ public class ConfigInfo<T> {
 
 
 
-    public    int cacheMode;
+    public    int cacheMode = GlobalConfig.get().getCacheMode();
     public int cookieMode;
 
 

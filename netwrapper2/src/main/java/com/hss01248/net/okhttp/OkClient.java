@@ -11,6 +11,7 @@ import com.hss01248.net.okhttp.log.LogInterceptor;
 import com.hss01248.net.okhttp.progress.UploadFileRequestBody;
 import com.hss01248.net.util.HttpsUtil;
 import com.hss01248.net.util.TextUtils;
+import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyJson;
 import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.Tool;
@@ -21,6 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
+import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.CookieJar;
@@ -68,7 +71,9 @@ public class OkClient extends IClient {
 
             setGloablConfig(builder);
 
-
+            //设置缓存文件夹
+            File cacheFile = new File(HttpUtil.context.getCacheDir(), "okhttpcache");
+            Cache cache = new Cache(cacheFile, 1024 * 1024 * 100); //100Mb
 
 
             //HttpsUtil.setHttps(builder);
@@ -76,6 +81,7 @@ public class OkClient extends IClient {
                     .connectTimeout(GlobalConfig.get().getConnectTimeout(), TimeUnit.MILLISECONDS)
                     .readTimeout(0, TimeUnit.MILLISECONDS)
                     .writeTimeout(0, TimeUnit.MILLISECONDS)
+                    .cache(cache)
                     .build();
            // client.newBuilder().build()
 
@@ -86,7 +92,7 @@ public class OkClient extends IClient {
     private static void setGloablConfig(OkHttpClient.Builder builder) {
         setCookie(builder,GlobalConfig.get().getCookieMode());
         setHttps(builder,GlobalConfig.get().isIgnoreCertificateVerify());
-        setCacheStrategy(builder,GlobalConfig.get().getCacheMode());
+
         setLog(builder,GlobalConfig.get().isOpenLog());
     }
 
@@ -96,32 +102,44 @@ public class OkClient extends IClient {
         }
     }
 
-    private static void setCacheStrategy(OkHttpClient.Builder builder, int cacheMode) {
-        switch (cacheMode){
+    private static <E> void setCacheStrategy(Request.Builder builder, ConfigInfo<E> info) {
+        CacheControl.Builder cacheBuilder = new CacheControl.Builder();
+        CacheControl cacheControl;
+
+        switch (info.cacheMode){
             case CacheStrategy.NO_CACHE:{
                 //CacheControl
-
+                cacheBuilder = new CacheControl.Builder();
+                cacheBuilder.noCache();
             }
                 break;
             case CacheStrategy.DEFAULT:{
 
+
             }
             break;
             case CacheStrategy.REQUEST_FAILED_READ_CACHE:{
+                cacheControl = CacheControl.FORCE_NETWORK;
+
 
             }
             break;
             case CacheStrategy.IF_NONE_CACHE_REQUEST:{
+                cacheControl = CacheControl.FORCE_NETWORK;
 
             }
             break;
             case CacheStrategy.FIRST_CACHE_THEN_REQUEST:{
+                cacheControl = CacheControl.FORCE_NETWORK;
 
             }
             break;
             default:
             break;
         }
+
+         cacheControl = cacheBuilder.build();
+       builder.cacheControl(cacheControl);
     }
 
     private static void setHttps(OkHttpClient.Builder builder, boolean ignoreCertificateVerify) {
@@ -133,13 +151,15 @@ public class OkClient extends IClient {
     }
 
     private static void setCookie(OkHttpClient.Builder builder, int cookieMode) {
-        CookieJar cookieJar = CookieJar.NO_COOKIES;
+        CookieJar cookieJar ;
         if(cookieMode == GlobalConfig.COOKIE_MEMORY){
             cookieJar = new MemoryCookieJar();
         }else if (cookieMode == GlobalConfig.COOKIE_DISK){
             cookieJar = new DiskCookieJar();
-        }else {
+        }else if(cookieMode == GlobalConfig.COOKIE_NONE){
             cookieJar = CookieJar.NO_COOKIES;
+        }else {
+            cookieJar = new MemoryCookieJar();
         }
         builder.cookieJar(cookieJar);
     }
@@ -150,11 +170,14 @@ public class OkClient extends IClient {
         Request.Builder builder = new Request.Builder();
         addTag(builder,info);
 
+       // setCacheStrategy(builder,info.cacheMode);
+
         String url = Tool.generateUrlOfGET(info);
        MyLog.e("url:"+url);
         builder.url(url);
         //builder.
         addHeaders(builder,info.headers);
+
 
         handleStringRequest(info, builder);
         return info;

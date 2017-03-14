@@ -54,7 +54,7 @@ public class GlobalConfig {
     public static final int COOKIE_NONE = 1;
     public static final int COOKIE_MEMORY = 2;
     public static final int COOKIE_DISK = 3;
-    private int cookieMode = COOKIE_MEMORY;//会话cookie,不做持久化操作
+    private int cookieMode = COOKIE_MEMORY;//默认是会话cookie,不做持久化操作
     /**
      * 设置cookie管理策略
      */

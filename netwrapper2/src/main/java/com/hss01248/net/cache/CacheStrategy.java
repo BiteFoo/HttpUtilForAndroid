@@ -18,4 +18,6 @@ public class CacheStrategy {
     // @Retention(RetentionPolicy.CLASS)
     public @interface Mode {
     }
+
+
 }

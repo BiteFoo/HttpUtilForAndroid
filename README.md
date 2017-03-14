@@ -130,11 +130,35 @@ addHeaders(Map<String,String> headers)
 setCacheMode(int cacheMode)
 ```
 
-### cookie管理(todo)
+取值有:
+
+1. CacheStrategy.NO_CACHE = 1;//不使用缓存,该模式下,cacheKey,cacheTime 参数均无效
+
+2. CacheStrategy.DEFAULT = 2;//完全按照HTTP协议的默认缓存规则，例如有304响应头时缓存。
+
+3. CacheStrategy.REQUEST_FAILED_READ_CACHE = 3;//先请求网络，如果请求网络失败，则读取缓存，如果读取缓存失败，本次请求失败。会导致强制缓存响应.
+
+4. CacheStrategy.IF_NONE_CACHE_REQUEST = 4;//如果缓存不存在才请求网络，否则使用缓存。会导致强制缓存响应
+
+5. CacheStrategy.FIRST_CACHE_THEN_REQUEST = 5;//先使用缓存，不管是否存在，仍然请求网络。会导致强制缓存响应
+
+   注: 分类参考:[okhttp-OkGo](https://github.com/jeasonlzy/okhttp-OkGo)
+
+
+
+### cookie管理
 
 ```
 setCookieMode(int cookieMode) 
 ```
+
+取值有:
+
+1. GlobalConfig.COOKIE_NONE  不接收cookie
+2. GlobalConfig.COOKIE_MEMORY 会话cookie,只保存在内存中(默认值)
+3. GlobalConfig.COOKIE_DISK 持久化cookie
+
+
 
 ## 其他
 
@@ -220,6 +244,22 @@ onSuccessArr(List<T> response,String resonseStr)
 ## 响应为三字段标准json的请求:
 
 > 根据用户的配置自动解析三个字段,并回调.三个字段和code的几个取值单个请求没有设置的话,采用全局中的设置.
+
+### json格式类似:
+
+```
+{
+	"data":xxx,
+	"msg":"请求成功!",
+	"code":0
+}
+```
+
+> 其中,三个字段可以通过setStandardJsonKey()方法配置,
+>
+> 错误码code的几种常见取值(成功,未登录,未找到)也可以配置:setCustomCodeValue()
+>
+> 支持全局配置和单个请求的配置
 
 
 
@@ -356,6 +396,8 @@ HttpUtil.buildUpLoadRequest("http://192.168.1.100:8080/gm/file/q_uploadAndroidAp
 
 
 # 请求的取消
+
+> 请求的取消能够立即关闭socket,立即回调到onError中,只要在activity/fragment销毁时调用,就可以避免网络请求导致的内存泄漏.
 
 ## 取消单个请求
 
