@@ -2,8 +2,11 @@ package com.hss01248.net.okhttp;
 
 
 import com.hss01248.net.builder.IClient;
+import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.cookie.CookieManger;
+import com.hss01248.net.config.GlobalConfig;
+import com.hss01248.net.cookie.DiskCookieJar;
+import com.hss01248.net.cookie.MemoryCookieJar;
 import com.hss01248.net.okhttp.log.LogInterceptor;
 import com.hss01248.net.okhttp.progress.UploadFileRequestBody;
 import com.hss01248.net.util.HttpsUtil;
@@ -20,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.CookieJar;
 import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -50,7 +54,6 @@ public class OkClient extends IClient {
                    .connectTimeout(6000, TimeUnit.MILLISECONDS)
                    .readTimeout(0, TimeUnit.MILLISECONDS)
                    .writeTimeout(0, TimeUnit.MILLISECONDS)
-                   .cookieJar(new CookieManger())
                    .addNetworkInterceptor(new LogInterceptor())
                    .build();
        }
@@ -60,22 +63,86 @@ public class OkClient extends IClient {
     public static OkClient getInstance(){
         if(okClient ==null){
             okClient = new OkClient();
+
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+            setGloablConfig(builder);
+
+
+
+
             //HttpsUtil.setHttps(builder);
             OkClient.client = builder
-                    .connectTimeout(6000, TimeUnit.MILLISECONDS)
+                    .connectTimeout(GlobalConfig.get().getConnectTimeout(), TimeUnit.MILLISECONDS)
                     .readTimeout(0, TimeUnit.MILLISECONDS)
                     .writeTimeout(0, TimeUnit.MILLISECONDS)
-                    .cookieJar(new CookieManger())
-                    .addNetworkInterceptor(new LogInterceptor())
                     .build();
+           // client.newBuilder().build()
 
         }
         return okClient;
     }
 
+    private static void setGloablConfig(OkHttpClient.Builder builder) {
+        setCookie(builder,GlobalConfig.get().getCookieMode());
+        setHttps(builder,GlobalConfig.get().isIgnoreCertificateVerify());
+        setCacheStrategy(builder,GlobalConfig.get().getCacheMode());
+        setLog(builder,GlobalConfig.get().isOpenLog());
+    }
 
+    private static void setLog(OkHttpClient.Builder builder, boolean openLog) {
+        if(openLog){
+            builder.addNetworkInterceptor(new LogInterceptor());
+        }
+    }
 
+    private static void setCacheStrategy(OkHttpClient.Builder builder, int cacheMode) {
+        switch (cacheMode){
+            case CacheStrategy.NO_CACHE:{
+                //CacheControl
+
+            }
+                break;
+            case CacheStrategy.DEFAULT:{
+
+            }
+            break;
+            case CacheStrategy.REQUEST_FAILED_READ_CACHE:{
+
+            }
+            break;
+            case CacheStrategy.IF_NONE_CACHE_REQUEST:{
+
+            }
+            break;
+            case CacheStrategy.FIRST_CACHE_THEN_REQUEST:{
+
+            }
+            break;
+            default:
+            break;
+        }
+    }
+
+    private static void setHttps(OkHttpClient.Builder builder, boolean ignoreCertificateVerify) {
+        if(ignoreCertificateVerify){
+            HttpsUtil.setAllCerPass(builder);
+        }else {
+            HttpsUtil.setHttps(builder);
+        }
+    }
+
+    private static void setCookie(OkHttpClient.Builder builder, int cookieMode) {
+        CookieJar cookieJar = CookieJar.NO_COOKIES;
+        if(cookieMode == GlobalConfig.COOKIE_MEMORY){
+            cookieJar = new MemoryCookieJar();
+        }else if (cookieMode == GlobalConfig.COOKIE_DISK){
+            cookieJar = new DiskCookieJar();
+        }else {
+            cookieJar = CookieJar.NO_COOKIES;
+        }
+        builder.cookieJar(cookieJar);
+    }
 
 
     public <E> ConfigInfo<E> getString(final ConfigInfo<E> info) {
