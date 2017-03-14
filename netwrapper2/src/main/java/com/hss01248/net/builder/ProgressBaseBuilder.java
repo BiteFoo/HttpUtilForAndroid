@@ -5,7 +5,6 @@ import android.app.Activity;
 /**
  * Created by Administrator on 2017/1/18 0018.
  */
-
 public class ProgressBaseBuilder<T> extends BaseNetBuilder {
 
     public boolean isLoadingDialogHorizontal;

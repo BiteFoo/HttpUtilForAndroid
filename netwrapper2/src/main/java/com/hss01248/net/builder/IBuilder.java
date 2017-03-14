@@ -5,7 +5,7 @@ package com.hss01248.net.builder;
  */
 public interface IBuilder {
 
-    //TODO 新api,最简化,其他个性化设置由
+    // 新api,最简化,其他个性化设置由
     public <E> StringRequestBuilder<E> buildStringRequest(String url);
 
     public <E> JsonRequestBuilder<E> buildJsonRequest(String url, Class<E> clazz);

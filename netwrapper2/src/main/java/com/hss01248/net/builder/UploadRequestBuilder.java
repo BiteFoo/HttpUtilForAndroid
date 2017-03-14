@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
-public class UploadRequestBuilder <T> extends ProgressBaseBuilder{
+public class UploadRequestBuilder<T> extends ProgressBaseBuilder{
     public Map<String,String> files;
 
 
@@ -81,6 +81,11 @@ public class UploadRequestBuilder <T> extends ProgressBaseBuilder{
     }
 
 
+    /**
+     * 最简化的api
+     * @param activity
+     * @return
+     */
     public UploadRequestBuilder showLoadingDialog(Activity activity) {
         return  showLoadingDialog(activity,"文件上传中");
     }
