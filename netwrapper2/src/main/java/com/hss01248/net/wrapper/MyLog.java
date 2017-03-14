@@ -8,8 +8,17 @@ import android.util.Log;
 
 public class MyLog {
 
-    private static boolean isLog = true;
-    private static String tag = "netwrapper";
+    public static void setIsLog(boolean isLog) {
+        MyLog.isLog = isLog;
+    }
+
+    private static boolean isLog = false;
+
+    public static void setTag(String tag) {
+        MyLog.tag = tag;
+    }
+
+    private static String tag = "HttpUtil";
 
     public static void e(String obj){
         if(isLog){

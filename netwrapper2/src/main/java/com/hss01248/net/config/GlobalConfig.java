@@ -3,6 +3,7 @@ package com.hss01248.net.config;
 import android.text.TextUtils;
 
 import com.hss01248.net.cache.CacheStrategy;
+import com.hss01248.net.wrapper.MyLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -244,7 +245,7 @@ public class GlobalConfig {
         return logTag;
     }
 
-    private String logTag = "okhttp";
+    private String logTag = "HttpUtil";
 
     public boolean isOpenLog() {
         return isOpenLog;
@@ -252,8 +253,11 @@ public class GlobalConfig {
 
     public GlobalConfig openLog(String logTag) {
         isOpenLog = true;
+        MyLog.setIsLog(true);
+
         if(!TextUtils.isEmpty(logTag)){
             this.logTag = logTag;
+            MyLog.setTag(logTag);
         }
         return this;
     }
