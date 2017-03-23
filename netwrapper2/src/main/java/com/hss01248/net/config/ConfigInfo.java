@@ -35,7 +35,7 @@ public class ConfigInfo<T> {
     //核心参数
     public int method = HttpMethod.GET;
     public String url;
-    public Map params ;
+    public Map<String,String> params ;
     public String paramsStr;
 
 

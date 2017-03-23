@@ -19,6 +19,7 @@ import com.hss01248.net.wrapper.Tool;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -279,7 +280,23 @@ public class OkClient extends IClient {
         builder.headers(headBuilder.build());
     }
 
-    private FormBody getFormBody(Map<String,String> params) {
+    private FormBody getFormBody(ConfigInfo info) {
+        if(TextUtils.isNotEmpty(info.paramsStr)){
+            Map<String,String> paramsInStr = new HashMap<>();
+            String[] kvs = info.paramsStr.split("&");
+            if(kvs!=null && kvs.length>0){
+                for(String kv : kvs){
+                    String[] kvarr = kv.split("=");
+                    if(kvarr !=null && kvarr.length==2){
+                        paramsInStr.put(kvarr[0],kvarr[1]);
+                    }
+                }
+            }
+            info.paramsStr="";
+            info.params.putAll(paramsInStr);
+        }
+
+        Map<String,String> params = info.params;
         FormBody.Builder builder = new FormBody.Builder();
         for(Map.Entry<String,String> param   : params.entrySet()){
             builder.add(param.getKey(),param.getValue());
@@ -289,17 +306,26 @@ public class OkClient extends IClient {
 
     private void addPostBody(Request.Builder builder, ConfigInfo info) {
         RequestBody body = null;
-        if(TextUtils.isNotEmpty(info.paramsStr)){
-            body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), info.paramsStr);
-            builder.post(body);
-            return;
-        }
-
         if(info.paramsAsJson){
-            String jsonStr = MyJson.toJsonStr(info.params);
-            body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), jsonStr);
+            if(TextUtils.isNotEmpty(info.paramsStr) ){
+                if(info.paramsStr.startsWith("{")&& info.paramsStr.endsWith("}")){
+                    body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), info.paramsStr);
+                }else if(info.paramsStr.startsWith("[")&& info.paramsStr.endsWith("]")){
+                    body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), info.paramsStr);
+                }else {
+                    String jsonStr = MyJson.toJsonStr(info.params);
+                    body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), jsonStr);
+                }
+            }else {
+                String jsonStr = MyJson.toJsonStr(info.params);
+                body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), jsonStr);
+            }
+
+
+
+
         }else {
-            body=   getFormBody(info.params);
+            body=   getFormBody(info);
         }
         builder.post(body);
     }

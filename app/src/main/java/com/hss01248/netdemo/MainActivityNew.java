@@ -103,6 +103,11 @@ public class MainActivityNew extends Activity {
                             public void onSuccess(String response, String resonseStr) {
                                 Logger.e(response);
                             }
+                            @Override
+                            public void onError(String msgCanShow) {
+                                super.onError(msgCanShow);
+                                Logger.e(msgCanShow);
+                            }
                         }).postAsync();
                 break;
             case R.id.get_json:
@@ -114,6 +119,12 @@ public class MainActivityNew extends Activity {
                             @Override
                             public void onSuccess(GetCommonJsonBean response, String resonseStr) {
                                 Logger.json(MyJson.toJsonStr(response));
+                            }
+
+                            @Override
+                            public void onError(String msgCanShow) {
+                                super.onError(msgCanShow);
+                                Logger.e(msgCanShow);
                             }
                         })
                         .getAsync();
@@ -128,6 +139,11 @@ public class MainActivityNew extends Activity {
                             @Override
                             public void onSuccess(PostCommonJsonBean response, String resonseStr) {
                                 Logger.json(MyJson.toJsonStr(response));
+                            }
+                            @Override
+                            public void onError(String msgCanShow) {
+                                super.onError(msgCanShow);
+                                Logger.e(msgCanShow);
                             }
                         }).postAsync();
 

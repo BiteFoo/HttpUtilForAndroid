@@ -416,7 +416,15 @@ HttpUtil.cancelRquest(tag);
 ## 取消所有请求
 
 HttpUtil.cancleAllRequest()
-## 日志打印
+## 日志打印效果
+
+默认关闭日志,在GlobalConfig的openLog(String logTag) 打开.
+
+能够将请求和响应的全部内容都打印出来.
+
+如果是上传下载的大数据量,则相应的请求体或者响应体不打印.
+
+ ![log](log.jpg)
 
 # usage
 
@@ -439,7 +447,7 @@ Step 2. Add the dependency
 
 ```java
 dependencies {
-        compile 'com.github.hss01248:HttpUtilForAndroid:2.0.0'
+        compile 'com.github.hss01248:HttpUtilForAndroid:2.0.1'
 }
 ```
 
