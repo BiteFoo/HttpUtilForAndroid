@@ -18,6 +18,8 @@ import com.hss01248.net.wrapper.Tool;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -40,16 +42,35 @@ import okhttp3.Response;
  * Created by Administrator on 2017/1/19 0019.
  */
 public class OkClient extends IClient {
-    private static OkClient okClient;
-   private static OkHttpClient client;
-    private static OkHttpClient allCerPassClient;
+    private static OkClient instance;
+
+    /**
+     * 获取到一个client,以便与图片框架共享
+     * @return
+     */
+    public  OkHttpClient getOkhttpClientForImageLoader(boolean ignoreCertificateVerify) {
+        if(GlobalConfig.get().isIgnoreCertificateVerify() == ignoreCertificateVerify){
+            return okhttpClient;
+        }
+
+        OkHttpClient.Builder builder = okhttpClient.newBuilder();
+        setHttps(builder,ignoreCertificateVerify);
+        OkHttpClient client = builder.build();
+        tempClients.add(client);
+        return client;
+    }
+
+    private static OkHttpClient okhttpClient;
+   // private static OkHttpClient allCerPassClient;
+
+    private static List<OkHttpClient> tempClients ;
 
 
    private OkClient(){
 
    }
 
-   private OkHttpClient getAllCerPassClient(){
+   /*private OkHttpClient getAllCerPassClient(){
        if(allCerPassClient ==null){
            OkHttpClient.Builder builder = new OkHttpClient.Builder();
            HttpsUtil.setAllCerPass(builder);
@@ -61,11 +82,12 @@ public class OkClient extends IClient {
                    .build();
        }
        return allCerPassClient;
-   }
+   }*/
 
     public static OkClient getInstance(){
-        if(okClient ==null){
-            okClient = new OkClient();
+        if(instance ==null){
+            instance = new OkClient();
+            tempClients = new ArrayList<>();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
@@ -77,16 +99,17 @@ public class OkClient extends IClient {
 
 
             //HttpsUtil.setHttps(builder);
-            OkClient.client = builder
-                    .connectTimeout(GlobalConfig.get().getConnectTimeout(), TimeUnit.MILLISECONDS)
+            OkClient.okhttpClient = builder
+
+                    //.connectTimeout(GlobalConfig.get().getConnectTimeout(), TimeUnit.MILLISECONDS)
                     .readTimeout(0, TimeUnit.MILLISECONDS)
                     .writeTimeout(0, TimeUnit.MILLISECONDS)
                     .cache(cache)
                     .build();
-           // client.newBuilder().build()
+           // okhttpClient.newBuilder().build()
 
         }
-        return okClient;
+        return instance;
     }
 
     private static void setGloablConfig(OkHttpClient.Builder builder) {
@@ -94,6 +117,8 @@ public class OkClient extends IClient {
         setHttps(builder,GlobalConfig.get().isIgnoreCertificateVerify());
 
         setLog(builder,GlobalConfig.get().isOpenLog());
+
+        builder.connectTimeout(GlobalConfig.get().getConnectTimeout(),TimeUnit.MILLISECONDS);
     }
 
     private static void setLog(OkHttpClient.Builder builder, boolean openLog) {
@@ -338,15 +363,15 @@ public class OkClient extends IClient {
 
     private <E> void requestAndHandleResoponse(final ConfigInfo<E> info, Request.Builder builder, final ISuccessResponse successResponse) {
         final Request request = builder.build();
-        OkHttpClient theClient;
-        if(info.ignoreCer){
+        final OkHttpClient theClient = getInstance(info);
+        /*if(info.ignoreCer){
             if(allCerPassClient==null){
                 allCerPassClient = getAllCerPassClient();
             }
             theClient = allCerPassClient;
         }else {
-            theClient = client;
-        }
+            theClient = okhttpClient;
+        }*/
         Call call = theClient.newCall(request);
         info.request = call;
         if(info.isSync){//同步请求
@@ -371,6 +396,10 @@ public class OkClient extends IClient {
         //异步请求
         call.enqueue(new Callback() {
             public void onFailure(Call call, final IOException e) {
+                if(tempClients.contains(theClient)){//将临时client移除
+                    tempClients.remove(theClient);
+                }
+
                 Tool.callbackOnMainThread(new Runnable() {
                     @Override
                     public void run() {
@@ -382,6 +411,9 @@ public class OkClient extends IClient {
                 e.printStackTrace();
             }
             public void onResponse(Call call, final Response response) throws IOException {
+                if(tempClients.contains(theClient)){//将临时client移除
+                    tempClients.remove(theClient);
+                }
                 if(response.isSuccessful()){
                     successResponse.handleSuccess(call,response);
                 }else {
@@ -404,8 +436,11 @@ public class OkClient extends IClient {
 
     @Override
     public void cancleRequest(Object tag) {
-        cancel(client,tag);
-        cancel(allCerPassClient,tag);
+        cancel(okhttpClient,tag);
+
+        for(OkHttpClient client1: tempClients){
+            cancel(client1,tag);
+        }
     }
 
     private void cancel(OkHttpClient client, Object tag) {
@@ -426,16 +461,53 @@ public class OkClient extends IClient {
 
     @Override
     public void cancleAllRequest() {
-        if(client!=null){
-            client.dispatcher().cancelAll();
+        if(okhttpClient !=null){
+            okhttpClient.dispatcher().cancelAll();
         }
-        if(allCerPassClient != null){
-            client.dispatcher().cancelAll();
+
+        for(OkHttpClient client1: tempClients){
+            client1.dispatcher().cancelAll();
         }
+
 
 
     }
 
+    //@Override
+    private  OkHttpClient getInstance(ConfigInfo info) {
+        if(differentWithGlobal(info)){
+            return getInstance().okhttpClient;
+        }
+
+        OkHttpClient.Builder builder = getInstance().okhttpClient.newBuilder();
+        setCookie(builder,info.cookieMode);
+        setHttps(builder,info.isVerify);
+
+        //setLog(builder,info.lo);
+
+        builder.connectTimeout(info.timeout,TimeUnit.MILLISECONDS);
+
+        OkHttpClient client = builder.build();
+        tempClients.add(client);
+
+        return client;
+    }
+
+    private  boolean differentWithGlobal(ConfigInfo info){
+
+        if(info.cookieMode >0 && info.cookieMode!= GlobalConfig.get().getCookieMode()){
+            return true;
+        }
+        if(info.ignoreCer != GlobalConfig.get().isIgnoreCertificateVerify() ){
+            return true;
+        }
+
+        if(info.timeout >0 && info.timeout != GlobalConfig.get().getConnectTimeout() ){
+            return true;
+        }
+
+        return false;
+    }
 
 
 }

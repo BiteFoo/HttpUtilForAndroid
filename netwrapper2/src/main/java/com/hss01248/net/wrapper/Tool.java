@@ -8,12 +8,10 @@ import android.net.NetworkInfo;
 import android.webkit.MimeTypeMap;
 
 import com.blankj.utilcode.utils.EncryptUtils;
-import com.hss01248.net.cache.ACache;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.util.FileUtils;
 import com.hss01248.net.util.TextUtils;
-import com.litesuits.android.async.SimpleTask;
 
 import org.json.JSONObject;
 
@@ -356,7 +354,7 @@ public class Tool {
 
 
 
-    private static void cacheResponse(final String string, final ConfigInfo configInfo) {
+    /*private static void cacheResponse(final String string, final ConfigInfo configInfo) {
         if (configInfo.shouldCacheResponse && !configInfo.isFromCache && configInfo.cacheTime >0){
             SimpleTask<Void> simple = new SimpleTask<Void>() {
 
@@ -373,7 +371,7 @@ public class Tool {
             };
             simple.execute();
         }
-    }
+    }*/
 
 
 

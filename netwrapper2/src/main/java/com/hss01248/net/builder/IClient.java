@@ -45,6 +45,10 @@ public abstract class IClient {
     public abstract void cancleRequest(Object tag);
     public abstract void cancleAllRequest();
 
+    //public abstract IClient getInstance(ConfigInfo info);
+
+
+
 
 
 

@@ -3,10 +3,8 @@ package com.hss01248.net.config;
 import android.text.TextUtils;
 
 import com.hss01248.net.cache.CacheStrategy;
+import com.hss01248.net.util.HttpsUtil;
 import com.hss01248.net.wrapper.MyLog;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Administrator on 2017/3/9 0009.
@@ -201,36 +199,35 @@ public class GlobalConfig {
 
 
     //预埋证书
-    private List<String> certificateFiles = new ArrayList<>();
+    //private List<String> certificateFiles = new ArrayList<>();
 
-    public List<String> getCertificateAsserts() {
-        return certificateAsserts;
-    }
 
-    @Deprecated
-    public List<String> getCertificateFiles() {
-        return certificateFiles;
-    }
 
     public boolean isIgnoreCertificateVerify() {
         return ignoreCertificateVerify;
     }
 
-    private List<String> certificateAsserts= new ArrayList<>();
+    //private List<String> certificateAsserts= new ArrayList<>();
 
     @Deprecated  //只给java使用,android使用assert内置
     public  GlobalConfig addCrtificateFile(String filePath){
-        if(certificateFiles==null){
-            certificateFiles=new ArrayList<String>();
-        }
-        certificateFiles.add(filePath);
+        HttpsUtil.addCrtificateFile(filePath);
         return this;
     }
     public  GlobalConfig addCrtificateAssert(String fileName){
-        if(certificateAsserts==null){
+        HttpsUtil.addCrtificateAsserts(fileName);
+       /* if(certificateAsserts==null){
             certificateAsserts=new ArrayList<String>();
         }
-        certificateFiles.add(fileName);
+        certificateFiles.add(fileName);*/
+        return this;
+    }
+    public  GlobalConfig addCrtificateRaw(int rawId){
+        HttpsUtil.addCrtificateRaws(rawId);
+       /* if(certificateAsserts==null){
+            certificateAsserts=new ArrayList<String>();
+        }
+        certificateFiles.add(fileName);*/
         return this;
     }
 

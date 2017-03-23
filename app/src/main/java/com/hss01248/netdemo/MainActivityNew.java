@@ -51,7 +51,11 @@ public class MainActivityNew extends Activity {
         ButterKnife.bind(this);
        Logger.init("netapi");
         //HttpUtil.initAddHttps(R.raw.srca);//添加12306的证书
-        HttpUtil.init(getApplicationContext(),"http://www.qxinli.com:9001/api/");
+        HttpUtil.init(getApplicationContext(),"http://www.qxinli.com:9001/api/")
+               // .addCrtificateRaw(R.raw.srca)
+                .addCrtificateAssert("srca.cer")
+                .openLog("okhttp");
+
 
         //HttpUtil.initAppDefault("session_id","data","code","msg",0,5,2);
 
@@ -71,13 +75,12 @@ public class MainActivityNew extends Activity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.get_string:
-
+                //测试自签名/未被android系统承认的的https
                 HttpUtil.buildStringRequest("https://kyfw.12306.cn/otn/regist/init")
                         .callback(new MyNetListener<String>() {
                                     @Override
                                     public void onSuccess(String response, String resonseStr) {
                                         Logger.e(response);
-
                                     }
 
                                     @Override
@@ -86,7 +89,8 @@ public class MainActivityNew extends Activity {
                                         Logger.e(error);
                                     }
                             })
-                        .setIgnoreCertificateVerify().getAsync();
+                        //.setIgnoreCertificateVerify()
+                        .getAsync();
                 break;
             case R.id.post_string:
 

@@ -1,5 +1,9 @@
 package com.hss01248.net.util;
 
+import android.util.Log;
+
+import com.hss01248.net.wrapper.HttpUtil;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -29,19 +33,39 @@ import okhttp3.OkHttpClient;
 
 public class HttpsUtil {
 
-   private static List<String> certificateFiles;
+   private static List<String> certificateFiles =new ArrayList<String>();
+    private static List<String> certificateAsserts =new ArrayList<String>();
+    private static List<Integer> certificateRaws =new ArrayList<Integer>();
 
     public static void addCrtificateFile(String filePath){
         if(certificateFiles==null){
-            certificateFiles=new ArrayList<String>();
+            certificateFiles = new ArrayList<>();
         }
         certificateFiles.add(filePath);
     }
 
-    public static void setHttps(OkHttpClient.Builder builder){
-        if(certificateFiles!= null && certificateFiles.size()>0){
-            builder.sslSocketFactory(getSSLSocketFactory());
+    public static void addCrtificateAsserts(String assertName){
+        if(certificateAsserts==null){
+            certificateAsserts = new ArrayList<>();
         }
+        certificateAsserts.add(assertName);
+    }
+
+    public static void addCrtificateRaws(Integer rawId){
+        if(certificateRaws==null){
+            certificateRaws = new ArrayList<>();
+        }
+
+        if(rawId<=0){
+            return;
+        }
+        certificateRaws.add(rawId);
+    }
+
+    public static void setHttps(OkHttpClient.Builder builder){
+        //if(certificateFiles!= null && certificateFiles.size()>0){
+            builder.sslSocketFactory(getSSLSocketFactory());
+       // }
     }
 
 
@@ -52,9 +76,9 @@ public class HttpsUtil {
 
      * @return
      */
-    public static SSLSocketFactory getSSLSocketFactory() {
+    private static SSLSocketFactory getSSLSocketFactory() {
 
-        List<String> certificateFiles = HttpsUtil.certificateFiles;
+       // List<String> certificateFiles = HttpsUtil.certificateFiles;
 
         CertificateFactory certificateFactory;
         try {
@@ -62,18 +86,33 @@ public class HttpsUtil {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, null);
 
-            for (int i = 0; i < certificateFiles.size(); i++) {
-                File file = new File(certificateFiles.get(i));
-                if(!file.exists()){
-                    throw new RuntimeException("证书文件不存在"+certificateFiles.get(i));
-                }
-                InputStream certificate = new FileInputStream(file);
-                keyStore.setCertificateEntry(0+"", certificateFactory.generateCertificate(certificate));
 
-                if (certificate != null) {
-                    certificate.close();
+            if(certificateFiles!=null && certificateFiles.size()>0){
+                for(String filePath :certificateFiles){
+                    File file = new File(filePath);
+                    if(!file.exists()){
+                        continue;
+                    }
+                    InputStream certificate = new FileInputStream(file);
+                    setCertificateEntry(keyStore,certificateFactory,certificate,file.getName());
+                }
+
+            }
+            if(certificateRaws!=null && certificateRaws.size()>0){
+                for(Integer rawIds :certificateRaws){
+                    InputStream inputStream =     HttpUtil.context.getResources().openRawResource(rawIds);
+                    setCertificateEntry(keyStore,certificateFactory,inputStream,rawIds+"");
                 }
             }
+
+            if(certificateAsserts!=null && certificateAsserts.size()>0){
+                for(String fileName:certificateAsserts){
+                    InputStream inputStream =  HttpUtil.context.getAssets().open(fileName);
+                    setCertificateEntry(keyStore,certificateFactory,inputStream,fileName);
+                }
+
+            }
+
             SSLContext sslContext = SSLContext.getInstance("TLS");
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(keyStore);
@@ -93,7 +132,7 @@ public class HttpsUtil {
      * 你的host数据 列如 String hosts[]`= {“https//:aaaa,com”, “https//:bbb.com”}
      * {@link HostnameVerifier}
      */
-    public static HostnameVerifier getHostnameVerifier(final List<String> hostUrls) {
+    private static HostnameVerifier getHostnameVerifier(final List<String> hostUrls) {
 
         HostnameVerifier TRUSTED_VERIFIER = new HostnameVerifier() {
 
@@ -163,26 +202,12 @@ public class HttpsUtil {
 
 
 
-    public static SSLContext getSslContextForCertificateFile(InputStream caInput, String fileName) {
-        try {
-            KeyStore keyStore = getKeyStore(caInput, fileName);
-            SSLContext sslContext = SSLContext.getInstance("SSL");
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            trustManagerFactory.init(keyStore);
-            sslContext.init(null, trustManagerFactory.getTrustManagers(), new SecureRandom());
-            return sslContext;
-        } catch (Exception e) {
-            String msg = "Error during creating SslContext for certificate from assets";
-            //Log.e("SslUtilsAndroid", msg, e);
-            throw new RuntimeException(msg);
-        }
-    }
 
-    private static KeyStore getKeyStore(InputStream caInput, String fileName) {
-        KeyStore keyStore = null;
+
+    private static void setCertificateEntry(KeyStore keyStore,CertificateFactory cf ,InputStream caInput, String fileName) {
+
         try {
            // AssetManager assetManager = context.getAssets();
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
             //InputStream caInput = assetManager.open(fileName);
             Certificate ca;
             try {
@@ -191,15 +216,11 @@ public class HttpsUtil {
             } finally {
                 caInput.close();
             }
-
-            String keyStoreType = KeyStore.getDefaultType();
-            keyStore = KeyStore.getInstance(keyStoreType);
-            keyStore.load(null, null);
-            keyStore.setCertificateEntry("ca", ca);
+            keyStore.setCertificateEntry(fileName, ca);
         } catch (Exception e) {
-          //  Log.e("SslUtilsAndroid","Error during getting keystore", e);
+            Log.e("SslUtilsAndroid","Error during getting keystore", e);
         }
-        return keyStore;
+
     }
 
 
