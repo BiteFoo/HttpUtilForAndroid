@@ -416,6 +416,7 @@ HttpUtil.cancelRquest(tag);
 ## 取消所有请求
 
 HttpUtil.cancleAllRequest()
+## 日志打印
 
 # usage
 
