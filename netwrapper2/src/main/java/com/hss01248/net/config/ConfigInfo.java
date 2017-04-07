@@ -92,15 +92,16 @@ public class ConfigInfo<T> {
         if(client == null){
             client = HttpUtil.getClient();
         }
-        validata();
-        client.start(this);
+        if(validata()){
+            client.start(this);
+        }
         return this;
     }
 
     /**
      * 参数逻辑校验
      */
-    private void validata() {
+    private boolean validata() {
         String url = Tool.appendUrl(this.url, true);//todo 自动拼接url功能
         this.url = url;
         this.listener.url = url;
@@ -123,26 +124,39 @@ public class ConfigInfo<T> {
         //todo 看下载路径在不在
 
 
+
+
         //todo dialog的取消网络请求
         //Tool.(loadingDialog)
         if(loadingDialog!=null ){
-
             if(tagForCancle ==null){
                 tagForCancle = UUID.randomUUID().toString();
             }
-
-
 
             loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override
                 public void onCancel(DialogInterface dialog) {
                     MyLog.i("取消请求中.......");
+                    //listener.onCancel();//这里需要回调,虽然在执行过程中相应地方都会有回调,但那是走onError:socket closed,识别不了是oncancel
                     HttpUtil.cancelRquest(tagForCancle);
-                   // listener.onCancel();//这里不需要回调,因为在执行过程中相应地方都会有回调
-
+                   /* if(type== TYPE_DOWNLOAD){//下载比较特殊,只要开始传送文件了,就会走okhttp的onresponse,然后写文件流.socket断开后
+                        listener.onCancel();
+                    }*/
                 }
             });
         }
+
+        //todo 判断有没有网络,没有网,或者网连不通,直接就返回
+        if(!Tool.isNetworkAvailable()){
+            listener.onNoNetwork();
+            return false;
+        }
+
+        if(!listener.onPreValidate(this)){
+            return false;
+        }
+        listener.onPreExecute();
+        return true;
     }
 
 

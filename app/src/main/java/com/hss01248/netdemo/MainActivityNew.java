@@ -114,7 +114,7 @@ public class MainActivityNew extends Activity {
 
 
                 HttpUtil.buildJsonRequest("version/latestVersion/v1.json",GetCommonJsonBean.class)
-                        .showLoadingDialog(MainActivityNew.this,"加载中...")
+                        .showLoadingDialog()
                         .callback(new MyNetListener<GetCommonJsonBean>() {
                             @Override
                             public void onSuccess(GetCommonJsonBean response, String resonseStr) {
@@ -172,7 +172,7 @@ public class MainActivityNew extends Activity {
                         .addParam("key","fuck you")
                         .setStandardJsonKey("result","error_code","reason")
                         .setCustomCodeValue(0,2,-1)
-                        .showLoadingDialog(MainActivityNew.this,"加载中...")
+                        .showLoadingDialog()
                         .callback(new MyNetListener<GetStandardJsonBean>() {
                             @Override
                             public void onSuccess(GetStandardJsonBean response, String resonseStr) {
@@ -219,7 +219,7 @@ public class MainActivityNew extends Activity {
                 String url = "https://travel.12306.cn/imgs/resources/uploadfiles/images/fed7d5b4-37d3-4f32-bacc-e9b942cb721d_product_W572_H370.jpg";
                 String url2 = "http://www.qxinli.com/download/qxinli.apk";
                 HttpUtil.buildDownloadRequest(url2)
-                        .showLoadingDialog(MainActivityNew.this)//显示下载进度dialog
+                        .showLoadingDialog()//显示下载进度dialog
                         //.savedPath(path)
                         .setOpenAfterSuccess()//下载完成后打开
                         .setHideFile()//隐藏该文件
@@ -251,7 +251,7 @@ public class MainActivityNew extends Activity {
                         .addFile("uploadFile","/storage/emulated/0/Download/retrofit/qxinli.apk")
                         .addParam("uploadFile555","1474363536041.jpg")
                         .addParam("api_secret777","898767hjk")
-                        .showLoadingDialog(this)
+                        .showLoadingDialog()
                         .postAsync(new MyNetListener<String>() {
                                             @Override
                                             public void onSuccess(String response, String resonseStr) {
@@ -274,11 +274,12 @@ public class MainActivityNew extends Activity {
 
             case R.id.postbyjson:
 
+
                 HttpUtil.buildStandardJsonRequest("http://app.cimc.com:9090/app/appVersion/getLatestVersion",VersionInfo.class)
                         .addParam("versionName","1.0.0")
                         .addParam("appType","0")
                         .setParamsAsJson()
-                        .showLoadingDialog(MainActivityNew.this,"jiaxxx")
+                        .showLoadingDialog("jiaxxx")
                         .setCustomCodeValue(1,2,3)
                         .callback(new MyNetListener<VersionInfo>() {
 

@@ -1,6 +1,5 @@
 package com.hss01248.net.builder;
 
-import android.app.Activity;
 import android.app.Dialog;
 
 import com.hss01248.net.config.ConfigInfo;
@@ -76,28 +75,27 @@ public class UploadRequestBuilder<T> extends ProgressBaseBuilder{
     }
 
     @Override
-    public UploadRequestBuilder showLoadingDialog(Activity activity, String loadingMsg) {
-        return (UploadRequestBuilder) showLoadingDialog(activity,loadingMsg,true,true);
+    public UploadRequestBuilder showLoadingDialog( String loadingMsg) {
+        return (UploadRequestBuilder) showLoadingDialog(loadingMsg,true,true);
     }
 
 
     /**
      * 最简化的api
-     * @param activity
      * @return
      */
-    public UploadRequestBuilder showLoadingDialog(Activity activity) {
-        return  showLoadingDialog(activity,"文件上传中");
+    public UploadRequestBuilder showLoadingDialog() {
+        return  showLoadingDialog("文件上传中");
     }
 
     @Override
-    protected UploadRequestBuilder setShowLoadingDialog(Dialog loadingDialog, String msg, Activity activity, boolean updateProgress, boolean horizontal) {
-        return (UploadRequestBuilder) super.setShowLoadingDialog(loadingDialog, msg, activity, updateProgress, horizontal);
+    protected UploadRequestBuilder setShowLoadingDialog(Dialog loadingDialog, String msg,  boolean updateProgress, boolean horizontal) {
+        return (UploadRequestBuilder) super.setShowLoadingDialog(loadingDialog, msg,  updateProgress, horizontal);
     }
 
     @Override
-    public UploadRequestBuilder showLoadingDialog(Activity activity, String loadingMsg, boolean updateProgress, boolean horizontal) {
-        return (UploadRequestBuilder) super.showLoadingDialog(activity, loadingMsg, updateProgress, horizontal);
+    public UploadRequestBuilder showLoadingDialog( String loadingMsg, boolean updateProgress, boolean horizontal) {
+        return (UploadRequestBuilder) super.showLoadingDialog( loadingMsg, updateProgress, horizontal);
     }
 
     @Override

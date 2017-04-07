@@ -181,7 +181,8 @@ setIgnoreCertificateVerify()//设置忽略证书校验
 能在dialog取消时,自动取消对应的网络请求
 
 ```
-showLoadingDialog(Activity activity, String loadingMsg)//内置的ProgressDialog
+showLoadingDialog()
+showLoadingDialog(String loadingMsg)//内置的ProgressDialog
 showLoadingDialog(Dialog loadingDialog)//传入自定义的dialog
 ```
 
@@ -320,7 +321,7 @@ HttpUtil.buildStandardJsonRequest("http://japi.juhe.cn/joke/content/list.from",G
 可以选择是圆圈型的还是直线型的,可采用下面的方法配置
 
 ```
- showLoadingDialog(Activity activity, String loadingMsg, boolean updateProgress, boolean horizontal)
+ showLoadingDialog( String loadingMsg, boolean updateProgress, boolean horizontal)
 ```
 
 > 暂不实现多线程下载,断点续传等功能
@@ -397,7 +398,7 @@ HttpUtil.buildUpLoadRequest("http://192.168.1.100:8080/gm/file/q_uploadAndroidAp
 
 # 请求的取消
 
-> 请求的取消能够立即关闭socket,立即回调到onError中,只要在activity/fragment销毁时调用,就可以避免网络请求导致的内存泄漏.
+> 请求的取消能够立即关闭socket,立即回调到onCancel()中,只要在activity/fragment销毁时调用,就可以避免网络请求导致的内存泄漏.
 
 ## 取消单个请求
 
@@ -411,7 +412,7 @@ HttpUtil.cancelRquest(tag);
 
 ### 通过dialog取消
 
-如果弹出dialog,那么不管有没有设置tag,只要取消dialog,就能取消该网络请求.
+如果弹出dialog,那么不管有没有设置tag,只要取消dialog(后退键),就能取消该网络请求.
 
 ## 取消所有请求
 

@@ -8,6 +8,7 @@ import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.interfaces.HttpMethod;
 import com.hss01248.net.util.CollectionUtil;
+import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.util.TextUtils;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.net.wrapper.Tool;
@@ -216,10 +217,12 @@ public class BaseNetBuilder<T> {
 
     //TODO 以下是UI显示控制
     public Dialog loadingDialog;
+    public BaseNetBuilder<T> showLoadingDialog(){
+        return setShowLoadingDialog(null,"加载中...",false,false);
+    }
 
-
-    public BaseNetBuilder<T> showLoadingDialog(Activity activity, String loadingMsg){
-        return setShowLoadingDialog(null,loadingMsg,activity,false,false);
+    public BaseNetBuilder<T> showLoadingDialog(String loadingMsg){
+        return setShowLoadingDialog(null,loadingMsg,false,false);
     }
     /**
      *
@@ -227,10 +230,13 @@ public class BaseNetBuilder<T> {
      */
     public BaseNetBuilder<T> showLoadingDialog(Dialog loadingDialog){
 
-        return  setShowLoadingDialog(loadingDialog,"",null,false,false);
+        return  setShowLoadingDialog(loadingDialog,"",false,false);
     }
 
-    protected BaseNetBuilder<T> setShowLoadingDialog(Dialog loadingDialog, String msg, Activity activity,boolean updateProgress,boolean horizontal){
+    protected BaseNetBuilder<T> setShowLoadingDialog(Dialog loadingDialog, String msg,boolean updateProgress,boolean horizontal){
+
+        Activity activity = MyActyManager.getInstance().getCurrentActivity();
+
         if (loadingDialog == null){
             if (TextUtils.isEmpty(msg)){
                 msg = "加载中...";
@@ -239,7 +245,7 @@ public class BaseNetBuilder<T> {
                 this.loadingDialog = null;//todo 生成dialog,先不显示
             }else {
                 try {
-                    new ProgressDialog(activity).setTitle("");
+                    //new ProgressDialog(activity).setTitle("");
                    // this.loadingDialog = ProgressDialog.show(activity, "", msg,!updateProgress, true);
                     ProgressDialog dialog = new ProgressDialog(activity);
                     dialog.setTitle("");

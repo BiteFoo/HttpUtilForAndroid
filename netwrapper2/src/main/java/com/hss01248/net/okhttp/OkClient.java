@@ -236,7 +236,7 @@ public class OkClient extends IClient {
         //info.listener.registEventBus();
         requestAndHandleResoponse(info, builder, new ISuccessResponse() {
             public void handleSuccess(Call call, Response response) throws IOException {
-                Tool.writeResponseBodyToDisk(response.body(),info);
+                Tool.writeResponseBodyToDisk(call,response.body(),info);
             }
         });
 
@@ -405,11 +405,10 @@ public class OkClient extends IClient {
               final Response response =   call.execute();
                 if(response.isSuccessful()){
                     successResponse.handleSuccess(call,response);
+                }else if(call.isCanceled()){
+                    info.listener.onCancel();
                 }else {
-
-                            info.listener.onCodeError("http错误码:"+response.code(),response.message(),response.code());
-
-                    
+                    info.listener.onCodeError("http错误码:"+response.code(),response.message(),response.code());
                 }
 
             } catch (IOException e) {
@@ -421,7 +420,7 @@ public class OkClient extends IClient {
         }
         //异步请求
         call.enqueue(new Callback() {
-            public void onFailure(Call call, final IOException e) {
+            public void onFailure(final Call call, final IOException e) {
                 if(tempClients.contains(theClient)){//将临时client移除
                     tempClients.remove(theClient);
                 }
@@ -430,7 +429,12 @@ public class OkClient extends IClient {
                     @Override
                     public void run() {
                         Tool.dismiss(info.loadingDialog);
-                        info.listener.onError(e.getMessage());
+                        if(call.isCanceled()){
+                            info.listener.onCancel();
+                        }else {
+                            info.listener.onError(e.getMessage());
+                        }
+
                     }
                 });
 

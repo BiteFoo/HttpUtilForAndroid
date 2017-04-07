@@ -1,6 +1,5 @@
 package com.hss01248.net.builder;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -23,7 +22,6 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
     public DownloadBuilder(){
         super();
         this.type = ConfigInfo.TYPE_DOWNLOAD;
-
     }
 
     public String savedPath;
@@ -156,17 +154,17 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
     }
 
     @Override
-    public DownloadBuilder showLoadingDialog(Activity activity, String loadingMsg, boolean updateProgress, boolean horizontal) {
-        return (DownloadBuilder) super.showLoadingDialog(activity, loadingMsg, updateProgress, horizontal);
+    public DownloadBuilder showLoadingDialog( String loadingMsg, boolean updateProgress, boolean horizontal) {
+        return (DownloadBuilder) super.showLoadingDialog( loadingMsg, updateProgress, horizontal);
     }
 
-    public DownloadBuilder showLoadingDialog(Activity activity) {
-        return (DownloadBuilder) showLoadingDialog(activity,"文件下载中",updateProgress,isLoadingDialogHorizontal);
+    public DownloadBuilder showLoadingDialog() {
+        return (DownloadBuilder) showLoadingDialog("文件下载中",updateProgress,isLoadingDialogHorizontal);
     }
 
     @Override
-    public DownloadBuilder showLoadingDialog(Activity activity, String loadingMsg) {
-        return (DownloadBuilder) super.showLoadingDialog(activity, loadingMsg);
+    public DownloadBuilder showLoadingDialog( String loadingMsg) {
+        return (DownloadBuilder) super.showLoadingDialog(loadingMsg);
     }
 
     @Override

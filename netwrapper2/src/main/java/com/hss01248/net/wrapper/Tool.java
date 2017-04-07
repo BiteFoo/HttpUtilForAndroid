@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.blankj.utilcode.utils.EncryptUtils;
@@ -15,10 +17,12 @@ import com.hss01248.net.util.TextUtils;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -27,12 +31,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import okhttp3.Call;
 import okhttp3.ResponseBody;
 
 /**
  * Created by Administrator on 2016/9/21.
  */
 public class Tool {
+
+
+
+
+
 
     public static String urlEncode(String string)  {
         String str = "";
@@ -54,7 +64,7 @@ public class Tool {
     }
 
 
-    public static boolean writeResponseBodyToDisk(ResponseBody body, final ConfigInfo info) {
+    public static boolean writeResponseBodyToDisk(final Call call, ResponseBody body, final ConfigInfo info) throws IOException{
        // try {
             // todo change the file location/name according to your needs
             File futureStudioIconFile = new File(info.filePath);
@@ -129,10 +139,16 @@ public class Tool {
                 return true;
             } catch (final IOException e) {
                 e.printStackTrace();
+                //这里如果返回socket closed,可能是取消下载,也可能是网络断了,怎么判断?还是用call来判断
                 Tool.callbackOnMainThread(new Runnable() {
                     @Override
                     public void run() {
-                        info.listener.onError(e.getMessage());
+                        if(call.isCanceled()){
+                            info.listener.onCancel();
+                        }else {
+                            info.listener.onError(e.getMessage());
+                        }
+
                     }
                 });
 
@@ -259,17 +275,138 @@ public class Tool {
     public static boolean isNetworkAvailable() {
         ConnectivityManager connectivity = (ConnectivityManager) HttpUtil.context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null) {
-            NetworkInfo info = connectivity.getActiveNetworkInfo();
-            if (info != null && info.isConnected())
-            {
-                // 当前网络是连接的
-                if (info.getState() == NetworkInfo.State.CONNECTED)
-                {
-                    // 当前所连接的网络可用
-                    return true;
+
+        if (connectivity != null && connectivity.getActiveNetworkInfo() != null) {
+
+            boolean isAvialable = connectivity.getActiveNetworkInfo().isAvailable();
+            /*if(isAvialable){
+
+                if(lastPingTime==0){
+                    lastPingStatus =  ping();
+                    lastPingTime = System.currentTimeMillis();
+                    isAvialable &= lastPingStatus;
+                }else {
+                    if(System.currentTimeMillis() -lastPingTime >60000){//请求间隔超过1min,重新ping,探测网络状态
+                        lastPingStatus =  ping();
+                        lastPingTime = System.currentTimeMillis();
+                        isAvialable &= lastPingStatus;
+                    }else {//没有超过1min,就沿用之前的一个状态
+                        isAvialable &= lastPingStatus;
+                    }
                 }
+            }*/
+            return isAvialable;
+        }else {
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @return 返回值: 2G,3G,4G,WIFI,""
+     */
+    public static String getNetworkType()
+    {
+        String strNetworkType = "";
+
+        NetworkInfo networkInfo = ((ConnectivityManager) HttpUtil.context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected())
+        {
+            if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI)
+            {
+                strNetworkType = "WIFI";
             }
+            else if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE)
+            {
+                String _strSubTypeName = networkInfo.getSubtypeName();
+
+                Log.e("cocos2d-x", "Network getSubtypeName : " + _strSubTypeName);
+
+                // TD-SCDMA   networkType is 17
+                int networkType = networkInfo.getSubtype();
+                switch (networkType) {
+                    case TelephonyManager.NETWORK_TYPE_GPRS:
+                    case TelephonyManager.NETWORK_TYPE_EDGE:
+                    case TelephonyManager.NETWORK_TYPE_CDMA:
+                    case TelephonyManager.NETWORK_TYPE_1xRTT:
+                    case TelephonyManager.NETWORK_TYPE_IDEN: //api<8 : replace by 11
+                        strNetworkType = "2G";
+                        break;
+                    case TelephonyManager.NETWORK_TYPE_UMTS:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                    case TelephonyManager.NETWORK_TYPE_HSDPA:
+                    case TelephonyManager.NETWORK_TYPE_HSUPA:
+                    case TelephonyManager.NETWORK_TYPE_HSPA:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_B: //api<9 : replace by 14
+                    case TelephonyManager.NETWORK_TYPE_EHRPD:  //api<11 : replace by 12
+                    case TelephonyManager.NETWORK_TYPE_HSPAP:  //api<13 : replace by 15
+                        strNetworkType = "3G";
+                        break;
+                    case TelephonyManager.NETWORK_TYPE_LTE:    //api<11 : replace by 13
+                        strNetworkType = "4G";
+                        break;
+                    default:
+                        // http://baike.baidu.com/item/TD-SCDMA 中国移动 联通 电信 三种3G制式
+                        if (_strSubTypeName.equalsIgnoreCase("TD-SCDMA") || _strSubTypeName.equalsIgnoreCase("WCDMA") || _strSubTypeName.equalsIgnoreCase("CDMA2000"))
+                        {
+                            strNetworkType = "3G";
+                        }
+                        else
+                        {
+                            strNetworkType = _strSubTypeName;
+                        }
+
+                        break;
+                }
+
+                Log.e("cocos2d-x", "Network getSubtype : " + Integer.valueOf(networkType).toString());
+            }
+        }
+
+        Log.e("cocos2d-x", "Network Type : " + strNetworkType);
+
+        return strNetworkType;
+    }
+
+
+    private static long lastPingTime =0;
+    private static boolean lastPingStatus = false;
+
+    /** @author sichard
+     * @category 判断是否有外网连接（普通方法不能判断外网的网络是否连接，比如连接上局域网）
+     * ping 是网络请求,不能在主线程,所以这里没有意义
+            * @return
+            */
+    public static final boolean ping() {
+
+        String result = null;
+        try {
+            String ip = "www.baidu.com";// ping 的地址，可以换成任何一种可靠的外网
+            Process p = Runtime.getRuntime().exec("ping -c 3 -w 100 " + ip);// ping网址3次
+            // 读取ping的内容，可以不加
+            InputStream input = p.getInputStream();
+            BufferedReader in = new BufferedReader(new InputStreamReader(input));
+            StringBuffer stringBuffer = new StringBuffer();
+            String content = "";
+            while ((content = in.readLine()) != null) {
+                stringBuffer.append(content);
+            }
+            Log.d("------ping-----", "result content : " + stringBuffer.toString());
+            // ping的状态
+            int status = p.waitFor();
+            if (status == 0) {
+                result = "success";
+                return true;
+            } else {
+                result = "failed";
+            }
+        } catch (IOException e) {
+            result = "IOException";
+        } catch (InterruptedException e) {
+            result = "InterruptedException";
+        } finally {
+            Log.d("----result---", "result = " + result);
         }
         return false;
     }
@@ -340,14 +477,14 @@ public class Tool {
     }
 
 
-
-
-
+    /**
+     * 没必要加callbackonUithread,因为都是自己内部用,能确保都在主线程调用
+     * @param dialog
+     */
     public static void dismiss(Dialog dialog) {
         if(dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
-
     }
 
 
@@ -615,14 +752,20 @@ public class Tool {
         }
     }
 
-    public static void showDialog(Dialog dialog){
-        if(dialog!=null && !dialog.isShowing()){
-            try {
-                dialog.show();
-            }catch (Exception e){
-                e.printStackTrace();
+    public static void showDialog(final Dialog dialog){
+        callbackOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                if(dialog!=null && !dialog.isShowing()){
+                    try {
+                        dialog.show();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
+        });
+
     }
 
     private static <E> void parseCommonJson(final String string, final ConfigInfo<E> configInfo) {

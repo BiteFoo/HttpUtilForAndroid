@@ -24,7 +24,22 @@ public abstract class MyNetListener<T>  {
      */
     public  void onEmpty(){}
 
-    public void onPreExecute() {}
+    /**
+     *提供给开发者的校验通过后,执行前最后一步的调用
+     * @return
+     */
+    public void onPreExecute() {
+
+    }
+
+    /**
+     * 提供给开发者的额外 的校验接口
+     * @param config
+     * @return
+     */
+    public boolean onPreValidate(ConfigInfo config) {
+        return true;
+    }
 
     public void onNoNetwork(){
         onError("当前没有网络");
