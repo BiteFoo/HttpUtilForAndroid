@@ -16,6 +16,8 @@
 
 api设计上结合http协议和android平台特点来实现: loading对话框,进度条显示,文件下载后的打开/扫描到媒体库
 
+六种缓存策略可选,涵盖大多数业务场景.
+
 [![](https://jitpack.io/v/hss01248/NetWrapper.svg)](https://jitpack.io/#hss01248/NetWrapper)
 
 
