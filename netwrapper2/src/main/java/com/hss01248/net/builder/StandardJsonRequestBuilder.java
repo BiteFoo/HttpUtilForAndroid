@@ -23,7 +23,7 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
         this.code_unlogin = GlobalConfig.get().getCodeUnlogin();
         this.code_unFound = GlobalConfig.get().getCodeUnfound();
         isCustomCodeSet = false;
-        isSuccessDataEmpty = true;
+        isTreatEmptyDataAsSuccess  = true;//todo quanju
     }
 
 
@@ -43,6 +43,8 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     public int code_unFound;
 
     public boolean isCustomCodeSet ;
+
+
 
     /**
      * 单个请求的
@@ -87,9 +89,15 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
 
 
     //todo 状态为成功时,data对应的字段是否为空
-    public boolean isSuccessDataEmpty ;
-    public StandardJsonRequestBuilder<T> setFailWhenDataIsEmpty(){
-        this.isSuccessDataEmpty = false;
+    public boolean isTreatEmptyDataAsSuccess ;
+
+    /**
+     * 设置 当data对应字段为空时,回调是成功还是失败
+     * 默认是成功.
+     * 只有当data预期为jsonobject时,这个设置才生效
+     */
+    public StandardJsonRequestBuilder<T> setTreatEmptyDataStrAsSuccess(boolean treatEmptyDataAsSuccess){
+        this.isTreatEmptyDataAsSuccess = treatEmptyDataAsSuccess;
         return this;
     }
 

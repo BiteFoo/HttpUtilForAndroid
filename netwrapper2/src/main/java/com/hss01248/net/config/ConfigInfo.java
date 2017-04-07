@@ -185,9 +185,9 @@ public class ConfigInfo<T> {
     public boolean isAppendToken = true;
 
     //状态为成功时,data对应的字段是否为空
-    public boolean isSuccessDataEmpty = true;
+    public boolean isTreatEmptyDataAsSuccess = true;
     /*public ConfigInfo<T> setFailWhenDataIsEmpty(){
-        this.isSuccessDataEmpty = false;
+        this.isTreatEmptyDataAsSuccess = false;
         return this;
     }*/
 
@@ -427,7 +427,7 @@ public class ConfigInfo<T> {
         this.code_unlogin = builder.code_unlogin;
         this.code_unFound = builder.code_unFound;
         this.isCustomCodeSet = builder.isCustomCodeSet;
-        this.isSuccessDataEmpty = builder.isSuccessDataEmpty;
+        this.isTreatEmptyDataAsSuccess = builder.isTreatEmptyDataAsSuccess;
 
         this.key_code = builder.key_code;
         this.key_data = builder.key_data;

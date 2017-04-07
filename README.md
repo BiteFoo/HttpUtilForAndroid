@@ -65,6 +65,11 @@ onCancel()
 onProgressChange(long transPortedBytes, long totalBytes)
 onFilesUploadProgress(long transPortedBytes, long totalBytes,int fileIndex,int filesCount)
 
+//返回为空
+onEmpty()
+1.在commonjson中,返回空,"","{}","[]","null"等情况时会走这个回调
+2.或者三字段json中,
+预期返回为一个jsonArray(即解析后的List<T> response),而实际返回"[]"时,会走此回调
 
 ```
 
@@ -339,6 +344,29 @@ HttpUtil.buildStandardJsonRequest("http://japi.juhe.cn/joke/content/list.from",G
         })
         .getAsync();
 ```
+
+### 自定义配置
+
+> 当data对应字段预期为jsonobject,而实际为空,空字符串,或者"null","{}"时,是走成功的回调还是失败的回调:
+>
+> 全局和单个请求均可配置.默认为true,走成功的回调
+
+```
+setTreatEmptyDataStrAsSuccess(boolean treatEmptyDataAsSuccess)
+```
+
+三个字段的自定义配置,全局和单个请求均可配置:
+
+```
+setStandardJsonKeys(String key_data, String key_code, String key_msg)
+setStandardJsonCodes(int codeSuccess,int codeUnlogin,int codeUnfound)
+```
+
+### 相关的回调逻辑
+
+
+
+
 
 ## 文件下载
 

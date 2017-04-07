@@ -2,6 +2,7 @@ package com.hss01248.net.config;
 
 import android.text.TextUtils;
 
+import com.hss01248.net.builder.StandardJsonRequestBuilder;
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.util.HttpsUtil;
 import com.hss01248.net.wrapper.MyLog;
@@ -98,6 +99,13 @@ public class GlobalConfig {
     }
     public String getStandardJsonKeyMsg() {
         return key_msg;
+    }
+
+    public boolean isTreatEmptyDataAsSuccess ;
+
+    public GlobalConfig setTreatEmptyDataStrAsSuccess(boolean treatEmptyDataAsSuccess){
+        this.isTreatEmptyDataAsSuccess = treatEmptyDataAsSuccess;
+        return this;
     }
 
     /**

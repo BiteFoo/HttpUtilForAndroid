@@ -634,7 +634,7 @@ public class Tool {
                         if(configInfo.isResponseJsonArray){
                             configInfo.listener.onEmpty();
                         }else {
-                            if(configInfo.isSuccessDataEmpty){
+                            if(configInfo.isTreatEmptyDataAsSuccess){
                                 configInfo.listener.onSuccess(null,TextUtils.isEmpty(msg)? "请求成功!" :msg,isFromCache);
                             }else {
                                 configInfo.listener.onError("数据为空");
@@ -795,22 +795,33 @@ public class Tool {
                     cacheResponse(string, configInfo);
                 }else if (string.startsWith("[")){
                     final List<E> beans =  MyJson.parseArray(string,configInfo.clazz);
+
                     callbackOnMainThread(new Runnable() {
                         @Override
                         public void run() {
-                            configInfo.listener.onSuccessArr(beans,string,string,0,"",isFromCache);
+                            if(beans!=null && beans.size()>0){
+                                configInfo.listener.onSuccessArr(beans,string,string,0,"",isFromCache);
+                                cacheResponse(string, configInfo);
+                            }else {
+                                configInfo.listener.onEmpty();
+                            }
+
                         }
                     });
 
-                    cacheResponse(string, configInfo);
+
                 }else {
-                    callbackOnMainThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            configInfo.listener.onError("不是标准json格式");
-                        }
-                    });
-
+                    if(string.startsWith("\"")&& string.endsWith("\"")){
+                        String str = string.substring(1,string.length()-1);
+                        parseCommonJson(str,configInfo,isFromCache);
+                    }else {
+                        callbackOnMainThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                configInfo.listener.onError("不是标准json格式");
+                            }
+                        });
+                    }
                 }
             }catch (final Exception e){
                 e.printStackTrace();
@@ -820,7 +831,6 @@ public class Tool {
                         configInfo.listener.onError(e.toString());
                     }
                 });
-
             }
         }
     }

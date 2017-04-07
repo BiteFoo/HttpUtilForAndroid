@@ -30,6 +30,8 @@ public class BaseNetBuilder<T> {
     public int type ;//= ConfigInfo.TYPE_STRING;
     public String responseCharset;
 
+
+
     public BaseNetBuilder setExtraTag(Object extraTag) {
         this.extraTag = extraTag;
         return this;
@@ -48,7 +50,7 @@ public class BaseNetBuilder<T> {
         // headers.put("Accept","*/*");
         headers.put("Connection","Keep-Alive");
         //headers.put("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)");
-        isSync = true;
+        isSync = false;
         responseCharset = "utf-8";
 
 
