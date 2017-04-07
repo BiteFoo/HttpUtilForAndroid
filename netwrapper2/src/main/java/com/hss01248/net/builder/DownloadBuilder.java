@@ -172,10 +172,10 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
         return (DownloadBuilder) super.showLoadingDialog(loadingDialog);
     }
 
-    @Override
+    /*@Override
     public DownloadBuilder setCacheControl(boolean shouldReadCache, boolean shouldCacheResponse, long cacheTimeInSeconds) {
         return (DownloadBuilder) super.setCacheControl(shouldReadCache, shouldCacheResponse, cacheTimeInSeconds);
-    }
+    }*/
 
     @Override
     public DownloadBuilder setRetryCount(int retryCount) {
@@ -197,4 +197,8 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
         return (DownloadBuilder) super.setIsAppendToken(isAppendToken, isInHeaderOrParam);
     }
 
+    @Override
+    public DownloadBuilder setExtraTag(Object extraTag) {
+        return (DownloadBuilder) super.setExtraTag(extraTag);
+    }
 }

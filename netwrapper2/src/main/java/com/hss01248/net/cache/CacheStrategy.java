@@ -2,6 +2,9 @@ package com.hss01248.net.cache;
 
 import android.support.annotation.IntDef;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * Created by Administrator on 2017/3/9 0009.
  */
@@ -15,7 +18,7 @@ public class CacheStrategy {
     public static final int IF_NONE_CACHE_REQUEST = 4;//如果缓存不存在才请求网络，否则使用缓存。会导致强制缓存响应
     public static final int FIRST_CACHE_THEN_REQUEST = 5;//先使用缓存，不管是否存在，仍然请求网络。会导致强制缓存响应
     @IntDef({NO_CACHE, DEFAULT,REQUEST_FAILED_READ_CACHE,IF_NONE_CACHE_REQUEST,FIRST_CACHE_THEN_REQUEST})
-    // @Retention(RetentionPolicy.CLASS)
+     @Retention(RetentionPolicy.SOURCE)
     public @interface Mode {
     }
 

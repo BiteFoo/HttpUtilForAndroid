@@ -48,22 +48,25 @@ public abstract class MyNetListener<T>  {
     public void onTimeout(){
         onError("连接超时,请检查网络");
     }
+    public boolean isResponseFromCache(){
+        return configInfo.isFromCache;
+    }
 
 
 
     /** Called when response success. */
-    public abstract void onSuccess(T response,String resonseStr);
+    public abstract void onSuccess(T response,String resonseStr,boolean isFromCache);
 
-    public  void onSuccessArr(List<T> response, String resonseStr){
+    public  void onSuccessArr(List<T> response, String resonseStr,boolean isFromCache){
 
     }
 
-    public  void onSuccessObj(T response, String responseStr, String data, int code, String msg){
-            onSuccess(response,responseStr);
+    public  void onSuccessObj(T response, String responseStr, String data, int code, String msg,boolean isFromCache){
+            onSuccess(response,responseStr,isFromCache);
     }
 
-    public  void onSuccessArr(List<T> response, String responseStr, String data, int code, String msg){
-        onSuccessArr(response,responseStr);
+    public  void onSuccessArr(List<T> response, String responseStr, String data, int code, String msg,boolean isFromCache){
+        onSuccessArr(response,responseStr,isFromCache);
     }
 
 
@@ -123,24 +126,7 @@ public abstract class MyNetListener<T>  {
         onProgressChange(transPortedBytes,totalBytes);
     }
 
-    public void onFinish(){}
 
-
-    public void onNetworking() {}
-
-    /** Inform when the cache already use,
-     * it means http networking won't execute. */
-
-    public void onUsedCache() {}
-
-
-
-    public void onRetry() {}
-
-
-    /**
-     * 只需要在retrofit下载时调用
-     */
     /*public void registEventBus(){
         EventBus.getDefault().register(this);
     }

@@ -7,7 +7,9 @@
 * 增加onPreExecute()和onPreValidate(ConfigInfo config)两个回调
 * 正式开始发请求前先检查网络连接,如果没网,直接走listener.onNoNetwork()
 * 实现任意线程任意界面发请求并弹出dialog,不再需要传入activity引用,改成软引用自动获取,此时需要在BaseApplication中registerActivityLifecycleCallbacks
-* 处理取消请求的回调,实现不管是哪一种取消方法,都会回调到对应的oncancel方法中
+* 处理取消请求的回调,实现了:不管是哪一种取消方式,都会回调到对应的oncancel方法中
+* 完成了六种缓存策略的实现,yeah
+* ConfigInfo 增加一个extraTag,给开发者携带额外的参数,并提供设置方法setExtraTag(Object extraTag),以及校验的回调onPreValidate(ConfigInfo config)
 
 
 

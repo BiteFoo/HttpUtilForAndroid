@@ -103,10 +103,10 @@ public class UploadRequestBuilder<T> extends ProgressBaseBuilder{
         return (UploadRequestBuilder) super.showLoadingDialog(loadingDialog);
     }
 
-    @Override
+    /*@Override
     public UploadRequestBuilder setCacheControl(boolean shouldReadCache, boolean shouldCacheResponse, long cacheTimeInSeconds) {
         return (UploadRequestBuilder) super.setCacheControl(shouldReadCache, shouldCacheResponse, cacheTimeInSeconds);
-    }
+    }*/
 
     @Override
     public UploadRequestBuilder setRetryCount(int retryCount) {
@@ -128,4 +128,8 @@ public class UploadRequestBuilder<T> extends ProgressBaseBuilder{
         return (UploadRequestBuilder) super.setIsAppendToken(isAppendToken, isInHeaderOrParam);
     }
 
+    @Override
+    public UploadRequestBuilder setExtraTag(Object extraTag) {
+        return (UploadRequestBuilder) super.setExtraTag(extraTag);
+    }
 }

@@ -144,6 +144,10 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     }
 
 
+    @Override
+    public StandardJsonRequestBuilder showLoadingDialog() {
+        return (StandardJsonRequestBuilder) super.showLoadingDialog();
+    }
 
     @Override
     public StandardJsonRequestBuilder showLoadingDialog( String loadingMsg) {
@@ -154,11 +158,15 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     public StandardJsonRequestBuilder showLoadingDialog(Dialog loadingDialog) {
         return (StandardJsonRequestBuilder) super.showLoadingDialog(loadingDialog);
     }
-
     @Override
+    public StandardJsonRequestBuilder setCacheMode(int cacheMode) {
+        return (StandardJsonRequestBuilder) super.setCacheMode(cacheMode);
+    }
+
+    /*@Override
     public StandardJsonRequestBuilder setCacheControl(boolean shouldReadCache, boolean shouldCacheResponse, long cacheTimeInSeconds) {
         return (StandardJsonRequestBuilder) super.setCacheControl(shouldReadCache, shouldCacheResponse, cacheTimeInSeconds);
-    }
+    }*/
 
     @Override
     public StandardJsonRequestBuilder setRetryCount(int retryCount) {
@@ -198,5 +206,8 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
         return (StandardJsonRequestBuilder) super.setResponseJsonArray();
     }
 
-
+    @Override
+    public StandardJsonRequestBuilder setExtraTag(Object extraTag) {
+        return (StandardJsonRequestBuilder) super.setExtraTag(extraTag);
+    }
 }

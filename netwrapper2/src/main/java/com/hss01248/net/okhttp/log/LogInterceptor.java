@@ -72,8 +72,12 @@ public class LogInterceptor implements Interceptor {
         if(mediaType!=null){
             String type0 = mediaType.toString();
             String type = mediaType.type();
+            if(response.body().contentLength()<0){//todo 需要排除gzip的情况
+                return response;
+            }
 
             if("text".equals(type)){
+
                 String content = response.body().string();
                 MyLog.i(content);
                 response = response.newBuilder()

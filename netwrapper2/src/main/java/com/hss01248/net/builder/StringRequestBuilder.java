@@ -7,6 +7,8 @@ import com.hss01248.net.wrapper.MyNetListener;
 
 import java.util.Map;
 
+import okhttp3.internal.http.HttpDate;
+
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
@@ -16,7 +18,21 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
         this.type = ConfigInfo.TYPE_STRING;
     }
 
+    public    int cacheMode;
+    //todo 以下是缓存控制策略
+    public boolean shouldReadCache = false;
+    public boolean shouldCacheResponse = false;
+    public long cacheTime = HttpDate.MAX_DATE; //单位秒
+    public boolean isFromCache = false;//内部控制,不让外部设置
+    /**
+     * 只支持String和json类型的请求,不支持文件下载的缓存.
+     * @param shouldReadCache 是否先去读缓存
+     * @param shouldCacheResponse 是否缓存response  内部已做判断,只会缓存状态是成功的那些请求
+     * @param cacheTimeInSeconds 缓存的时间,单位是秒
+     * @return
+     *
 
+     */
 
     //todo 请求以什么形式,key=value&key=value还是json形式
     public boolean paramsAsJson = false;
@@ -31,6 +47,11 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
         //做一些参数合理性校验
 
         return new ConfigInfo(this);
+    }
+
+    public StringRequestBuilder setCacheMode(int cacheMode) {
+        this.cacheMode = cacheMode;
+        return this;
     }
 
 //todo 以下的都是复写基类的方法,强转成子类
@@ -71,6 +92,10 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
     }
 
 
+    @Override
+    public StringRequestBuilder showLoadingDialog() {
+        return (StringRequestBuilder) super.showLoadingDialog();
+    }
 
     @Override
     public StringRequestBuilder showLoadingDialog(String loadingMsg) {
@@ -82,10 +107,10 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
         return (StringRequestBuilder) super.showLoadingDialog(loadingDialog);
     }
 
-    @Override
+   /* @Override
     public StringRequestBuilder setCacheControl(boolean shouldReadCache, boolean shouldCacheResponse, long cacheTimeInSeconds) {
         return (StringRequestBuilder) super.setCacheControl(shouldReadCache, shouldCacheResponse, cacheTimeInSeconds);
-    }
+    }*/
 
     @Override
     public StringRequestBuilder setRetryCount(int retryCount) {
@@ -107,4 +132,8 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
         return (StringRequestBuilder) super.setIsAppendToken(isAppendToken, isInHeaderOrParam);
     }
 
+    @Override
+    public StringRequestBuilder setExtraTag(Object extraTag) {
+        return (StringRequestBuilder) super.setExtraTag(extraTag);
+    }
 }

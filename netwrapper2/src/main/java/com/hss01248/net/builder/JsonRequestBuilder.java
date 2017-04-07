@@ -81,6 +81,10 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
     }
 
 
+    @Override
+    public JsonRequestBuilder showLoadingDialog() {
+        return (JsonRequestBuilder) super.showLoadingDialog();
+    }
 
     @Override
     public JsonRequestBuilder showLoadingDialog( String loadingMsg) {
@@ -93,9 +97,14 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
     }
 
     @Override
+    public JsonRequestBuilder setCacheMode(int cacheMode) {
+        return (JsonRequestBuilder) super.setCacheMode(cacheMode);
+    }
+
+    /*@Override
     public JsonRequestBuilder setCacheControl(boolean shouldReadCache, boolean shouldCacheResponse, long cacheTimeInSeconds) {
         return (JsonRequestBuilder) super.setCacheControl(shouldReadCache, shouldCacheResponse, cacheTimeInSeconds);
-    }
+    }*/
 
     @Override
     public JsonRequestBuilder setRetryCount(int retryCount) {
@@ -124,5 +133,8 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
         return (JsonRequestBuilder) super.setParamsAsJson();
     }
 
-
+    @Override
+    public JsonRequestBuilder setExtraTag(Object extraTag) {
+        return (JsonRequestBuilder) super.setExtraTag(extraTag);
+    }
 }

@@ -16,8 +16,6 @@ import com.hss01248.net.wrapper.Tool;
 import java.util.HashMap;
 import java.util.Map;
 
-import okhttp3.internal.http.HttpDate;
-
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
@@ -31,6 +29,13 @@ public class BaseNetBuilder<T> {
     public int method ;
     public int type ;//= ConfigInfo.TYPE_STRING;
     public String responseCharset;
+
+    public BaseNetBuilder setExtraTag(Object extraTag) {
+        this.extraTag = extraTag;
+        return this;
+    }
+
+    public Object extraTag;
 
     public BaseNetBuilder(){
 
@@ -71,17 +76,14 @@ public class BaseNetBuilder<T> {
 
     public String paramsStr;
 
-    public BaseNetBuilder setCacheMode(int cacheMode) {
-        this.cacheMode = cacheMode;
-        return this;
-    }
+
 
     public BaseNetBuilder setCookieMode(int cookieMode) {
         this.cookieMode = cookieMode;
         return this;
     }
 
-    public    int cacheMode;
+
     public int cookieMode;
 
 
@@ -265,27 +267,14 @@ public class BaseNetBuilder<T> {
         return this;
     }
 
-    //todo 以下是缓存控制策略
-    public boolean shouldReadCache = false;
-    public boolean shouldCacheResponse = false;
-    public long cacheTime = HttpDate.MAX_DATE; //单位秒
-    public boolean isFromCache = false;//内部控制,不让外部设置
-    /**
-     * 只支持String和json类型的请求,不支持文件下载的缓存.
-     * @param shouldReadCache 是否先去读缓存
-     * @param shouldCacheResponse 是否缓存response  内部已做判断,只会缓存状态是成功的那些请求
-     * @param cacheTimeInSeconds 缓存的时间,单位是秒
-     * @return
-     *
 
-     */
-    public BaseNetBuilder<T> setCacheControl(boolean shouldReadCache,boolean shouldCacheResponse,long cacheTimeInSeconds){
+   /* public BaseNetBuilder<T> setCacheControl(boolean shouldReadCache,boolean shouldCacheResponse,long cacheTimeInSeconds){
         this.shouldReadCache = shouldReadCache;
         this.shouldCacheResponse = shouldCacheResponse;
         this.cacheTime = cacheTimeInSeconds;
         return this;
 
-    }
+    }*/
 
 
 

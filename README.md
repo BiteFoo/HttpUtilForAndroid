@@ -26,6 +26,44 @@ api设计上结合http协议和android平台特点来实现: loading对话框,�
 
 [1.0.1的api说明文档](/README_OLD.MD)
 
+# 回调概览
+
+```
+前处理
+onPreValidate(ConfigInfo config)//额外的参数校验,比如extraTag
+onPreExecute()
+
+
+//成功
+onSuccess(T response,String resonseStr,boolean isFromCache)
+onSuccessArr(List<T> response, String resonseStr,boolean isFromCache)
+
+onSuccessObj(T response, String responseStr, String data, int code, String msg,boolean isFromCache)
+onSuccessArr(List<T> response, String responseStr, String data, int code, String msg,boolean isFromCache)
+
+//失败
+onError(String msgCanShow)
+onCodeError(String msgCanShow, String hiddenMsg, int code)
+
+onTimeout()//连接超时
+onNoNetwork()//没有网络
+
+
+//业务相关的失败回调
+onUnFound()//没有找到对应的内容
+onUnlogin()//没有登录或者token过期
+
+//请求被取消
+onCancel()
+
+
+//进度
+onProgressChange(long transPortedBytes, long totalBytes)
+onFilesUploadProgress(long transPortedBytes, long totalBytes,int fileIndex,int filesCount)
+
+
+```
+
 
 
 # 全局配置
@@ -217,7 +255,7 @@ HttpUtil.buildJsonRequest("version/latestVersion/v1.json",GetCommonJsonBean.clas
         .showLoadingDialog(MainActivityNew.this,"加载中...")
         .callback(new MyNetListener<GetCommonJsonBean>() {
             @Override
-            public void onSuccess(GetCommonJsonBean response, String resonseStr) {
+            public void onSuccess(GetCommonJsonBean response, String resonseStr,boolean isFromCache) {
                 Logger.json(MyJson.toJsonStr(response));
             }
         })
@@ -286,7 +324,7 @@ HttpUtil.buildStandardJsonRequest("http://japi.juhe.cn/joke/content/list.from",G
         .showLoadingDialog(MainActivityNew.this,"老司机开车了...")
         .callback(new MyNetListener<GetStandardJsonBean>() {
             @Override
-            public void onSuccess(GetStandardJsonBean response, String resonseStr) {
+            public void onSuccess(GetStandardJsonBean response, String resonseStr,boolean isFromCache) {
                 Logger.json(MyJson.toJsonStr(response));
             }
             @Override
@@ -338,7 +376,7 @@ HttpUtil.buildDownloadRequest(url2)
         .verifyMd5("djso8d89dsjd9s7dsfj")//下载完后校验md5
         .getAsync(new MyNetListener() {
             @Override
-            public void onSuccess(Object response, String onSuccess) {
+            public void onSuccess(Object response, String onSuccess,boolean isFromCache) {
                 Logger.e("onSuccess:"+onSuccess);
             }
 
@@ -448,9 +486,12 @@ Step 2. Add the dependency
 
 ```java
 dependencies {
-        compile 'com.github.hss01248:HttpUtilForAndroid:2.0.1'
+        compile 'com.github.hss01248:HttpUtilForAndroid:2.1.0'
 }
 ```
+
+
+
 
 
 

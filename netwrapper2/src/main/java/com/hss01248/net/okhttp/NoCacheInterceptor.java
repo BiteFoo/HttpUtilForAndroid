@@ -8,6 +8,7 @@ import okhttp3.Response;
 
 /**
  * Created by Administrator on 2016/9/22 0022.
+ * 不让okhttp处理,完全由ACache+内置逻辑来处理缓存
  */
 public class NoCacheInterceptor implements Interceptor {
 

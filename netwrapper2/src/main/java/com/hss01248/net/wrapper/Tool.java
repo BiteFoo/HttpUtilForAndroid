@@ -10,10 +10,13 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.blankj.utilcode.utils.EncryptUtils;
+import com.hss01248.net.cache.ACache;
+import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.util.FileUtils;
 import com.hss01248.net.util.TextUtils;
+import com.litesuits.android.async.SimpleTask;
 
 import org.json.JSONObject;
 
@@ -25,7 +28,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -99,7 +104,7 @@ public class Tool {
                                 info.listener.onProgressChange(finalFileSizeDownloaded,fileSize);
 
                                 if(finalFileSizeDownloaded == fileSize){
-                                    info.listener.onSuccess(info.filePath,info.filePath);
+                                    info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
                                     Tool.dismiss(info.loadingDialog);
 
 
@@ -113,13 +118,13 @@ public class Tool {
                                             str = EncryptUtils.encryptSHA1ToString(info.filePath);//todo 缺少shar1文件的算法
                                         }
                                         if(str.equalsIgnoreCase(info.verifyStr)){//校验通过
-                                            info.listener.onSuccess(info.filePath,info.filePath);
+                                            info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
                                             handleMedia(info);
                                         }else {
                                             info.listener.onError("文件下载失败:校验不一致");
                                         }
                                     }else {
-                                        info.listener.onSuccess(info.filePath,info.filePath);
+                                        info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
                                         handleMedia(info);
                                     }
 
@@ -423,6 +428,26 @@ public class Tool {
         return url;
     }
 
+    /**
+     * 对字符串md5加密
+     *
+     * @param str
+     * @return
+     */
+    public static String getMD5(String str) {
+        try {
+            // 生成一个MD5加密计算摘要
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // 计算md5函数
+            md.update(str.getBytes());
+            // digest()最后确定返回md5 hash值，返回值为8为字符串。因为md5 hash值是16位的hex值，实际上就是8位的字符
+            // BigInteger函数则将8位的字符串转换成16位hex值，用字符串来表示；得到字符串形式的hash值
+            return new BigInteger(1, md.digest()).toString(16);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return str;
+        }
+    }
 
     public static String getCacheKey(ConfigInfo configInfo){
         String url = configInfo.url;
@@ -437,44 +462,13 @@ public class Tool {
             }
 
         }
-
-        return stringBuilder.toString();
+        String str = stringBuilder.toString();
+        return getMD5(str);
 
     }
 
 
-    /**
-     *
-     * @param startTime 请求刚开始的时间
-     * @param configInfo
-     * @param runnable 要执行的代码,通常是最终的网络回调
-     * @param <T>
-     */
-    public static <T> void parseInTime(long startTime, final ConfigInfo<T> configInfo, final Runnable runnable) {
-        Tool.dismiss(configInfo.loadingDialog);
-      /*  long time2 = System.currentTimeMillis();
-        long gap = time2 - startTime;
-        if (configInfo.isForceMinTime ){
-            long minGap = configInfo.minTime <= 0 ? NetDefaultConfig.TIME_MINI : configInfo.minTime;
 
-            if (gap < minGap){
-                TimerUtil.doAfter(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Tool.dismiss(configInfo.loadingDialog);
-                        runnable.run();
-                    }
-                },(minGap - gap));
-            }else {
-                Tool.dismiss(configInfo.loadingDialog);
-                runnable.run();
-            }
-
-        }else {
-            Tool.dismiss(configInfo.loadingDialog);
-            runnable.run();
-        }*/
-    }
 
 
     /**
@@ -491,14 +485,18 @@ public class Tool {
 
 
 
-    /*private static void cacheResponse(final String string, final ConfigInfo configInfo) {
+
+
+    private static void cacheResponse(final String string, final ConfigInfo configInfo) {
         if (configInfo.shouldCacheResponse && !configInfo.isFromCache && configInfo.cacheTime >0){
+
             SimpleTask<Void> simple = new SimpleTask<Void>() {
 
                 @Override
                 protected Void doInBackground() {
-                    ACache.get(HttpUtil.context).put(getCacheKey(configInfo),string, (int) (configInfo.cacheTime));
-                    MyLog.d("caching resonse:"+string);
+
+                    ACache.get(HttpUtil.context).put(getCacheKey(configInfo),string, Integer.MAX_VALUE/5);
+                    MyLog.d("key is "+getCacheKey(configInfo)+ "---caching resonse:\n"+string);
                     return null;
                 }
 
@@ -507,8 +505,13 @@ public class Tool {
                 }
             };
             simple.execute();
+        }else {
+            configInfo.isFromCacheSuccess = true;
+            if(configInfo.cacheMode== CacheStrategy.IF_NONE_CACHE_REQUEST){
+                dismiss(configInfo.loadingDialog);
+            }
         }
-    }*/
+    }
 
 
 
@@ -557,7 +560,7 @@ public class Tool {
 
 
 
-    public  static  <E> void parseStandJsonStr(String string, final ConfigInfo<E> configInfo)  {
+    public  static  <E> void parseStandJsonStr(String string, final ConfigInfo<E> configInfo, boolean isFromCache)  {
         if (isJsonEmpty(string)){//先看是否为空
 
             callbackOnMainThread(new Runnable() {
@@ -602,7 +605,7 @@ public class Tool {
 
             final String finalString1 = string;
 
-            parseStandardJsonObj(finalString1,dataStr,code,msg,configInfo);
+            parseStandardJsonObj(finalString1,dataStr,code,msg,configInfo,isFromCache);
             //todo 将时间解析放到后面去
 
         }
@@ -617,7 +620,7 @@ public class Tool {
      */
     private static <E> void parseStandardJsonObj(final String response, final String data, final int code,
 
-                                                 final String msg, final ConfigInfo<E> configInfo){
+                                                 final String msg, final ConfigInfo<E> configInfo, final boolean isFromCache){
 
         int codeSuccess = configInfo.isCustomCodeSet ? configInfo.code_success : GlobalConfig.get().getCodeSuccess();
         int codeUnFound = configInfo.isCustomCodeSet ? configInfo.code_unFound :  GlobalConfig.get().getCodeUnfound();
@@ -632,7 +635,7 @@ public class Tool {
                             configInfo.listener.onEmpty();
                         }else {
                             if(configInfo.isSuccessDataEmpty){
-                                configInfo.listener.onSuccess(null,TextUtils.isEmpty(msg)? "请求成功!" :msg);
+                                configInfo.listener.onSuccess(null,TextUtils.isEmpty(msg)? "请求成功!" :msg,isFromCache);
                             }else {
                                 configInfo.listener.onError("数据为空");
                             }
@@ -647,30 +650,30 @@ public class Tool {
                         callbackOnMainThread(new Runnable() {
                             @Override
                             public void run() {
-                                configInfo.listener.onSuccessObj(bean ,response,data,code,msg);
+                                configInfo.listener.onSuccessObj(bean ,response,data,code,msg,isFromCache);
                             }
                         });
 
 
-                        //cacheResponse(response, configInfo);
+                        cacheResponse(response, configInfo);
                     }else if (data.startsWith("[")){
                         final List<E> beans =  MyJson.parseArray(data,configInfo.clazz);
                         callbackOnMainThread(new Runnable() {
                             @Override
                             public void run() {
-                                configInfo.listener.onSuccessArr(beans,response,data,code,msg);
+                                configInfo.listener.onSuccessArr(beans,response,data,code,msg,isFromCache);
                             }
                         });
 
 
 
-                        //cacheResponse(response, configInfo);
+                        cacheResponse(response, configInfo);
                     }else {//如果data的值是一个字符串,而不是标准json,那么直接返回
                         if (String.class.equals(configInfo.clazz) ){//此时,E也是String类型.如果有误,会抛出到下面catch里
                             callbackOnMainThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    configInfo.listener.onSuccess((E) data,data);
+                                    configInfo.listener.onSuccess((E) data,data,isFromCache);
                                 }
                             });
 
@@ -729,25 +732,26 @@ public class Tool {
         }
     }
 
-    public static  void parseStringByType(final String string, final ConfigInfo configInfo) {
+    public static  void parseStringByType(final String string, final ConfigInfo configInfo,final boolean isFromCache) {
         switch (configInfo.type){
             case ConfigInfo.TYPE_STRING:
                 //缓存
-                //cacheResponse(string, configInfo);
+                cacheResponse(string, configInfo);
+
                 //处理结果
                 callbackOnMainThread(new Runnable() {
                     @Override
                     public void run() {
-                        configInfo.listener.onSuccess(string, string);
+                        configInfo.listener.onSuccess(string, string,isFromCache);
                     }
                 });
 
                 break;
             case ConfigInfo.TYPE_JSON:
-                parseCommonJson(string,configInfo);
+                parseCommonJson(string,configInfo,isFromCache);
                 break;
             case ConfigInfo.TYPE_JSON_FORMATTED:
-                parseStandJsonStr(string, configInfo);
+                parseStandJsonStr(string, configInfo,isFromCache);
                 break;
         }
     }
@@ -768,7 +772,7 @@ public class Tool {
 
     }
 
-    private static <E> void parseCommonJson(final String string, final ConfigInfo<E> configInfo) {
+    private static <E> void parseCommonJson(final String string, final ConfigInfo<E> configInfo, final boolean isFromCache) {
         if (isJsonEmpty(string)){
             callbackOnMainThread(new Runnable() {
                 @Override
@@ -784,21 +788,21 @@ public class Tool {
                     callbackOnMainThread(new Runnable() {
                         @Override
                         public void run() {
-                            configInfo.listener.onSuccessObj(bean ,string,string,0,"");
+                            configInfo.listener.onSuccessObj(bean ,string,string,0,"",isFromCache);
                         }
                     });
 
-                    //cacheResponse(string, configInfo);
+                    cacheResponse(string, configInfo);
                 }else if (string.startsWith("[")){
                     final List<E> beans =  MyJson.parseArray(string,configInfo.clazz);
                     callbackOnMainThread(new Runnable() {
                         @Override
                         public void run() {
-                            configInfo.listener.onSuccessArr(beans,string,string,0,"");
+                            configInfo.listener.onSuccessArr(beans,string,string,0,"",isFromCache);
                         }
                     });
 
-                    //cacheResponse(string, configInfo);
+                    cacheResponse(string, configInfo);
                 }else {
                     callbackOnMainThread(new Runnable() {
                         @Override

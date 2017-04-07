@@ -10,17 +10,15 @@ import com.hss01248.net.builder.JsonRequestBuilder;
 import com.hss01248.net.builder.StandardJsonRequestBuilder;
 import com.hss01248.net.builder.StringRequestBuilder;
 import com.hss01248.net.builder.UploadRequestBuilder;
+import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.interfaces.HttpMethod;
 import com.hss01248.net.wrapper.HttpUtil;
-import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.net.wrapper.Tool;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import okhttp3.internal.http.HttpDate;
 
 /**
  * Created by Administrator on 2016/9/3.
@@ -31,7 +29,7 @@ public class ConfigInfo<T> {
 
     }
     public Object request;//跟具体client有关的请求对象
-
+    public Object extraTag;
     //核心参数
     public int method = HttpMethod.GET;
     public String url;
@@ -98,6 +96,8 @@ public class ConfigInfo<T> {
         return this;
     }
 
+
+
     /**
      * 参数逻辑校验
      */
@@ -136,21 +136,42 @@ public class ConfigInfo<T> {
             loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override
                 public void onCancel(DialogInterface dialog) {
-                    MyLog.i("取消请求中.......");
-                    //listener.onCancel();//这里需要回调,虽然在执行过程中相应地方都会有回调,但那是走onError:socket closed,识别不了是oncancel
+                    //MyLog.i("取消请求中.......");
                     HttpUtil.cancelRquest(tagForCancle);
-                   /* if(type== TYPE_DOWNLOAD){//下载比较特殊,只要开始传送文件了,就会走okhttp的onresponse,然后写文件流.socket断开后
-                        listener.onCancel();
-                    }*/
+
                 }
             });
         }
 
-        //todo 判断有没有网络,没有网,或者网连不通,直接就返回
-        if(!Tool.isNetworkAvailable()){
-            listener.onNoNetwork();
-            return false;
+        //todo  处理缓存,io要在子线程
+        switch (cacheMode){
+            case CacheStrategy.DEFAULT://使用符合http协议的缓存管理-直接用okhttp的缓存功能
+                shouldCacheResponse = false;
+                shouldReadCache=false;
+                break;
+            case CacheStrategy.NO_CACHE:
+                shouldCacheResponse = false;
+                shouldReadCache=false;
+                break;
+            case CacheStrategy.REQUEST_FAILED_READ_CACHE:
+                shouldCacheResponse = true;
+                shouldReadCache=false;
+                break;
+            case CacheStrategy.IF_NONE_CACHE_REQUEST:
+                shouldCacheResponse = true;
+                shouldReadCache=true;
+                break;
+            case CacheStrategy.FIRST_CACHE_THEN_REQUEST:
+                shouldCacheResponse = true;
+                shouldReadCache=true;
+                break;
+
         }
+
+
+
+
+
 
         if(!listener.onPreValidate(this)){
             return false;
@@ -263,12 +284,13 @@ public class ConfigInfo<T> {
    // public boolean forceGetNet = true;
     public boolean shouldReadCache = false;
     public boolean shouldCacheResponse = false;
-    public long cacheTime = HttpDate.MAX_DATE; //单位秒
+    public long cacheTime = Integer.MAX_VALUE; //单位秒
 
 
 
 
     public boolean isFromCache = false;//内部控制,不让外部设置
+    public boolean isFromCacheSuccess = false;//内部控制,不让外部设置
 
     //優先級,备用 volley使用
     public int priority = Priority_NORMAL;
@@ -345,11 +367,9 @@ public class ConfigInfo<T> {
         this.method = builder.method;
         this.params = builder.params;
         this.headers = builder.headers;
+        this.extraTag = builder.extraTag;
 
-        this.cacheTime = builder.cacheTime;
-        this.isFromCache = builder.isFromCache;
-        this.shouldCacheResponse = builder.shouldCacheResponse;
-        this.shouldReadCache = builder.shouldReadCache;
+
         this.ignoreCer = builder.ignoreCertificateVerify;
         this.listener = builder.listener;
         this.retryCount = builder.retryCount;
@@ -360,7 +380,7 @@ public class ConfigInfo<T> {
         this.isSync = builder.isSync;
         this.responseCharset = builder.responseCharset;
         this.cookieMode = builder.cookieMode;
-        this.cacheMode = builder.cacheMode;
+
         this.tagForCancle = builder.tagForCancle;
 
 
@@ -374,6 +394,12 @@ public class ConfigInfo<T> {
     public ConfigInfo (StringRequestBuilder builder){
         assginValues(builder);
         this.paramsAsJson = builder.paramsAsJson;
+
+        this.cacheTime = builder.cacheTime;
+        this.isFromCache = builder.isFromCache;
+        this.shouldCacheResponse = builder.shouldCacheResponse;
+        this.shouldReadCache = builder.shouldReadCache;
+        this.cacheMode = builder.cacheMode;
         start();
     }
     public ConfigInfo (JsonRequestBuilder builder){
@@ -382,6 +408,11 @@ public class ConfigInfo<T> {
         this.clazz = builder.clazz;
         this.isResponseJsonArray = builder.isResponseJsonArray;
 
+        this.cacheTime = builder.cacheTime;
+        this.isFromCache = builder.isFromCache;
+        this.shouldCacheResponse = builder.shouldCacheResponse;
+        this.shouldReadCache = builder.shouldReadCache;
+        this.cacheMode = builder.cacheMode;
 
         start();
 
@@ -402,6 +433,12 @@ public class ConfigInfo<T> {
         this.key_data = builder.key_data;
         this.key_msg = builder.key_msg;
 
+
+        this.cacheTime = builder.cacheTime;
+        this.isFromCache = builder.isFromCache;
+        this.shouldCacheResponse = builder.shouldCacheResponse;
+        this.shouldReadCache = builder.shouldReadCache;
+        this.cacheMode = builder.cacheMode;
 
         start();
 

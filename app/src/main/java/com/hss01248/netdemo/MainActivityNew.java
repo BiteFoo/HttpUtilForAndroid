@@ -6,8 +6,10 @@ import android.view.View;
 import android.widget.Button;
 
 import com.blankj.utilcode.utils.EncryptUtils;
+import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyJson;
+import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.netdemo.bean.GetCommonJsonBean;
 import com.hss01248.netdemo.bean.GetStandardJsonBean;
@@ -53,7 +55,7 @@ public class MainActivityNew extends Activity {
         //HttpUtil.initAddHttps(R.raw.srca);//添加12306的证书
         HttpUtil.init(getApplicationContext(),"http://www.qxinli.com:9001/api/")
                // .addCrtificateRaw(R.raw.srca)
-                .addCrtificateAssert("srca.cer")
+                //.addCrtificateAssert("srca.cer")
                 .openLog("okhttp");
 
 
@@ -70,6 +72,29 @@ public class MainActivityNew extends Activity {
 
     }
 
+    public MyNetListener getListener(final MyNetListener listener){
+        return listener;
+        /*return ProxyUtil.getProxy(listener, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                if(!"isResponseFromCache".equals(method.getName())){
+                    if(listener.isResponseFromCache()){
+                        MyLog.e("---from cache-----listener: method:"+method.getName());
+                    }else {
+                        MyLog.e("---from net  -----listener: method:"+method.getName());
+                    }
+                }
+                Object obj = method.invoke(proxy,args);
+                return obj;
+            }
+        });*/
+    }
+
+
+
+
+
+
     @OnClick({R.id.get_string, R.id.post_string, R.id.get_json, R.id.post_json, R.id.get_standard_json,
             R.id.post_standard_json, R.id.download, R.id.upload,R.id.postbyjson,R.id.testvoice,R.id.testvoice2})
     public void onClick(View view) {
@@ -77,18 +102,29 @@ public class MainActivityNew extends Activity {
             case R.id.get_string:
                 //测试自签名/未被android系统承认的的https
                 HttpUtil.buildStringRequest("https://kyfw.12306.cn/otn/regist/init")
-                        .callback(new MyNetListener<String>() {
+                        .setCacheMode(CacheStrategy.REQUEST_FAILED_READ_CACHE)
+                        .callback(getListener(new MyNetListener<String>() {
                                     @Override
-                                    public void onSuccess(String response, String resonseStr) {
+                                    public void onSuccess(String response, String resonseStr,boolean isFromCache) {
                                         Logger.e(response);
+                                        if(isFromCache){
+                                            MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                        }else {
+                                            MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                        }
                                     }
 
                                     @Override
                                     public void onError(String error) {
                                         super.onError(error);
                                         Logger.e(error);
+                                        if(isResponseFromCache()){
+                                            MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                        }else {
+                                            MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                        }
                                     }
-                            })
+                            }))
                         //.setIgnoreCertificateVerify()
                         .getAsync();
                 break;
@@ -97,36 +133,58 @@ public class MainActivityNew extends Activity {
                 HttpUtil.buildStringRequest("article/getArticleCommentList/v1.json")
                         .addParam("pageSize","30")
                         .addParam("articleId","1738")
+                        .setCacheMode(CacheStrategy.IF_NONE_CACHE_REQUEST)
                         .addParam("pageIndex","1")
-                        .callback(new MyNetListener<String>() {
+                        .callback(getListener(new MyNetListener<String>() {
                             @Override
-                            public void onSuccess(String response, String resonseStr) {
+                            public void onSuccess(String response, String resonseStr,boolean isFromCache) {
                                 Logger.e(response);
+                                if(isFromCache){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
                             @Override
                             public void onError(String msgCanShow) {
                                 super.onError(msgCanShow);
                                 Logger.e(msgCanShow);
+                                if(isResponseFromCache()){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
-                        }).postAsync();
+                        })).postAsync();
                 break;
             case R.id.get_json:
 
 
                 HttpUtil.buildJsonRequest("version/latestVersion/v1.json",GetCommonJsonBean.class)
                         .showLoadingDialog()
-                        .callback(new MyNetListener<GetCommonJsonBean>() {
+                        .setCacheMode(CacheStrategy.IF_NONE_CACHE_REQUEST)
+                        .callback(getListener(new MyNetListener<GetCommonJsonBean>() {
                             @Override
-                            public void onSuccess(GetCommonJsonBean response, String resonseStr) {
+                            public void onSuccess(GetCommonJsonBean response, String resonseStr,boolean isFromCache) {
                                 Logger.json(MyJson.toJsonStr(response));
+                                if(isFromCache){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
 
                             @Override
                             public void onError(String msgCanShow) {
                                 super.onError(msgCanShow);
                                 Logger.e(msgCanShow);
+                                if(isResponseFromCache()){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
-                        })
+                        }))
                         .getAsync();
                 break;
             case R.id.post_json:
@@ -134,18 +192,29 @@ public class MainActivityNew extends Activity {
                 HttpUtil.buildJsonRequest("article/getArticleCommentList/v1.json",PostCommonJsonBean.class)
                         .addParam("pageSize","30")
                         .addParam("articleId","1738")
+                        .setCacheMode(CacheStrategy.FIRST_CACHE_THEN_REQUEST)
                         .addParam("pageIndex","1")
-                        .callback(new MyNetListener<PostCommonJsonBean>() {
+                        .callback(getListener(new MyNetListener<PostCommonJsonBean>() {
                             @Override
-                            public void onSuccess(PostCommonJsonBean response, String resonseStr) {
-                                Logger.json(MyJson.toJsonStr(response));
+                            public void onSuccess(PostCommonJsonBean response, String resonseStr,boolean isFromCache) {
+                                    Logger.json(MyJson.toJsonStr(response));
+                                if(isFromCache){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
                             @Override
                             public void onError(String msgCanShow) {
                                 super.onError(msgCanShow);
                                 Logger.e(msgCanShow);
+                                if(isResponseFromCache()){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
-                        }).postAsync();
+                        })).postAsync();
 
                 break;
             case R.id.get_standard_json:
@@ -172,18 +241,29 @@ public class MainActivityNew extends Activity {
                         .addParam("key","fuck you")
                         .setStandardJsonKey("result","error_code","reason")
                         .setCustomCodeValue(0,2,-1)
+                        .setCacheMode(CacheStrategy.FIRST_CACHE_THEN_REQUEST)
                         .showLoadingDialog()
-                        .callback(new MyNetListener<GetStandardJsonBean>() {
+                        .callback(getListener(new MyNetListener<GetStandardJsonBean>() {
                             @Override
-                            public void onSuccess(GetStandardJsonBean response, String resonseStr) {
+                            public void onSuccess(GetStandardJsonBean response, String resonseStr,boolean isFromCache) {
                                 Logger.json(MyJson.toJsonStr(response));
+                                if(isFromCache){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
                             @Override
                             public void onError(String error) {
                                 super.onError(error);
                                 Logger.e(error);
+                                if(isResponseFromCache()){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
-                        })
+                        }))
                         .getAsync();
                 break;
             case R.id.post_standard_json:
@@ -192,19 +272,26 @@ public class MainActivityNew extends Activity {
                         .addParam("pageSize","30")
                         .addParam("articleId","1738")
                         .addParam("pageIndex","1")
+                        .setCacheMode(CacheStrategy.REQUEST_FAILED_READ_CACHE)
                         .setResponseJsonArray()
-                        .postAsync(new MyNetListener<PostStandardJsonArray>() {
+                        .postAsync(getListener(new MyNetListener<PostStandardJsonArray>() {
                             @Override
-                            public void onSuccess(PostStandardJsonArray response, String resonseStr) {
-                                //Logger.json(MyJson.toJsonStr(response));
+                            public void onSuccess(PostStandardJsonArray response, String resonseStr,boolean isFromCache) {
+                               // Logger.json(MyJson.toJsonStr(response));
+
                             }
 
                             @Override
-                            public void onSuccessArr(List<PostStandardJsonArray> response, String responseStr, String data, int code, String msg) {
-                                super.onSuccessArr(response, responseStr, data, code, msg);
+                            public void onSuccessArr(List<PostStandardJsonArray> response, String responseStr, String data, int code, String msg,boolean isFromCache) {
+                                super.onSuccessArr(response, responseStr, data, code, msg,isFromCache);
                                 Logger.json(MyJson.toJsonStr(response));
+                                if(isFromCache){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
-                        });
+                        }));
                 break;
             case R.id.download:
                 /*File dir = Environment.getExternalStorageDirectory();
@@ -225,10 +312,15 @@ public class MainActivityNew extends Activity {
                         .setHideFile()//隐藏该文件
                         .setNotifyMediaCenter(false)
                         .verifyMd5("djso8d89dsjd9s7dsfj")//下载完后校验md5,如果
-                        .getAsync(new MyNetListener() {
+                        .getAsync(getListener(new MyNetListener() {
                             @Override
-                            public void onSuccess(Object response, String onSuccess) {
+                            public void onSuccess(Object response, String onSuccess,boolean isFromCache) {
                                 Logger.e("onSuccess:"+onSuccess);
+                                if(isFromCache){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
 
                             @Override
@@ -241,8 +333,13 @@ public class MainActivityNew extends Activity {
                             public void onError(String msgCanShow) {
                                 super.onError(msgCanShow);
                                 Logger.e(msgCanShow);
+                                if(isResponseFromCache()){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
-                        });
+                        }));
                 break;
             case R.id.upload:
 
@@ -252,9 +349,9 @@ public class MainActivityNew extends Activity {
                         .addParam("uploadFile555","1474363536041.jpg")
                         .addParam("api_secret777","898767hjk")
                         .showLoadingDialog()
-                        .postAsync(new MyNetListener<String>() {
+                        .postAsync(getListener(new MyNetListener<String>() {
                                             @Override
-                                            public void onSuccess(String response, String resonseStr) {
+                                            public void onSuccess(String response, String resonseStr,boolean isFromCache) {
                                                 Logger.e(resonseStr);
                                             }
 
@@ -269,7 +366,7 @@ public class MainActivityNew extends Activity {
                                                 super.onProgressChange(fileSize, downloadedSize);
                                                 Logger.e("upload onProgressChange:"+downloadedSize + "  total:"+ fileSize +"  progress:"+downloadedSize*100/fileSize);
                                             }
-                                        });
+                                        }));
                 break;
 
             case R.id.postbyjson:
@@ -281,12 +378,17 @@ public class MainActivityNew extends Activity {
                         .setParamsAsJson()
                         .showLoadingDialog("jiaxxx")
                         .setCustomCodeValue(1,2,3)
-                        .callback(new MyNetListener<VersionInfo>() {
+                        .callback(getListener(new MyNetListener<VersionInfo>() {
 
 
                             @Override
-                            public void onSuccess(VersionInfo response, String resonseStr) {
+                            public void onSuccess(VersionInfo response, String resonseStr,boolean isFromCache) {
                                 Logger.e(resonseStr);
+                                if(isFromCache){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
 
                             @Override
@@ -298,8 +400,13 @@ public class MainActivityNew extends Activity {
                             public void onError(String msgCanShow) {
                                 super.onError(msgCanShow);
                                 Logger.e(msgCanShow);
+                                if(isResponseFromCache()){
+                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }else {
+                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                }
                             }
-                        })
+                        }))
                         .postAsync();
                 break;
             case R.id.testvoice:
@@ -321,19 +428,18 @@ public class MainActivityNew extends Activity {
                         .addParam("articleId","1738")
                         .addParam("pageIndex","1")
                         .setResponseJsonArray()
-                        .setCacheControl(false,true,60)
-                        .callback(new MyNetListener<PostStandardJsonArray>() {
+                        .callback(getListener(new MyNetListener<PostStandardJsonArray>() {
                             @Override
-                            public void onSuccess(PostStandardJsonArray response, String resonseStr) {
+                            public void onSuccess(PostStandardJsonArray response, String resonseStr,boolean isFromCache) {
                                 //Logger.json(MyJson.toJsonStr(response));
                             }
 
                             @Override
-                            public void onSuccessArr(List<PostStandardJsonArray> response, String responseStr, String data, int code, String msg) {
-                                super.onSuccessArr(response, responseStr, data, code, msg);
+                            public void onSuccessArr(List<PostStandardJsonArray> response, String responseStr, String data, int code, String msg,boolean isFromCache) {
+                                super.onSuccessArr(response, responseStr, data, code, msg,isFromCache);
                                 Logger.json(MyJson.toJsonStr(response));
                             }
-                        })
+                        }))
                         .postAsync();
                 break;
             case R.id.testvoice2:{

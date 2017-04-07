@@ -120,6 +120,10 @@ public class OkClient extends IClient {
         setLog(builder,GlobalConfig.get().isOpenLog());
 
         builder.connectTimeout(GlobalConfig.get().getConnectTimeout(),TimeUnit.MILLISECONDS);
+
+        if(GlobalConfig.get().getCacheMode() != CacheStrategy.DEFAULT){
+            builder.addNetworkInterceptor(new NoCacheInterceptor());
+        }
     }
 
     private static void setLog(OkHttpClient.Builder builder, boolean openLog) {
@@ -259,7 +263,7 @@ public class OkClient extends IClient {
                     @Override
                     public void run() {
                         Tool.dismiss(info.loadingDialog);
-                        info.listener.onSuccess(str,str);
+                        info.listener.onSuccess(str,str,false);
                     }
                 });
             }
@@ -381,7 +385,7 @@ public class OkClient extends IClient {
                     str = GZipUtil.uncompress(str);
                 }*/
                 String str = response.body().string();
-                Tool.parseStringByType(str,info);
+                Tool.parseStringByType(str,info,false);
                 Tool.dismiss(info.loadingDialog);
             }
         });
@@ -428,11 +432,20 @@ public class OkClient extends IClient {
                 Tool.callbackOnMainThread(new Runnable() {
                     @Override
                     public void run() {
-                        Tool.dismiss(info.loadingDialog);
+
                         if(call.isCanceled()){
+                            Tool.dismiss(info.loadingDialog);
                             info.listener.onCancel();
+
                         }else {
-                            info.listener.onError(e.getMessage());
+                            if(info.cacheMode == CacheStrategy.REQUEST_FAILED_READ_CACHE){
+                                info.shouldReadCache = true;
+                                start(info);
+                            }else {
+                                Tool.dismiss(info.loadingDialog);
+                                info.listener.onError(e.getMessage());
+                            }
+
                         }
 
                     }
@@ -450,8 +463,17 @@ public class OkClient extends IClient {
                     Tool.callbackOnMainThread(new Runnable() {
                         @Override
                         public void run() {
-                            Tool.dismiss(info.loadingDialog);
-                            info.listener.onCodeError("http错误码:"+response.code(),response.message(),response.code());
+
+                            if(info.cacheMode == CacheStrategy.REQUEST_FAILED_READ_CACHE){
+                                info.shouldReadCache = true;
+                                start(info);
+                            }else {
+                                Tool.dismiss(info.loadingDialog);
+                                info.listener.onCodeError("http错误码:"+response.code(),response.message(),response.code());
+                            }
+
+
+
                         }
                     });
 
