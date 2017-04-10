@@ -15,9 +15,9 @@ public class NoCacheInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
 
         Request request = chain.request();
-        request = request.newBuilder().header("Cache-Control","no-cache").build();
+        request = request.newBuilder().header("Cache-Control","no-cache").header("Pragma","no-cache").build();
        Response originalResponse = chain.proceed(request);
-        originalResponse = originalResponse.newBuilder().header("Cache-Control","no-cache").build();
+        originalResponse = originalResponse.newBuilder().header("Cache-Control","no-cache").header("Pragma","no-cache").build();
         return originalResponse;
 
         //获取retrofit @headers里面的参数，参数可以自己定义，在本例我自己定义的是cache，跟@headers里面对应就可以了

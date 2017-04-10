@@ -10,6 +10,7 @@ import com.hss01248.net.cookie.MemoryCookieJar;
 import com.hss01248.net.okhttp.log.LogInterceptor;
 import com.hss01248.net.okhttp.progress.UploadFileRequestBody;
 import com.hss01248.net.threadpool.ThreadPoolFactory;
+import com.hss01248.net.util.CollectionUtil;
 import com.hss01248.net.util.HttpsUtil;
 import com.hss01248.net.util.TextUtils;
 import com.hss01248.net.wrapper.HttpUtil;
@@ -28,6 +29,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Call;
@@ -35,6 +37,7 @@ import okhttp3.Callback;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
 import okhttp3.Headers;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -134,7 +137,7 @@ public class OkClient extends IClient {
         builder.connectTimeout(GlobalConfig.get().getConnectTimeout(),TimeUnit.MILLISECONDS);
 
         if(GlobalConfig.get().getCacheMode() != CacheStrategy.DEFAULT){
-            builder.addNetworkInterceptor(new NoCacheInterceptor());
+            builder.addInterceptor(new NoCacheInterceptor());
         }
     }
 
@@ -220,9 +223,28 @@ public class OkClient extends IClient {
         //builder.
         addHeaders(builder,info.headers);
 
+        cacheControl(builder,info);
+
 
         handleStringRequest(info, builder);
         return info;
+    }
+
+    /**
+     * 完全安装http的缓存规范来操作缓存,只在CacheStrategy.DEFAULT时起作用,只对get请求起作用.
+     * @param builder
+     * @param info
+     * @param <E>
+     */
+    private <E> void cacheControl(Request.Builder builder, ConfigInfo<E> info) {
+        if(info.cacheMode != CacheStrategy.DEFAULT){
+            return;
+        }
+        final CacheControl.Builder cacheBuilder = new CacheControl.Builder();
+        cacheBuilder.maxAge((int) info.cacheMaxAge, TimeUnit.MILLISECONDS);
+        CacheControl cache = cacheBuilder.build();
+        builder.cacheControl(cache);
+
     }
 
     private <E> void addTag(Request.Builder builder, ConfigInfo<E> info) {
@@ -397,13 +419,24 @@ public class OkClient extends IClient {
                     str = GZipUtil.uncompress(str);
                 }*/
                 String str = response.body().string();
-                Tool.parseStringByType(str,info,false);
+                if(info.cacheMode== CacheStrategy.DEFAULT){
+                    if(response.cacheResponse()==null || response.cacheResponse().body()==null
+                            || TextUtils.isEmpty(response.cacheResponse().body().string())){
+                        Tool.parseStringByType(str,info,false);//说明不是从缓存来的
+                    }else {
+                        Tool.parseStringByType(str,info,true);//说明是从缓存来的
+                    }
+                }else {
+                    Tool.parseStringByType(str,info,false);
+                }
+
                 Tool.dismiss(info.loadingDialog);
             }
         });
     }
 
-    private <E> void requestAndHandleResoponse(final ConfigInfo<E> info, Request.Builder builder, final ISuccessResponse successResponse) {
+    private <E> void requestAndHandleResoponse(final ConfigInfo<E> info, Request.Builder builder,
+                                               final ISuccessResponse successResponse) {
         final Request request = builder.build();
         final OkHttpClient theClient = getInstance(info);
         /*if(info.ignoreCer){
@@ -538,7 +571,7 @@ public class OkClient extends IClient {
     }
 
     //@Override
-    private  OkHttpClient getInstance(ConfigInfo info) {
+    private  OkHttpClient getInstance(final ConfigInfo info) {
         if(differentWithGlobal(info)){
             return getInstance().okhttpClient;
         }
@@ -546,6 +579,21 @@ public class OkClient extends IClient {
         OkHttpClient.Builder builder = getInstance().okhttpClient.newBuilder();
         setCookie(builder,info.cookieMode);
         setHttps(builder,info.isVerify);
+
+        //更换缓存控制头
+        if(info.cacheMode!= CacheStrategy.DEFAULT){
+            builder.addInterceptor(new NoCacheInterceptor());
+        }else {
+            CollectionUtil.filter(builder.interceptors(), new CollectionUtil.Filter<Interceptor>() {
+                @Override
+                public boolean isRemain(Interceptor item) {
+                    if(item instanceof  NoCacheInterceptor){
+                        return false;
+                    }
+                    return true;
+                }
+            });
+        }
 
         //setLog(builder,info.lo);
 
@@ -567,6 +615,10 @@ public class OkClient extends IClient {
         }
 
         if(info.timeout >0 && info.timeout != GlobalConfig.get().getConnectTimeout() ){
+            return true;
+        }
+
+        if(info.cacheMode != GlobalConfig.get().getCacheMode()){
             return true;
         }
 

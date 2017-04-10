@@ -167,8 +167,8 @@ public class MyStandardJsonRequest<T>  {//extends Request<BaseNetBean<T>>
     }
 
     @Override
-    public Request<BaseNetBean<T>> setCacheTime(long cacheTime) {
-        mCacheTime = cacheTime;
+    public Request<BaseNetBean<T>> setCacheMaxAge(long cacheMaxAge) {
+        mCacheTime = cacheMaxAge;
         try {
             getHeaders().put("Cache-Control","max-age="+mCacheTime);
         } catch (AuthFailureError authFailureError) {

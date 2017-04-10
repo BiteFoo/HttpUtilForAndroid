@@ -116,7 +116,6 @@ public abstract class IClient {
                                     configInfo.shouldReadCache = false;
                                     configInfo.isFromCache = false;
                                     start(configInfo);//没有缓存就去访问网络
-
                                 }
                             }else {//如果拿到了缓存数据,解析,然后
                                 configInfo.isFromCache = true;//给Tool.parseStringByType里面识别的

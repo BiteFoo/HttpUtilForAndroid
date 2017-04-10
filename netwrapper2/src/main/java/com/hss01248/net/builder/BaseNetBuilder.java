@@ -273,7 +273,7 @@ public class BaseNetBuilder<T> {
    /* public BaseNetBuilder<T> setCacheControl(boolean shouldReadCache,boolean shouldCacheResponse,long cacheTimeInSeconds){
         this.shouldReadCache = shouldReadCache;
         this.shouldCacheResponse = shouldCacheResponse;
-        this.cacheTime = cacheTimeInSeconds;
+        this.cacheMaxAge = cacheTimeInSeconds;
         return this;
 
     }*/

@@ -43,7 +43,7 @@ public class VolleyAdapter {
     @Override
     protected void cacheControl(ConfigInfo configInfo, Request request) {
         request.setShouldCache(configInfo.shouldReadCache);
-        request.setCacheTime(configInfo.cacheTime);
+        request.setCacheMaxAge(configInfo.cacheMaxAge);
         request.setForceGetNet(configInfo.shouldReadCache);
     }
 

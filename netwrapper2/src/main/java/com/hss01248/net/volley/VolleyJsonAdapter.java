@@ -66,7 +66,7 @@ public class VolleyJsonAdapter  {
          *//*
 
         request.setShouldReadCache(configInfo.shouldReadCache);//请求是否从缓存读取的大开关
-        request.setCacheTime(configInfo.cacheTime);//设置缓存的时间
+        request.setCacheMaxAge(configInfo.cacheMaxAge);//设置缓存的时间
         if (!configInfo.shouldReadCache){
             request.setForceGetNet(true);
         }

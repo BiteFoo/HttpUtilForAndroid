@@ -99,10 +99,6 @@ public class Tool {
                                 info.listener.onProgressChange(finalFileSizeDownloaded,fileSize);
 
                                 if(finalFileSizeDownloaded == fileSize){
-                                   // info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
-
-
-
                                     //文件校验
                                     if(info.isVerify){
                                         String str = "";
@@ -584,12 +580,12 @@ public class Tool {
 
 
     private static void cacheResponse(final String string, final ConfigInfo configInfo) {
-        if (configInfo.shouldCacheResponse && !configInfo.isFromCache && configInfo.cacheTime >0){
+        if (configInfo.shouldCacheResponse && !configInfo.isFromCache && configInfo.cacheMaxAge >0){
 
             HttpUtil.getClient().getExecutor().execute(new Runnable() {
                 @Override
                 public void run() {
-                    ACache.get(HttpUtil.context).put(getCacheKey(configInfo),string, Integer.MAX_VALUE/5);
+                    ACache.get(HttpUtil.context).put(getCacheKey(configInfo),string, (int) configInfo.cacheMaxAge);
                     MyLog.d("key is "+getCacheKey(configInfo)+ "---caching resonse:\n"+string);
                 }
             });

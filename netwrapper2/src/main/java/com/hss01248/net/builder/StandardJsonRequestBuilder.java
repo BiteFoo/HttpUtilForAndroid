@@ -218,4 +218,9 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     public StandardJsonRequestBuilder setExtraTag(Object extraTag) {
         return (StandardJsonRequestBuilder) super.setExtraTag(extraTag);
     }
+
+    @Override
+    public StandardJsonRequestBuilder setCacheMaxAge(int cacheMaxAge) {
+        return (StandardJsonRequestBuilder) super.setCacheMaxAge(cacheMaxAge);
+    }
 }

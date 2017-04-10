@@ -74,7 +74,7 @@ public class MyBaseStringRequest  {//extends Request<String>
 
     //todo 用依赖注入改写
 
-    long cacheTime;//毫秒
+    long cacheMaxAge;//毫秒
 
     public boolean isFromCache = false;
     public int cacheHitCount = 0;
@@ -97,7 +97,7 @@ public class MyBaseStringRequest  {//extends Request<String>
         this.setShouldCache(true);//重置cache开关
         if (!isFromCache){
             Map<String, String> headers = response.headers;
-            headers.put("Cache-Control","max-age="+cacheTime);
+            headers.put("Cache-Control","max-age="+cacheMaxAge);
         }
 
     }

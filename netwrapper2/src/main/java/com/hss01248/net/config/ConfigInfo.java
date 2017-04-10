@@ -284,7 +284,7 @@ public class ConfigInfo<T> {
    // public boolean forceGetNet = true;
     public boolean shouldReadCache = false;
     public boolean shouldCacheResponse = false;
-    public long cacheTime = Integer.MAX_VALUE; //单位秒
+    public int cacheMaxAge = Integer.MAX_VALUE/2; //单位秒
 
 
 
@@ -395,7 +395,7 @@ public class ConfigInfo<T> {
         assginValues(builder);
         this.paramsAsJson = builder.paramsAsJson;
 
-        this.cacheTime = builder.cacheTime;
+        this.cacheMaxAge = builder.cacheMaxAge;
         this.isFromCache = builder.isFromCache;
         this.shouldCacheResponse = builder.shouldCacheResponse;
         this.shouldReadCache = builder.shouldReadCache;
@@ -408,7 +408,7 @@ public class ConfigInfo<T> {
         this.clazz = builder.clazz;
         this.isResponseJsonArray = builder.isResponseJsonArray;
 
-        this.cacheTime = builder.cacheTime;
+        this.cacheMaxAge = builder.cacheMaxAge;
         this.isFromCache = builder.isFromCache;
         this.shouldCacheResponse = builder.shouldCacheResponse;
         this.shouldReadCache = builder.shouldReadCache;
@@ -434,7 +434,7 @@ public class ConfigInfo<T> {
         this.key_msg = builder.key_msg;
 
 
-        this.cacheTime = builder.cacheTime;
+        this.cacheMaxAge = builder.cacheMaxAge;
         this.isFromCache = builder.isFromCache;
         this.shouldCacheResponse = builder.shouldCacheResponse;
         this.shouldReadCache = builder.shouldReadCache;

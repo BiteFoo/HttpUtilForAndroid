@@ -18,6 +18,7 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
     }
 
 
+
     public Class<T> clazz;
     public JsonRequestBuilder<T> setJsonClazz(Class<T> clazz) {
         this.clazz = clazz;
@@ -137,4 +138,11 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
     public JsonRequestBuilder setExtraTag(Object extraTag) {
         return (JsonRequestBuilder) super.setExtraTag(extraTag);
     }
+
+    @Override
+    public JsonRequestBuilder setCacheMaxAge(int cacheMaxAge) {
+        return (JsonRequestBuilder) super.setCacheMaxAge(cacheMaxAge);
+    }
+
+
 }

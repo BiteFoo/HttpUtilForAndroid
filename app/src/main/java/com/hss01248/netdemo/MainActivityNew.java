@@ -101,7 +101,7 @@ public class MainActivityNew extends Activity {
             case R.id.get_string:
                 //测试自签名/未被android系统承认的的https
                 HttpUtil.buildStringRequest("https://kyfw.12306.cn/otn/regist/init")
-                        .setCacheMode(CacheStrategy.REQUEST_FAILED_READ_CACHE)
+                        .setCacheMode(CacheStrategy.DEFAULT)
                         .callback(getListener(new MyNetListener<String>() {
                                     @Override
                                     public void onSuccess(String response, String resonseStr,boolean isFromCache) {
@@ -158,10 +158,9 @@ public class MainActivityNew extends Activity {
                 break;
             case R.id.get_json:
 
-
                 HttpUtil.buildJsonRequest("version/latestVersion/v1.json",GetCommonJsonBean.class)
                         .showLoadingDialog()
-                        .setCacheMode(CacheStrategy.IF_NONE_CACHE_REQUEST)
+                        .setCacheMode(CacheStrategy.DEFAULT)
                         .callback(getListener(new MyNetListener<GetCommonJsonBean>() {
                             @Override
                             public void onSuccess(GetCommonJsonBean response, String resonseStr,boolean isFromCache) {

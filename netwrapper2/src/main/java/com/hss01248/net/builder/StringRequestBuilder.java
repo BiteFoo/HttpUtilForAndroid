@@ -7,8 +7,6 @@ import com.hss01248.net.wrapper.MyNetListener;
 
 import java.util.Map;
 
-import okhttp3.internal.http.HttpDate;
-
 /**
  * Created by Administrator on 2017/1/16 0016.
  */
@@ -22,7 +20,13 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
     //todo 以下是缓存控制策略
     public boolean shouldReadCache = false;
     public boolean shouldCacheResponse = false;
-    public long cacheTime = HttpDate.MAX_DATE; //单位秒
+
+    public StringRequestBuilder setCacheMaxAge(int cacheMaxAge) {
+        this.cacheMaxAge = cacheMaxAge;
+        return this;
+    }
+
+    public int cacheMaxAge = Integer.MAX_VALUE/2; //单位秒
     public boolean isFromCache = false;//内部控制,不让外部设置
     /**
      * 只支持String和json类型的请求,不支持文件下载的缓存.
