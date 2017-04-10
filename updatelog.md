@@ -4,7 +4,7 @@
 
 ## 2017.04.10
 * 移除原lite-asyntask.jar,以及对androidUtilCode的依赖.读写缓存的executor改由IClient提供
-* 增加设置公共header和公共参数的功能
+* 增加设置和更新公共header和公共参数的功能
 * 三字段json请求时,如果为unlogin,调用自动登录方法,并在登录成功后自动发送原请求.
 
 
