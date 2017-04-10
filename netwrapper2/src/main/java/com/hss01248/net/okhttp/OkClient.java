@@ -9,6 +9,7 @@ import com.hss01248.net.cookie.DiskCookieJar;
 import com.hss01248.net.cookie.MemoryCookieJar;
 import com.hss01248.net.okhttp.log.LogInterceptor;
 import com.hss01248.net.okhttp.progress.UploadFileRequestBody;
+import com.hss01248.net.threadpool.ThreadPoolFactory;
 import com.hss01248.net.util.HttpsUtil;
 import com.hss01248.net.util.TextUtils;
 import com.hss01248.net.wrapper.HttpUtil;
@@ -23,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
@@ -70,6 +73,15 @@ public class OkClient extends IClient {
    private OkClient(){
 
    }
+
+    public Executor getExecutor(){
+        ExecutorService executor = okhttpClient.dispatcher().executorService();
+        if(executor==null || executor.isShutdown() || executor.isTerminated()){
+            return ThreadPoolFactory.getMaxPool().getExecutor();
+        }else {
+            return executor;
+        }
+    }
 
    /*private OkHttpClient getAllCerPassClient(){
        if(allCerPassClient ==null){

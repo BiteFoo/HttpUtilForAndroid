@@ -9,13 +9,15 @@ import com.hss01248.net.util.TextUtils;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.Tool;
-import com.litesuits.android.async.SimpleTask;
+
+import java.util.concurrent.Executor;
 
 
 /**
  * Created by Administrator on 2017/1/19 0019.
  */
 public abstract class IClient {
+    public abstract Executor getExecutor();
     protected abstract <E> ConfigInfo<E> getString(ConfigInfo<E> info);
 
     protected abstract  <E> ConfigInfo<E> postString(ConfigInfo<E> info);
@@ -97,10 +99,10 @@ public abstract class IClient {
                 boolean isOnlyCache = false;
                 //拿缓存
                 if (configInfo.shouldReadCache){
-                    SimpleTask<String> simple = new SimpleTask<String>() {
-                        @Override
-                        protected String doInBackground() {
 
+                    getExecutor().execute(new Runnable() {
+                        @Override
+                        public void run() {
                             String result = ACache.get(HttpUtil.context).getAsString(Tool.getCacheKey(configInfo));
                             MyLog.e("key of get:"+Tool.getCacheKey(configInfo)+"\n"+result);
                             if (TextUtils.isEmpty(result)){
@@ -144,14 +146,9 @@ public abstract class IClient {
                                     }
                                 }
                             }
-                            return result;
                         }
-                        @Override
-                        protected void onPostExecute(String result) {
+                    });
 
-                        }
-                    };
-                    simple.execute();
                     isOnlyCache = true;//不再网络请求,而是进入这个子线程执行
                 }else {
                     isOnlyCache = false;

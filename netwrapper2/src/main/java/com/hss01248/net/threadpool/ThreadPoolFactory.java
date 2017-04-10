@@ -38,4 +38,16 @@ public class ThreadPoolFactory {
 		}
 		return mDownLoadPool;
 	}
+
+	/**得到一个高并发不阻塞的线程池*/
+	public static ThreadPoolProxy getMaxPool() {
+		if (mDownLoadPool == null) {
+			synchronized (ThreadPoolProxy.class) {
+				if (mDownLoadPool == null) {
+					mDownLoadPool = new ThreadPoolProxy(0, Integer.MAX_VALUE, 6000);
+				}
+			}
+		}
+		return mDownLoadPool;
+	}
 }

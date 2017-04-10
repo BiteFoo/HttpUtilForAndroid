@@ -8,8 +8,8 @@ import android.os.Build;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
-import com.blankj.utilcode.utils.LogUtils;
 import com.hss01248.net.R;
+import com.hss01248.net.wrapper.MyLog;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class FileUtils {
 
         if (Build.VERSION.SDK_INT>19){
             String mineType =getMineType(filePath);
-            LogUtils.e("filepath:"+filePath+"---mimetype:"+mineType);
+            MyLog.e("filepath:"+filePath+"---mimetype:"+mineType);
 
             saveImageSendScanner(activity,new MyMediaScannerConnectionClient(filePath,mineType));
         }else {

@@ -9,19 +9,18 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
-import com.blankj.utilcode.utils.EncryptUtils;
 import com.hss01248.net.cache.ACache;
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.util.FileUtils;
 import com.hss01248.net.util.TextUtils;
-import com.litesuits.android.async.SimpleTask;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,10 +42,6 @@ import okhttp3.ResponseBody;
  * Created by Administrator on 2016/9/21.
  */
 public class Tool {
-
-
-
-
 
 
     public static String urlEncode(String string)  {
@@ -104,19 +99,25 @@ public class Tool {
                                 info.listener.onProgressChange(finalFileSizeDownloaded,fileSize);
 
                                 if(finalFileSizeDownloaded == fileSize){
-                                    info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
-                                    Tool.dismiss(info.loadingDialog);
+                                   // info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
+
 
 
                                     //文件校验
                                     if(info.isVerify){
                                         String str = "";
                                         if(info.verfyByMd5OrShar1){//md5
-                                            str = EncryptUtils.encryptMD5File2String(info.filePath);
-
+                                            str = fileToMD5(info.filePath);
                                         }else {//sha1
-                                            str = EncryptUtils.encryptSHA1ToString(info.filePath);//todo 缺少shar1文件的算法
+                                            str = fileToSHA1(info.filePath);
                                         }
+
+                                        Tool.dismiss(info.loadingDialog);
+                                        if(TextUtils.isEmpty(str)){//md算法失败
+                                            info.listener.onError("文件下载失败:校验失败");
+                                            return;
+                                        }
+                                        MyLog.e("real md:"+str+" --- expect md:"+info.verifyStr);
                                         if(str.equalsIgnoreCase(info.verifyStr)){//校验通过
                                             info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
                                             handleMedia(info);
@@ -124,6 +125,7 @@ public class Tool {
                                             info.listener.onError("文件下载失败:校验不一致");
                                         }
                                     }else {
+                                        Tool.dismiss(info.loadingDialog);
                                         info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
                                         handleMedia(info);
                                     }
@@ -428,16 +430,11 @@ public class Tool {
         return url;
     }
 
-    /**
-     * 对字符串md5加密
-     *
-     * @param str
-     * @return
-     */
-    public static String getMD5(String str) {
+
+    public static String getMD(String str,String algorithm) {
         try {
             // 生成一个MD5加密计算摘要
-            MessageDigest md = MessageDigest.getInstance("MD5");
+            MessageDigest md = MessageDigest.getInstance(algorithm);
             // 计算md5函数
             md.update(str.getBytes());
             // digest()最后确定返回md5 hash值，返回值为8为字符串。因为md5 hash值是16位的hex值，实际上就是8位的字符
@@ -445,9 +442,108 @@ public class Tool {
             return new BigInteger(1, md.digest()).toString(16);
         } catch (Exception e) {
             e.printStackTrace();
-            return str;
+            return null;
         }
     }
+/*
+    public static String getMD(File file,String algorithm){
+        if (!file.isFile()) {
+            return null;
+        }
+        MessageDigest digest = null;
+        FileInputStream in = null;
+        byte buffer[] = new byte[1024];
+        int len;
+        try {
+            digest = MessageDigest.getInstance(algorithm);
+            in = new FileInputStream(file);
+            while ((len = in.read(buffer, 0, 1024)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        return bigInt.toString(16);
+    }*/
+
+    /**
+     * Get the md5 value of the filepath specified file
+     * @param filePath The filepath of the file
+     * @return The md5 value
+     */
+    public static String fileToMD5(String filePath) {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(filePath); // Create an FileInputStream instance according to the filepath
+            byte[] buffer = new byte[1024]; // The buffer to read the file
+            MessageDigest digest = MessageDigest.getInstance("MD5"); // Get a MD5 instance
+            int numRead = 0; // Record how many bytes have been read
+            while (numRead != -1) {
+                numRead = inputStream.read(buffer);
+                if (numRead > 0)
+                    digest.update(buffer, 0, numRead); // Update the digest
+            }
+            byte [] md5Bytes = digest.digest(); // Complete the hash computing
+            return convertHashToString(md5Bytes); // Call the function to convert to hex digits
+        } catch (Exception e) {
+            return null;
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close(); // Close the InputStream
+                } catch (Exception e) { }
+            }
+        }
+    }
+
+    /**
+     * Get the sha1 value of the filepath specified file
+     * @param filePath The filepath of the file
+     * @return The sha1 value
+     */
+    public static String fileToSHA1(String filePath) {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(filePath); // Create an FileInputStream instance according to the filepath
+            byte[] buffer = new byte[1024]; // The buffer to read the file
+            MessageDigest digest = MessageDigest.getInstance("SHA-1"); // Get a SHA-1 instance
+            int numRead = 0; // Record how many bytes have been read
+            while (numRead != -1) {
+                numRead = inputStream.read(buffer);
+                if (numRead > 0)
+                    digest.update(buffer, 0, numRead); // Update the digest
+            }
+            byte [] sha1Bytes = digest.digest(); // Complete the hash computing
+            return convertHashToString(sha1Bytes); // Call the function to convert to hex digits
+        } catch (Exception e) {
+            return null;
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close(); // Close the InputStream
+                } catch (Exception e) { }
+            }
+        }
+    }
+
+    /**
+     * Convert the hash bytes to hex digits string
+     * @param hashBytes
+     * @return The converted hex digits string
+     */
+    private static String convertHashToString(byte[] hashBytes) {
+        String returnVal = "";
+        for (int i = 0; i < hashBytes.length; i++) {
+            returnVal += Integer.toString(( hashBytes[i] & 0xff) + 0x100, 16).substring(1);
+        }
+        return returnVal.toLowerCase();
+    }
+
+
+
 
     public static String getCacheKey(ConfigInfo configInfo){
         String url = configInfo.url;
@@ -463,7 +559,7 @@ public class Tool {
 
         }
         String str = stringBuilder.toString();
-        return getMD5(str);
+        return getMD(str,"MD5");
 
     }
 
@@ -490,21 +586,13 @@ public class Tool {
     private static void cacheResponse(final String string, final ConfigInfo configInfo) {
         if (configInfo.shouldCacheResponse && !configInfo.isFromCache && configInfo.cacheTime >0){
 
-            SimpleTask<Void> simple = new SimpleTask<Void>() {
-
+            HttpUtil.getClient().getExecutor().execute(new Runnable() {
                 @Override
-                protected Void doInBackground() {
-
+                public void run() {
                     ACache.get(HttpUtil.context).put(getCacheKey(configInfo),string, Integer.MAX_VALUE/5);
                     MyLog.d("key is "+getCacheKey(configInfo)+ "---caching resonse:\n"+string);
-                    return null;
                 }
-
-                @Override
-                protected void onPostExecute(Void result) {
-                }
-            };
-            simple.execute();
+            });
         }else {
             configInfo.isFromCacheSuccess = true;
             if(configInfo.cacheMode== CacheStrategy.IF_NONE_CACHE_REQUEST){

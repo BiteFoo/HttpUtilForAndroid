@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.blankj.utilcode.utils.EncryptUtils;
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyJson;
@@ -311,7 +310,7 @@ public class MainActivityNew extends Activity {
                         .setOpenAfterSuccess()//下载完成后打开
                         .setHideFile()//隐藏该文件
                         .setNotifyMediaCenter(false)
-                        .verifyMd5("djso8d89dsjd9s7dsfj")//下载完后校验md5,如果
+                        .verifyShar1("76DAB206AE43FB81A15E9E54CAC87EA94BB5B384")//下载完后校验md5,如果djso8d89dsjd9s7dsfj
                         .getAsync(getListener(new MyNetListener() {
                             @Override
                             public void onSuccess(Object response, String onSuccess,boolean isFromCache) {
@@ -469,7 +468,7 @@ public class MainActivityNew extends Activity {
 
                 String str = appkey + m +c + act + params + appSecret + timeStamp2;
                 Logger.e("str:"+str);
-                String sign = EncryptUtils.encryptMD5ToString(str).toLowerCase();
+                String sign = "";
                 Logger.e("签名后的:"+sign);
 
                 Map map11 = new HashMap<>();
