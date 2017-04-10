@@ -14,6 +14,7 @@ import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.util.FileUtils;
+import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.util.TextUtils;
 
 import org.json.JSONObject;
@@ -794,17 +795,29 @@ public class Tool {
             });
 
         }else if (code == codeUnlogin){
-            /*configInfo.client.autoLogin(new MyNetListener() {
+            LoginManager loginManager = GlobalConfig.get().getLoginManager();
+            if(loginManager==null){
+                callbackOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        configInfo.listener.onUnlogin();
+                    }
+                });
+
+                return;
+            }
+            loginManager.autoLogin(new MyNetListener() {
                 @Override
-                public void onSuccess(Object response, String resonseStr) {
-                    configInfo.client.start(configInfo);
+                public void onSuccess(Object response, String resonseStr, boolean isFromCache) {
+                    configInfo.start();
                 }
+
                 @Override
                 public void onError(String error) {
                     super.onError(error);
                      configInfo.listener.onUnlogin();
                 }
-            });*/
+            });
         }else {
             callbackOnMainThread(new Runnable() {
                 @Override

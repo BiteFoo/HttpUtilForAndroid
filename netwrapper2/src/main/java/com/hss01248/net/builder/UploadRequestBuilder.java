@@ -132,4 +132,14 @@ public class UploadRequestBuilder<T> extends ProgressBaseBuilder{
     public UploadRequestBuilder setExtraTag(Object extraTag) {
         return (UploadRequestBuilder) super.setExtraTag(extraTag);
     }
+
+    @Override
+    public UploadRequestBuilder setAppendCommonHeaders(boolean appendCommonHeaders) {
+        return (UploadRequestBuilder) super.setAppendCommonHeaders(appendCommonHeaders);
+    }
+
+    @Override
+    public UploadRequestBuilder setAppendCommonParams(boolean appendCommonParams) {
+        return (UploadRequestBuilder) super.setAppendCommonParams(appendCommonParams);
+    }
 }

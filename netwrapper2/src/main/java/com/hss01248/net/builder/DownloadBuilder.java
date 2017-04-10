@@ -201,4 +201,14 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
     public DownloadBuilder setExtraTag(Object extraTag) {
         return (DownloadBuilder) super.setExtraTag(extraTag);
     }
+
+    @Override
+    public DownloadBuilder setAppendCommonHeaders(boolean appendCommonHeaders) {
+        return (DownloadBuilder) super.setAppendCommonHeaders(appendCommonHeaders);
+    }
+
+    @Override
+    public DownloadBuilder setAppendCommonParams(boolean appendCommonParams) {
+        return (DownloadBuilder) super.setAppendCommonParams(appendCommonParams);
+    }
 }

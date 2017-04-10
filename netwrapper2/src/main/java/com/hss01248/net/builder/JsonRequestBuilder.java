@@ -144,5 +144,13 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
         return (JsonRequestBuilder) super.setCacheMaxAge(cacheMaxAge);
     }
 
+    @Override
+    public JsonRequestBuilder setAppendCommonHeaders(boolean appendCommonHeaders) {
+        return (JsonRequestBuilder) super.setAppendCommonHeaders(appendCommonHeaders);
+    }
 
+    @Override
+    public JsonRequestBuilder setAppendCommonParams(boolean appendCommonParams) {
+        return (JsonRequestBuilder) super.setAppendCommonParams(appendCommonParams);
+    }
 }

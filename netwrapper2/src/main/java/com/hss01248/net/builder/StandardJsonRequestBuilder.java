@@ -223,4 +223,14 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     public StandardJsonRequestBuilder setCacheMaxAge(int cacheMaxAge) {
         return (StandardJsonRequestBuilder) super.setCacheMaxAge(cacheMaxAge);
     }
+
+    @Override
+    public StandardJsonRequestBuilder setAppendCommonHeaders(boolean appendCommonHeaders) {
+        return (StandardJsonRequestBuilder) super.setAppendCommonHeaders(appendCommonHeaders);
+    }
+
+    @Override
+    public StandardJsonRequestBuilder setAppendCommonParams(boolean appendCommonParams) {
+        return (StandardJsonRequestBuilder) super.setAppendCommonParams(appendCommonParams);
+    }
 }

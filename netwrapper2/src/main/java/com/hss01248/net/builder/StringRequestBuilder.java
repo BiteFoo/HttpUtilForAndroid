@@ -2,6 +2,7 @@ package com.hss01248.net.builder;
 
 import android.app.Dialog;
 
+import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.wrapper.MyNetListener;
 
@@ -16,7 +17,7 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
         this.type = ConfigInfo.TYPE_STRING;
     }
 
-    public    int cacheMode;
+    public    int cacheMode = CacheStrategy.NO_CACHE;
     //todo 以下是缓存控制策略
     public boolean shouldReadCache = false;
     public boolean shouldCacheResponse = false;
@@ -139,5 +140,15 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
     @Override
     public StringRequestBuilder setExtraTag(Object extraTag) {
         return (StringRequestBuilder) super.setExtraTag(extraTag);
+    }
+
+    @Override
+    public StringRequestBuilder setAppendCommonHeaders(boolean appendCommonHeaders) {
+        return (StringRequestBuilder) super.setAppendCommonHeaders(appendCommonHeaders);
+    }
+
+    @Override
+    public StringRequestBuilder setAppendCommonParams(boolean appendCommonParams) {
+        return (StringRequestBuilder) super.setAppendCommonParams(appendCommonParams);
     }
 }

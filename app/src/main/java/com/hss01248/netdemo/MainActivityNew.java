@@ -2,18 +2,21 @@ package com.hss01248.netdemo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Button;
 
 import com.hss01248.net.cache.CacheStrategy;
+import com.hss01248.net.config.GlobalConfig;
+import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyJson;
 import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.netdemo.bean.GetCommonJsonBean;
 import com.hss01248.netdemo.bean.GetStandardJsonBean;
-import com.hss01248.netdemo.bean.PostCommonJsonBean;
 import com.hss01248.netdemo.bean.PostStandardJsonArray;
+import com.hss01248.netdemo.bean.UserInfo;
 import com.hss01248.netdemo.bean.VersionInfo;
 import com.orhanobut.logger.Logger;
 
@@ -52,10 +55,41 @@ public class MainActivityNew extends Activity {
         ButterKnife.bind(this);
        Logger.init("netapi");
         //HttpUtil.initAddHttps(R.raw.srca);//添加12306的证书
-        HttpUtil.init(getApplicationContext(),"http://www.qxinli.com:9001/api/")
+        HttpUtil.init(getApplicationContext(),"http://api.qxinli.com:9005/api/")
+                .setStandardJsonKeys("data","code","message")
+                .setStandardJsonCodes(0,5,2)
+                .setTokenInfo("sessionId",0)
                // .addCrtificateRaw(R.raw.srca)
                 //.addCrtificateAssert("srca.cer")
-                .openLog("okhttp");
+                .openLog("okhttp")
+                .setLoginManager(new LoginManager() {
+                    @Override
+                    public void autoLogin(@Nullable final MyNetListener listener) {
+
+                        //注意: 应从sp中读取,加密存取,加密传输.这里的demo省略了这些安全性措施
+                        login("15989366579965", "123456", new MyNetListener<UserInfo>() {
+                            @Override
+                            public void onSuccess(UserInfo response, String resonseStr, boolean isFromCache) {
+                                GlobalConfig.get().updateToken(response.sessionId);
+
+                                if(listener!=null)
+                                listener.onSuccess(response,resonseStr,isFromCache);
+
+                            }
+
+                            @Override
+                            public void onError(String msgCanShow) {
+                                super.onError(msgCanShow);
+                                if(listener!=null)
+                                listener.onError(msgCanShow);
+
+                            }
+                        });
+
+                    }
+                });
+
+
 
 
         //HttpUtil.initAppDefault("session_id","data","code","msg",0,5,2);
@@ -90,6 +124,15 @@ public class MainActivityNew extends Activity {
     }
 
 
+    public void login(String username,String pw,MyNetListener listener){
+        HttpUtil.buildStandardJsonRequest("xxxx/login/v1.json",UserInfo.class)
+                .addParam("account",username)
+                .addParam("password",pw)
+                .addParam("platform", "Android")
+                .addParam("imei","352203065209543543037")
+                .setCacheMode(CacheStrategy.NO_CACHE)
+                .postAsync(listener);
+    }
 
 
 
@@ -187,7 +230,34 @@ public class MainActivityNew extends Activity {
                 break;
             case R.id.post_json:
 
-                HttpUtil.buildJsonRequest("article/getArticleCommentList/v1.json",PostCommonJsonBean.class)
+                login("159893675769965","123456",new MyNetListener<UserInfo>() {
+                    @Override
+                    public void onSuccess(UserInfo response, String resonseStr,boolean isFromCache) {
+                        Logger.json(MyJson.toJsonStr(response));
+                        GlobalConfig.get().updateToken(response.sessionId);
+
+
+                        if(isFromCache){
+                            MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                        }else {
+                            MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                        }
+                    }
+                    @Override
+                    public void onError(String msgCanShow) {
+                        super.onError(msgCanShow);
+                        Logger.e(msgCanShow);
+                        if(isResponseFromCache()){
+                            MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                        }else {
+                            MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                        }
+                    }
+                });
+
+
+
+                /*HttpUtil.buildJsonRequest("article/getArticleCommentList/v1.json",PostCommonJsonBean.class)
                         .addParam("pageSize","30")
                         .addParam("articleId","1738")
                         .setCacheMode(CacheStrategy.FIRST_CACHE_THEN_REQUEST)
@@ -212,7 +282,7 @@ public class MainActivityNew extends Activity {
                                     MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
                                 }
                             }
-                        })).postAsync();
+                        })).postAsync();*/
 
                 break;
             case R.id.get_standard_json:

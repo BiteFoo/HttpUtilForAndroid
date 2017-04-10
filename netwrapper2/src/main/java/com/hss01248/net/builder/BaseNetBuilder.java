@@ -22,6 +22,18 @@ import java.util.Map;
 public class BaseNetBuilder<T> {
 
 
+    public BaseNetBuilder setAppendCommonHeaders(boolean appendCommonHeaders) {
+        isAppendCommonHeaders = appendCommonHeaders;
+        return this;
+    }
+
+    public BaseNetBuilder setAppendCommonParams(boolean appendCommonParams) {
+        isAppendCommonParams = appendCommonParams;
+        return this;
+    }
+
+    public boolean isAppendCommonHeaders = GlobalConfig.get().isAppendCommonHeaders();
+    public boolean isAppendCommonParams = GlobalConfig.get().isAppendCommonParams();
     public Map<String,String> params = new HashMap<>();
     public Map<String,String> headers = new HashMap<>();
     public MyNetListener<T> listener;
@@ -206,12 +218,18 @@ public class BaseNetBuilder<T> {
 
         CollectionUtil.filterMap(headers, new CollectionUtil.MapFilter<String, String>() {
             public boolean isRemain(Map.Entry<String, String> entry) {
-                return entry.getValue() != null;
+                if(entry.getValue() == null){
+                    entry.setValue("");
+                }
+                return true;
             }
         });
         CollectionUtil.filterMap(params, new CollectionUtil.MapFilter<String, String>() {
             public boolean isRemain(Map.Entry<String, String> entry) {
-                return entry.getValue() != null;
+                if(entry.getValue() == null){
+                    entry.setValue("");
+                }
+                return true;
             }
         });
         return true;
@@ -316,13 +334,13 @@ public class BaseNetBuilder<T> {
 
 
     //TODO token身份验证字段的拼接
-    public boolean isAppendToken = false;//默认没有token验证
+    /*public boolean isAppendToken = false;//默认没有token验证
     public boolean isInHeaderOrParam = false;//默认在参数体中传递
     public BaseNetBuilder<T> setIsAppendToken(boolean isAppendToken,boolean isInHeaderOrParam){
         this.isAppendToken = isAppendToken;
         this.isInHeaderOrParam = isInHeaderOrParam;
         return this;
-    }
+    }*/
 
     public BaseNetBuilder<T> setTag(Object object){
         return this;

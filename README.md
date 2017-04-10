@@ -1,5 +1,7 @@
 # HttpUtilForAndroid
 
+[![](https://jitpack.io/v/hss01248/NetWrapper.svg)](https://jitpack.io/#hss01248/NetWrapper)
+
 ## 特点:
 
 第三方隔离:使用过程中不涉及到下一层的库的相关类,全部是
@@ -14,13 +16,15 @@
 
 提供data-code-msg三个标准字段的json解析和回调,并且可自定义配置三个字段
 
-api设计上结合http协议和android平台特点来实现: loading对话框,实时进度条显示,文件下载后的打开/扫描到媒体库
+api设计上结合http协议和android平台特点来实现: 
+
+​	loading对话框,实时进度条显示,文件下载后MD5/SHA1校验,以及打开/扫描到媒体库,或者选择隐藏下载的图片/视频.
 
 loading对话框可在任意界面,任意线程弹出.
 
 六种缓存策略可选,涵盖大多数业务场景.
 
-[![](https://jitpack.io/v/hss01248/NetWrapper.svg)](https://jitpack.io/#hss01248/NetWrapper)
+可设置公共参数和公共headers,并在单个请求中可以选择是否携带这些.
 
 
 
@@ -111,6 +115,20 @@ setRetryCount(int retryCount)
 addCrtificateAssert(String fileName)
 //打开log
 openLog(String logTag) 
+
+//设置公共header和公共params
+addCommonHeader(String key,String value)
+addCommonParam(String key,String value)
+setAppendCommonHeaders(boolean appendCommonHeaders) 
+setAppendCommonParams(boolean appendCommonParams)
+//后续可随时更新这些公共参数
+updateCommonHeader(String key,String value)
+updateCommonParam(String key,String value)
+
+//自动登录的实现
+setTokenInfo(String tokenKey, int tokenLocation)//设置token的key,以及token设置在哪里?参数中还是header中还是cookie中
+setLoginManager(LoginManager loginManager)//一个接口,实现带回调的自动登录:autoLogin(MyNetListener listener)
+updateToken(String token)//后面实时更新token时,调用此api
 ```
 
 # 几个入口方法
@@ -152,6 +170,8 @@ paramsStr(String paramsStr)//将一整个key=value形式或者json形式的字�
 addParam(String key,String value)//添加参数键值对
 
 addParams(Map<String,String> params)
+
+setAppendCommonParams(boolean appendCommonParams)//本次请求是否携带公共参数
 ```
 
 ### 两种传输形式
@@ -169,6 +189,8 @@ setParamsAsJson()//默认为key=value的形式,调用此方法,改成以json形�
 ```
 addHeader(String key,String value)
 addHeaders(Map<String,String> headers)
+
+setAppendCommonHeaders(boolean appendCommonHeaders)//本次请求是否携带公共headers
 ```
 
 ### 缓存控制(todo)
@@ -362,7 +384,53 @@ setStandardJsonKeys(String key_data, String key_code, String key_msg)
 setStandardJsonCodes(int codeSuccess,int codeUnlogin,int codeUnfound)
 ```
 
-### 相关的回调逻辑
+### 三字段json时,返回错误码为unlogin时,实现自动登录,并在登录成功后自动发送前一个请求
+
+* 首先是GlobalConfig中配置:
+
+setTokenInfo(String tokenKey, int tokenLocation)//设置token的key,以及token设置在哪里?是参数中(0)还是header中(1)还是cookie中(2).如果是cookie中,则cookie管理会自动设置成持久化cookie
+
+
+setLoginManager(LoginManager loginManager)//一个接口,实现带回调的自动登录:autoLogin(MyNetListener listener)
+
+updateToken(String token)//后面实时更新token时,调用此api
+
+示例:
+
+```
+HttpUtil.init(getApplicationContext(),"http://api.qxinli.com:9005/api/")
+                .setStandardJsonKeys("data","code","message")
+                .setStandardJsonCodes(0,5,2)
+                .setTokenInfo("sessionId",0)
+               // .addCrtificateRaw(R.raw.srca)
+                //.addCrtificateAssert("srca.cer")
+                .openLog("okhttp")
+                .setLoginManager(new LoginManager() {
+                    @Override
+                    public void autoLogin(@Nullable final MyNetListener listener) {
+        				//注意: 应从sp中读取,加密存取,加密传输.这里的demo省略了这些安全性措施	
+                        login("15989366579965", "123456", new MyNetListener<UserInfo>() {
+                            @Override
+                            public void onSuccess(UserInfo response, String resonseStr, boolean isFromCache) {
+                                GlobalConfig.get().updateToken(response.sessionId);//及时更新token
+        
+                                if(listener!=null)
+                                listener.onSuccess(response,resonseStr,isFromCache);
+        
+                            }
+        
+                            @Override
+                            public void onError(String msgCanShow) {
+                                super.onError(msgCanShow);
+                                if(listener!=null)
+                                listener.onError(msgCanShow);
+        
+                            }
+                        });
+        
+                    }
+                });
+```
 
 
 
@@ -493,9 +561,11 @@ HttpUtil.cancleAllRequest()
 
 能够将请求和响应的全部内容都打印出来.
 
-如果是上传下载的大数据量,则相应的请求体或者响应体不打印.
+如果是上传下载的大数据量,或者gzip压缩,则相应的请求体或者响应体不打印.
 
  ![log](log.jpg)
+
+
 
 # usage
 
@@ -508,7 +578,7 @@ Add it in your root build.gradle at the end of repositories:
 ```
 allprojects {
     repositories {
-        ...
+       
         maven { url "https://jitpack.io" }
     }
 }
@@ -518,7 +588,7 @@ Step 2. Add the dependency
 
 ```java
 dependencies {
-        compile 'com.github.hss01248:HttpUtilForAndroid:2.1.0'
+        compile 'com.github.hss01248:HttpUtilForAndroid:2.1.1'
 }
 ```
 

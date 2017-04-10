@@ -110,6 +110,8 @@ public class ConfigInfo<T> {
 
         //todo 自己实现缓存或者利用okhttp的缓存功能
 
+
+
         //打印调试
        /* MyLog.json(url);
         MyLog.e("headers-----------------------------------");
@@ -124,6 +126,16 @@ public class ConfigInfo<T> {
         //todo 看下载路径在不在
 
 
+        //添加公共参数
+        if(isAppendCommonParams){
+            params.putAll(GlobalConfig.get().getCommonParams());
+        }
+        if(isAppendCommonHeaders){
+            headers.putAll(GlobalConfig.get().getCommonHeaders());
+        }
+
+
+        //todo 排除gzip的内容
 
 
         //todo dialog的取消网络请求
@@ -324,7 +336,8 @@ public class ConfigInfo<T> {
     public int resonseType = TYPE_STRING;*/
 
 
-
+    public boolean isAppendCommonHeaders ;
+    public boolean isAppendCommonParams ;
 
 
     public static final int TYPE_STRING = 1;//純文本,比如html
@@ -382,6 +395,8 @@ public class ConfigInfo<T> {
         this.cookieMode = builder.cookieMode;
 
         this.tagForCancle = builder.tagForCancle;
+        this.isAppendCommonHeaders = builder.isAppendCommonHeaders;
+        this.isAppendCommonParams = builder.isAppendCommonParams;
 
 
     }

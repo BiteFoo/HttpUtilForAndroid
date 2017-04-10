@@ -2,35 +2,135 @@ package com.hss01248.net.config;
 
 import android.text.TextUtils;
 
-import com.hss01248.net.builder.StandardJsonRequestBuilder;
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.util.HttpsUtil;
+import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.wrapper.MyLog;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2017/3/9 0009.
  */
 
 public class GlobalConfig {
-    private static GlobalConfig instance;
+    //private static GlobalConfig instance;
 
 
     private GlobalConfig(){
 
     }
 
+    private static class SingletonHolder {
+        private static final GlobalConfig INSTANCE = new GlobalConfig();
+    }
+
     /**
      * 仅在
      * @return
      */
-    public static GlobalConfig get(){
-        if(instance == null){
-            instance = new GlobalConfig();
-        }
-        return instance;
+    public static synchronized  GlobalConfig get(){
+        return SingletonHolder.INSTANCE;
     }
 
     //private  long PROGRESS_INTERMEDIATE = 300;//进度条更新间隔,默认300ms
+
+
+    public Map<String, String> getCommonHeaders() {
+        return commonHeaders;
+    }
+
+    public GlobalConfig updateCommonHeader(String key,String value) {
+        this.commonHeaders .put(key,value);
+        return this;
+    }
+
+    public Map<String, String> getCommonParams() {
+        return commonParams;
+    }
+
+    public GlobalConfig updateCommonParam(String key,String value) {
+        this.commonParams .put(key,value);
+        return this;
+    }
+
+    public void updateToken(String token){
+        if(TextUtils.isEmpty(tokenKey) ){
+            return;
+        }
+        /*if(TextUtils.isEmpty(token)){
+            if(tokenLocation==0){
+                commonParams.put(tokenKey,token);
+            }else if(tokenLocation ==1){
+                commonHeaders.put(tokenKey,token);
+            }
+
+            return;
+        }*/
+        if(tokenLocation==0){
+            commonParams.put(tokenKey,token);
+        }else if(tokenLocation ==1){
+            commonHeaders.put(tokenKey,token);
+        }
+    }
+
+    /**
+     * 标识登录状态的关键字
+     */
+    private String tokenKey = "token";
+    /**
+     * 在参数中:0,在header中:1,在cookie中:2
+     */
+    private int tokenLocation;
+
+    private LoginManager loginManager;
+
+    public LoginManager getLoginManager() {
+        return loginManager;
+    }
+
+    public GlobalConfig setLoginManager(LoginManager loginManager) {
+        this.loginManager = loginManager;
+        return this;
+    }
+
+    public GlobalConfig setTokenInfo(String tokenKey, int tokenLocation){
+        this.tokenKey = tokenKey;
+        this.tokenLocation = tokenLocation;
+        if(tokenLocation ==2){
+            cookieMode = COOKIE_DISK;
+        }
+        return this;
+    }
+
+    private Map<String,String> commonHeaders = new HashMap<>();
+    private Map<String,String> commonParams = new HashMap<>();
+    private boolean isAppendCommonHeaders = true;
+    private boolean isAppendCommonParams = true;
+
+    public boolean isAppendCommonHeaders() {
+        return isAppendCommonHeaders;
+    }
+
+    public GlobalConfig setAppendCommonHeaders(boolean appendCommonHeaders) {
+        isAppendCommonHeaders = appendCommonHeaders;
+        return this;
+    }
+
+    public boolean isAppendCommonParams() {
+        return isAppendCommonParams;
+    }
+
+    public GlobalConfig setAppendCommonParams(boolean appendCommonParams) {
+        isAppendCommonParams = appendCommonParams;
+        return this;
+    }
+
+
+
+
+
 
 
 
@@ -127,10 +227,12 @@ public class GlobalConfig {
         return codeUnlogin;
     }
 
-    public void setStandardJsonCodes(int codeSuccess,int codeUnlogin,int codeUnfound) {
+    public GlobalConfig setStandardJsonCodes(int codeSuccess,int codeUnlogin,int codeUnfound) {
         this.codeUnlogin = codeUnlogin;
         this.codeSuccess = codeSuccess;
         this.codeUnfound = codeUnfound;
+        return this;
+
     }
 
 
