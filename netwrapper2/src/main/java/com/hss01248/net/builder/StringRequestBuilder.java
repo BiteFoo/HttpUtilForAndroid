@@ -132,10 +132,7 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
         return (StringRequestBuilder) super.setIgnoreCertificateVerify();
     }
 
-    @Override
-    public StringRequestBuilder setIsAppendToken(boolean isAppendToken, boolean isInHeaderOrParam) {
-        return (StringRequestBuilder) super.setIsAppendToken(isAppendToken, isInHeaderOrParam);
-    }
+
 
     @Override
     public StringRequestBuilder setExtraTag(Object extraTag) {

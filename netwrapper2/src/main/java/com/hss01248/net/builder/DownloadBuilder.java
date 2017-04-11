@@ -192,10 +192,7 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
         return (DownloadBuilder) super.setIgnoreCertificateVerify();
     }
 
-    @Override
-    public DownloadBuilder setIsAppendToken(boolean isAppendToken, boolean isInHeaderOrParam) {
-        return (DownloadBuilder) super.setIsAppendToken(isAppendToken, isInHeaderOrParam);
-    }
+
 
     @Override
     public DownloadBuilder setExtraTag(Object extraTag) {

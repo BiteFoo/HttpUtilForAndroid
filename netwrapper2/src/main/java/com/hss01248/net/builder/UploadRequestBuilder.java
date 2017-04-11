@@ -123,10 +123,7 @@ public class UploadRequestBuilder<T> extends ProgressBaseBuilder{
         return (UploadRequestBuilder) super.setIgnoreCertificateVerify();
     }
 
-    @Override
-    public UploadRequestBuilder setIsAppendToken(boolean isAppendToken, boolean isInHeaderOrParam) {
-        return (UploadRequestBuilder) super.setIsAppendToken(isAppendToken, isInHeaderOrParam);
-    }
+
 
     @Override
     public UploadRequestBuilder setExtraTag(Object extraTag) {

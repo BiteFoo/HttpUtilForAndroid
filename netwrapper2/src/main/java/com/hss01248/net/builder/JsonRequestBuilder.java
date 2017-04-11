@@ -122,10 +122,7 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
         return (JsonRequestBuilder) super.setIgnoreCertificateVerify();
     }
 
-    @Override
-    public JsonRequestBuilder setIsAppendToken(boolean isAppendToken, boolean isInHeaderOrParam) {
-        return (JsonRequestBuilder) super.setIsAppendToken(isAppendToken, isInHeaderOrParam);
-    }
+
 
     //todo 复写string的
 
