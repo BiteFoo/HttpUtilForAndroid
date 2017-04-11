@@ -588,7 +588,7 @@ Step 2. Add the dependency
 
 ```java
 dependencies {
-        compile 'com.github.hss01248:HttpUtilForAndroid:2.1.1'
+        compile 'com.github.hss01248:HttpUtilForAndroid:2.1.2'
 }
 ```
 
