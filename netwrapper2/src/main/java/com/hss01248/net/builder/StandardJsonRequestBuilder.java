@@ -191,10 +191,7 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
         return (StandardJsonRequestBuilder) super.setIgnoreCertificateVerify();
     }
 
-    @Override
-    public StandardJsonRequestBuilder setIsAppendToken(boolean isAppendToken, boolean isInHeaderOrParam) {
-        return (StandardJsonRequestBuilder) super.setIsAppendToken(isAppendToken, isInHeaderOrParam);
-    }
+
 
     //复写string
 
