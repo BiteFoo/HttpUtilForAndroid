@@ -7,8 +7,12 @@ import com.hss01248.net.util.HttpsUtil;
 import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.wrapper.MyLog;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import okhttp3.Interceptor;
 
 /**
  * Created by Administrator on 2017/3/9 0009.
@@ -39,6 +43,15 @@ public class GlobalConfig {
 
     public Map<String, String> getCommonHeaders() {
         return commonHeaders;
+    }
+
+    public List<Interceptor> commonInterceptors;
+    public GlobalConfig addInterceptor(Interceptor interceptor) {
+        if(commonInterceptors ==null){
+            commonInterceptors = new ArrayList<>();
+        }
+        commonInterceptors.add(interceptor);
+        return this;
     }
 
     public GlobalConfig updateCommonHeader(String key,String value) {

@@ -2,6 +2,9 @@
 
 # update
 
+## 2017.04.18
+* 增加设置公共interceptor,以及单个请求的拦截器的功能.(比如,便于使用chuck来显示请求和响应信息)
+
 ## 2017.04.10
 * 移除原lite-asyntask.jar,以及对androidUtilCode的依赖.读写缓存的executor改由IClient提供
 * 增加设置和更新公共header和公共参数的功能
