@@ -17,8 +17,11 @@ import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.net.wrapper.Tool;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import okhttp3.Interceptor;
 
 /**
  * Created by Administrator on 2016/9/3.
@@ -59,7 +62,7 @@ public class ConfigInfo<T> {
 
     public boolean isCustomCodeSet;
 
-
+    public List<Interceptor> interceptors;
 
 
 
@@ -397,6 +400,7 @@ public class ConfigInfo<T> {
         this.tagForCancle = builder.tagForCancle;
         this.isAppendCommonHeaders = builder.isAppendCommonHeaders;
         this.isAppendCommonParams = builder.isAppendCommonParams;
+        this.interceptors = builder.interceptors;
 
 
     }

@@ -1,5 +1,6 @@
 package com.hss01248.net.builder;
 
+import android.app.Activity;
 import android.app.Dialog;
 
 import com.hss01248.net.cache.CacheStrategy;
@@ -104,7 +105,17 @@ public class StringRequestBuilder <T> extends BaseNetBuilder{
 
     @Override
     public StringRequestBuilder showLoadingDialog(String loadingMsg) {
-        return (StringRequestBuilder) super.showLoadingDialog( loadingMsg);
+        return (StringRequestBuilder) super.showLoadingDialog(loadingMsg);
+    }
+
+    @Override
+    public StringRequestBuilder showLoadingDialog(Activity activity) {
+        return (StringRequestBuilder) super.showLoadingDialog(activity);
+    }
+
+    @Override
+    public StringRequestBuilder showLoadingDialog(Activity activity,String loadingMsg) {
+        return (StringRequestBuilder) super.showLoadingDialog( activity,loadingMsg);
     }
 
     @Override

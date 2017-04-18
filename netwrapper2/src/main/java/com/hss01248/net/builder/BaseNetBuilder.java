@@ -3,6 +3,7 @@ package com.hss01248.net.builder;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.os.Build;
 
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
@@ -13,8 +14,12 @@ import com.hss01248.net.util.TextUtils;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.net.wrapper.Tool;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import okhttp3.Interceptor;
 
 /**
  * Created by Administrator on 2017/1/16 0016.
@@ -42,7 +47,15 @@ public class BaseNetBuilder<T> {
     public int type ;//= ConfigInfo.TYPE_STRING;
     public String responseCharset;
 
+    public List<Interceptor> interceptors = GlobalConfig.get().commonInterceptors;
 
+    public BaseNetBuilder addInterceptor(Interceptor interceptor) {
+        if(interceptors ==null){
+            interceptors = new ArrayList<>();
+        }
+        interceptors.add(interceptor);
+        return this;
+    }
 
     public BaseNetBuilder setExtraTag(Object extraTag) {
         this.extraTag = extraTag;
@@ -240,11 +253,17 @@ public class BaseNetBuilder<T> {
     //TODO 以下是UI显示控制
     public Dialog loadingDialog;
     public BaseNetBuilder<T> showLoadingDialog(){
-        return setShowLoadingDialog(null,"加载中...",false,false);
+        return setShowLoadingDialog(null,null,"加载中...",false,false);
+    }
+    public BaseNetBuilder<T> showLoadingDialog(Activity activity){
+        return setShowLoadingDialog(activity,null,"加载中...",false,false);
     }
 
+    public BaseNetBuilder<T> showLoadingDialog(Activity activity,String loadingMsg){
+        return setShowLoadingDialog(activity,null,loadingMsg,false,false);
+    }
     public BaseNetBuilder<T> showLoadingDialog(String loadingMsg){
-        return setShowLoadingDialog(null,loadingMsg,false,false);
+        return setShowLoadingDialog(null,null,loadingMsg,false,false);
     }
     /**
      *
@@ -252,12 +271,20 @@ public class BaseNetBuilder<T> {
      */
     public BaseNetBuilder<T> showLoadingDialog(Dialog loadingDialog){
 
-        return  setShowLoadingDialog(loadingDialog,"",false,false);
+        return  setShowLoadingDialog(null,loadingDialog,"",false,false);
     }
 
-    protected BaseNetBuilder<T> setShowLoadingDialog(Dialog loadingDialog, String msg,boolean updateProgress,boolean horizontal){
+    protected BaseNetBuilder<T> setShowLoadingDialog(Activity activity,Dialog loadingDialog, String msg,boolean updateProgress,boolean horizontal){
 
-        Activity activity = MyActyManager.getInstance().getCurrentActivity();
+        if(activity ==null){
+            activity = MyActyManager.getInstance().getCurrentActivity();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if(activity.isDestroyed()){
+                activity = null;
+            }
+        }
+
 
         if (loadingDialog == null){
             if (TextUtils.isEmpty(msg)){

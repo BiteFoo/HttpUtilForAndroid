@@ -4,6 +4,8 @@
 
 ## 2017.04.18
 * 增加设置公共interceptor,以及单个请求的拦截器的功能.(比如,便于使用chuck来显示请求和响应信息)
+* demo中增加chuck的使用,果然很牛逼
+* loadingdialog的弹出既可以指定activity,也可以不指定.
 
 ## 2017.04.10
 * 移除原lite-asyntask.jar,以及对androidUtilCode的依赖.读写缓存的executor改由IClient提供

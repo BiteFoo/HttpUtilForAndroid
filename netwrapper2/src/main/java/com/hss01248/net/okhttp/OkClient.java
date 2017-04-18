@@ -135,6 +135,12 @@ public class OkClient extends IClient {
         setLog(builder,GlobalConfig.get().isOpenLog());
 
         builder.connectTimeout(GlobalConfig.get().getConnectTimeout(),TimeUnit.MILLISECONDS);
+        //todo 拦截器的区分
+
+        for(Interceptor interceptor : GlobalConfig.get().commonInterceptors){
+            builder.addInterceptor(interceptor);
+        }
+
 
         if(GlobalConfig.get().getCacheMode() != CacheStrategy.DEFAULT){
             builder.addInterceptor(new NoCacheInterceptor());
@@ -579,6 +585,15 @@ public class OkClient extends IClient {
         OkHttpClient.Builder builder = getInstance().okhttpClient.newBuilder();
         setCookie(builder,info.cookieMode);
         setHttps(builder,info.isVerify);
+
+        if(info.interceptors.size() > GlobalConfig.get().commonInterceptors.size()){
+            int size = GlobalConfig.get().commonInterceptors.size();
+            for(int i=size; i<info.interceptors.size();i++){
+                builder.addInterceptor((Interceptor) info.interceptors.get(i));
+            }
+        }
+
+
 
         //更换缓存控制头
         if(info.cacheMode!= CacheStrategy.DEFAULT){

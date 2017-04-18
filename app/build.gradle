@@ -64,4 +64,6 @@ dependencies {
     testCompile 'com.antfortune.freeline:runtime-no-op:0.8.4'
     compile files('libs/cglib-nodep-3.2.5.jar')
     compile files('libs/ProxyUtils-1.0.0.jar')
+    debugCompile 'com.readystatesoftware.chuck:library:1.0.4'
+    releaseCompile 'com.readystatesoftware.chuck:library-no-op:1.0.4'
 }

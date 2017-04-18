@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.antfortune.freeline.FreelineCore;
 import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.wrapper.HttpUtil;
+import com.readystatesoftware.chuck.ChuckInterceptor;
 
 /**
  * Created by Administrator on 2016/9/4.
@@ -17,8 +18,10 @@ public class BaseApp extends Application {
     public void onCreate() {
         FreelineCore.init(this);//要第一行
         super.onCreate();
-        HttpUtil.context = this;
-       // MyRetrofitUtil.init(getApplicationContext());
+        HttpUtil.init(this,"http://www.qxinli.com:8080/")
+                .openLog("httputil")
+                .addInterceptor(new ChuckInterceptor(this));
+       // MyRetrofitUtil.init(getApplicaionContext());
         registCallback();
 
     }

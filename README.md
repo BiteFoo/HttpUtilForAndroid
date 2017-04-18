@@ -253,7 +253,17 @@ setIgnoreCertificateVerify()//设置忽略证书校验
 showLoadingDialog()
 showLoadingDialog(String loadingMsg)//内置的ProgressDialog
 showLoadingDialog(Dialog loadingDialog)//传入自定义的dialog
+
 ```
+
+也可以指定activity弹出:
+```
+showLoadingDialog(Activity activity)
+showLoadingDialog(Activity activity,String loadingMsg)
+
+```
+
+注意,如果网络请求在activity的onResume之前发送,那么应该传入activity引用,否则会在前一个activity里弹出.因为引用是在onresume的回调中自动获取的.
 
 内置的dialog特点:
 
@@ -588,7 +598,7 @@ Step 2. Add the dependency
 
 ```java
 dependencies {
-        compile 'com.github.hss01248:HttpUtilForAndroid:2.1.3'
+        compile 'com.github.hss01248:HttpUtilForAndroid:2.1.4'
 }
 ```
 

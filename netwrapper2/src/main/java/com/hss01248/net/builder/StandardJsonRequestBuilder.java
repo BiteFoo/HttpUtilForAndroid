@@ -1,5 +1,6 @@
 package com.hss01248.net.builder;
 
+import android.app.Activity;
 import android.app.Dialog;
 
 import com.hss01248.net.config.ConfigInfo;
@@ -158,8 +159,18 @@ public class StandardJsonRequestBuilder <T> extends JsonRequestBuilder{
     }
 
     @Override
-    public StandardJsonRequestBuilder showLoadingDialog( String loadingMsg) {
-        return (StandardJsonRequestBuilder) super.showLoadingDialog( loadingMsg);
+    public StandardJsonRequestBuilder showLoadingDialog(Activity activity) {
+        return (StandardJsonRequestBuilder) super.showLoadingDialog(activity);
+    }
+
+    @Override
+    public StandardJsonRequestBuilder showLoadingDialog(String loadingMsg) {
+        return (StandardJsonRequestBuilder) super.showLoadingDialog(loadingMsg);
+    }
+
+    @Override
+    public StandardJsonRequestBuilder showLoadingDialog(Activity activity, String loadingMsg) {
+        return (StandardJsonRequestBuilder) super.showLoadingDialog(activity, loadingMsg);
     }
 
     @Override
