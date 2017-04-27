@@ -302,7 +302,7 @@ public class OkClient extends IClient {
                 Tool.callbackOnMainThread(new Runnable() {
                     @Override
                     public void run() {
-                        Tool.dismiss(info.loadingDialog);
+                       // Tool.dismiss(info.loadingDialog);
                         info.listener.onSuccess(str,str,false);
                     }
                 });
@@ -432,7 +432,7 @@ public class OkClient extends IClient {
                     Tool.parseStringByType(str,info,false);
                 }
 
-                Tool.dismiss(info.loadingDialog);
+               // Tool.dismiss(info.loadingDialog);
             }
         });
     }
@@ -481,7 +481,7 @@ public class OkClient extends IClient {
                     public void run() {
 
                         if(call.isCanceled()){
-                            Tool.dismiss(info.loadingDialog);
+                           // Tool.dismiss(info.loadingDialog);
                             info.listener.onCancel();
 
                         }else {
@@ -489,7 +489,7 @@ public class OkClient extends IClient {
                                 info.shouldReadCache = true;
                                 start(info);
                             }else {
-                                Tool.dismiss(info.loadingDialog);
+                                //Tool.dismiss(info.loadingDialog);
                                 info.listener.onError(e.getMessage());
                             }
 
@@ -515,7 +515,7 @@ public class OkClient extends IClient {
                                 info.shouldReadCache = true;
                                 start(info);
                             }else {
-                                Tool.dismiss(info.loadingDialog);
+                               // Tool.dismiss(info.loadingDialog);
                                 info.listener.onCodeError("http错误码:"+response.code(),response.message(),response.code());
                             }
 

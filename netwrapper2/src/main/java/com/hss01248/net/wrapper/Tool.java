@@ -109,7 +109,7 @@ public class Tool {
                                             str = fileToSHA1(info.filePath);
                                         }
 
-                                        Tool.dismiss(info.loadingDialog);
+                                        //Tool.dismiss(info.loadingDialog);
                                         if(TextUtils.isEmpty(str)){//md算法失败
                                             info.listener.onError("文件下载失败:校验失败");
                                             return;
@@ -122,7 +122,7 @@ public class Tool {
                                             info.listener.onError("文件下载失败:校验不一致");
                                         }
                                     }else {
-                                        Tool.dismiss(info.loadingDialog);
+                                       // Tool.dismiss(info.loadingDialog);
                                         info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
                                         handleMedia(info);
                                     }
@@ -200,6 +200,9 @@ public class Tool {
     public static void  callbackOnMainThread(Runnable runnable){
         HttpUtil.getMainHandler().post(runnable);
     }
+    public static void  callbackOnMainThread(Runnable runnable,long delay){
+        HttpUtil.getMainHandler().postDelayed(runnable,delay);
+    }
 
     public static boolean isJsonEmpty(String data){
         if (data== null || "".equals(data) || "[]".equals(data)
@@ -267,7 +270,7 @@ public class Tool {
         if(t != null){
             t.printStackTrace();
         }
-        dismiss(configInfo.loadingDialog);
+        //dismiss(configInfo.loadingDialog);
         String str = t.toString();
         if(str.contains("timeout")){
             configInfo.listener.onTimeout();
@@ -593,7 +596,7 @@ public class Tool {
         }else {
             configInfo.isFromCacheSuccess = true;
             if(configInfo.cacheMode== CacheStrategy.IF_NONE_CACHE_REQUEST){
-                dismiss(configInfo.loadingDialog);
+                //dismiss(configInfo.loadingDialog);
             }
         }
     }
@@ -808,7 +811,7 @@ public class Tool {
             }
             loginManager.autoLogin(new MyNetListener() {
                 @Override
-                public void onSuccess(Object response, String resonseStr, boolean isFromCache) {
+                public void onSuccess(Object response, String responseStr, boolean isFromCache) {
                     configInfo.start();
                 }
 
@@ -932,5 +935,17 @@ public class Tool {
         }
     }
 
-
+    public static <T> MyNetListener cloneListener(ConfigInfo info) {
+        if(!info.forceMinTime){
+            return null;
+        }
+        final MyNetListener listener = info.listener;
+        final MyNetListener callback = new MyNetListener<T>() {
+            @Override
+            public void onSuccess(T response, String responseStr, boolean isFromCache) {
+                listener.onSuccess(response, responseStr,isFromCache);
+            }
+        };
+        return callback;
+    }
 }

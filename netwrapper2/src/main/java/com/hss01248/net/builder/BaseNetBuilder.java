@@ -273,7 +273,6 @@ public class BaseNetBuilder<T> {
      * @return
      */
     public BaseNetBuilder<T> showLoadingDialog(Dialog loadingDialog){
-
         return  setShowLoadingDialog(null,loadingDialog,"",false,false);
     }
 

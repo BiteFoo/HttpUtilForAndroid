@@ -41,7 +41,7 @@ public abstract class IClient {
                 info.shouldReadCache = true;
                 start(info);
             }else {
-                Tool.dismiss(info.loadingDialog);
+               // Tool.dismiss(info.loadingDialog);
                 info.listener.onNoNetwork();
             }
             return info;
@@ -50,6 +50,7 @@ public abstract class IClient {
 
         // 真正网络请求时,才弹出dialog
         Tool.showDialog(info.loadingDialog);
+        info.netStartTime = System.currentTimeMillis();
         switch (info.type){
 
             case ConfigInfo.TYPE_STRING:

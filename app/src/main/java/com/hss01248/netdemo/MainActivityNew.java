@@ -69,11 +69,11 @@ public class MainActivityNew extends Activity {
                         //注意: 应从sp中读取,加密存取,加密传输.这里的demo省略了这些安全性措施
                         login("15989366579965", "123456", new MyNetListener<UserInfo>() {
                             @Override
-                            public void onSuccess(UserInfo response, String resonseStr, boolean isFromCache) {
+                            public void onSuccess(UserInfo response, String responseStr, boolean isFromCache) {
                                 GlobalConfig.get().updateToken(response.sessionId);
 
                                 if(listener!=null)
-                                listener.onSuccess(response,resonseStr,isFromCache);
+                                listener.onSuccess(response, responseStr,isFromCache);
 
                             }
 
@@ -147,7 +147,7 @@ public class MainActivityNew extends Activity {
                         .setCacheMode(CacheStrategy.DEFAULT)
                         .callback(getListener(new MyNetListener<String>() {
                                     @Override
-                                    public void onSuccess(String response, String resonseStr,boolean isFromCache) {
+                                    public void onSuccess(String response, String responseStr, boolean isFromCache) {
                                         Logger.e(response);
                                         if(isFromCache){
                                             MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
@@ -179,7 +179,7 @@ public class MainActivityNew extends Activity {
                         .addParam("pageIndex","1")
                         .callback(getListener(new MyNetListener<String>() {
                             @Override
-                            public void onSuccess(String response, String resonseStr,boolean isFromCache) {
+                            public void onSuccess(String response, String responseStr, boolean isFromCache) {
                                 Logger.e(response);
                                 if(isFromCache){
                                     MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
@@ -206,7 +206,7 @@ public class MainActivityNew extends Activity {
                         .setCacheMode(CacheStrategy.DEFAULT)
                         .callback(getListener(new MyNetListener<GetCommonJsonBean>() {
                             @Override
-                            public void onSuccess(GetCommonJsonBean response, String resonseStr,boolean isFromCache) {
+                            public void onSuccess(GetCommonJsonBean response, String responseStr, boolean isFromCache) {
                                 Logger.json(MyJson.toJsonStr(response));
                                 if(isFromCache){
                                     MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
@@ -232,7 +232,7 @@ public class MainActivityNew extends Activity {
 
                 login("159893675769965","123456",new MyNetListener<UserInfo>() {
                     @Override
-                    public void onSuccess(UserInfo response, String resonseStr,boolean isFromCache) {
+                    public void onSuccess(UserInfo response, String responseStr, boolean isFromCache) {
                         Logger.json(MyJson.toJsonStr(response));
                         GlobalConfig.get().updateToken(response.sessionId);
 
@@ -313,7 +313,7 @@ public class MainActivityNew extends Activity {
                         .showLoadingDialog()
                         .callback(getListener(new MyNetListener<GetStandardJsonBean>() {
                             @Override
-                            public void onSuccess(GetStandardJsonBean response, String resonseStr,boolean isFromCache) {
+                            public void onSuccess(GetStandardJsonBean response, String responseStr, boolean isFromCache) {
                                 Logger.json(MyJson.toJsonStr(response));
                                 if(isFromCache){
                                     MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
@@ -344,7 +344,7 @@ public class MainActivityNew extends Activity {
                         .setResponseJsonArray()
                         .postAsync(getListener(new MyNetListener<PostStandardJsonArray>() {
                             @Override
-                            public void onSuccess(PostStandardJsonArray response, String resonseStr,boolean isFromCache) {
+                            public void onSuccess(PostStandardJsonArray response, String responseStr, boolean isFromCache) {
                                // Logger.json(MyJson.toJsonStr(response));
 
                             }
@@ -382,8 +382,8 @@ public class MainActivityNew extends Activity {
                         .verifyShar1("76DAB206AE43FB81A15E9E54CAC87EA94BB5B384")//下载完后校验md5,如果djso8d89dsjd9s7dsfj
                         .getAsync(getListener(new MyNetListener() {
                             @Override
-                            public void onSuccess(Object response, String onSuccess,boolean isFromCache) {
-                                Logger.e("onSuccess:"+onSuccess);
+                            public void onSuccess(Object response, String responseStr, boolean isFromCache) {
+                                Logger.e("onSuccess:"+ responseStr);
                                 if(isFromCache){
                                     MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
                                 }else {
@@ -419,8 +419,8 @@ public class MainActivityNew extends Activity {
                         .showLoadingDialog()
                         .postAsync(getListener(new MyNetListener<String>() {
                                             @Override
-                                            public void onSuccess(String response, String resonseStr,boolean isFromCache) {
-                                                Logger.e(resonseStr);
+                                            public void onSuccess(String response, String responseStr, boolean isFromCache) {
+                                                Logger.e(responseStr);
                                             }
 
                                             @Override
@@ -450,8 +450,8 @@ public class MainActivityNew extends Activity {
 
 
                             @Override
-                            public void onSuccess(VersionInfo response, String resonseStr,boolean isFromCache) {
-                                Logger.e(resonseStr);
+                            public void onSuccess(VersionInfo response, String responseStr, boolean isFromCache) {
+                                Logger.e(responseStr);
                                 if(isFromCache){
                                     MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
                                 }else {
@@ -498,7 +498,7 @@ public class MainActivityNew extends Activity {
                         .setResponseJsonArray()
                         .callback(getListener(new MyNetListener<PostStandardJsonArray>() {
                             @Override
-                            public void onSuccess(PostStandardJsonArray response, String resonseStr,boolean isFromCache) {
+                            public void onSuccess(PostStandardJsonArray response, String responseStr, boolean isFromCache) {
                                 //Logger.json(MyJson.toJsonStr(response));
                             }
 

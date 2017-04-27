@@ -13,6 +13,7 @@ import com.hss01248.net.builder.UploadRequestBuilder;
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.interfaces.HttpMethod;
 import com.hss01248.net.wrapper.HttpUtil;
+import com.hss01248.net.wrapper.ListenerDector;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.net.wrapper.Tool;
 
@@ -100,7 +101,8 @@ public class ConfigInfo<T> {
     }
 
 
-
+    public boolean forceMinTime  = false;//强制最短时间,防止网络太快,请求结束了,dialog才弹出来.
+   public long netStartTime;
     /**
      * 参数逻辑校验
      */
@@ -109,6 +111,8 @@ public class ConfigInfo<T> {
         this.url = url;
         this.listener.url = url;
         this.listener.configInfo = this;
+
+
 
 
         //todo 自己实现缓存或者利用okhttp的缓存功能
@@ -156,7 +160,10 @@ public class ConfigInfo<T> {
 
                 }
             });
+            forceMinTime = true;
         }
+
+
 
         //todo  处理缓存,io要在子线程
         switch (cacheMode){
@@ -183,7 +190,8 @@ public class ConfigInfo<T> {
 
         }
 
-
+       // MyNetListener listener = Tool.cloneListener(this);
+        listener = new ListenerDector<>(listener);
 
 
 
@@ -387,6 +395,7 @@ public class ConfigInfo<T> {
 
 
         this.ignoreCer = builder.ignoreCertificateVerify;
+
         this.listener = builder.listener;
         this.retryCount = builder.retryCount;
         this.timeout = builder.timeout;

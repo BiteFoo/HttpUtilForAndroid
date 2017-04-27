@@ -19,6 +19,8 @@ public abstract class MyNetListener<T>  {
 
 
 
+
+
     /**
      * called when the request is success bug data is empty
      */
@@ -55,7 +57,7 @@ public abstract class MyNetListener<T>  {
 
 
     /** Called when response success. */
-    public abstract void onSuccess(T response,String resonseStr,boolean isFromCache);
+    public abstract void onSuccess(T response,String responseStr,boolean isFromCache);
 
     public  void onSuccessArr(List<T> response, String resonseStr,boolean isFromCache){
 
