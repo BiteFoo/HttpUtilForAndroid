@@ -2,6 +2,7 @@ package com.hss01248.net.config;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 
 import com.hss01248.net.builder.BaseNetBuilder;
 import com.hss01248.net.builder.DownloadBuilder;
@@ -12,6 +13,7 @@ import com.hss01248.net.builder.StringRequestBuilder;
 import com.hss01248.net.builder.UploadRequestBuilder;
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.interfaces.HttpMethod;
+import com.hss01248.net.util.CollectionUtil;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.ListenerDector;
 import com.hss01248.net.wrapper.MyNetListener;
@@ -141,8 +143,31 @@ public class ConfigInfo<T> {
             headers.putAll(GlobalConfig.get().getCommonHeaders());
         }
 
+        //get 参数的url编码
+        if(method == HttpMethod.GET){
+            CollectionUtil.filterMap(params, new CollectionUtil.MapFilter<String, String>() {
+                @Override
+                public boolean isRemain(Map.Entry<String, String> entry) {
+                    String value = entry.getValue();
+                    entry.setValue(Tool.urlEncode(value));
+                    return true;
+                }
+            });
+        }
+        //todo 排除gzip的自定设置,全权交给okhttp/httpclient处理
+        CollectionUtil.filterMap(headers, new CollectionUtil.MapFilter<String, String>() {
+            @Override
+            public boolean isRemain(Map.Entry<String, String> entry) {
+                if(entry.getKey().equalsIgnoreCase("Accept-Encoding")){
+                    String value = entry.getValue();
+                    if(!TextUtils.isEmpty(value) && value.contains("gzip")){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
 
-        //todo 排除gzip的内容
 
 
         //todo dialog的取消网络请求

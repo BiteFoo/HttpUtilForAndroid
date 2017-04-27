@@ -2,6 +2,12 @@
 
 # update
 
+## 2017.04.27
+
+* 取消post体的urlencode,只对get请求的参数进行urlencode
+* 对headers进行校验,移除自己设置"Accept-Encoding" ,"gzip, deflate",交给底层框架自己处理.
+* 采用装饰器模式实现 loadingdialog的dismiss,和限定回调时间的下限(500ms),防止 请求100ms完成回调,而dialog调用show后 200ms后弹出的问题.
+
 ## 2017.04.18
 * 增加设置公共interceptor,以及单个请求的拦截器的功能.(比如,便于使用chuck来显示请求和响应信息)
 * demo中增加chuck的使用,果然很牛逼

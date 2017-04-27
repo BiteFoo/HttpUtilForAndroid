@@ -64,7 +64,7 @@ public class GlobalConfig {
     }
 
     public GlobalConfig updateCommonParam(String key,String value) {
-        this.commonParams .put(key,value);
+        this.commonParams.put(key,value);
         return this;
     }
 
