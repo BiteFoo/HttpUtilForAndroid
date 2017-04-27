@@ -364,10 +364,6 @@ public class OkClient extends IClient {
                 String jsonStr = MyJson.toJsonStr(info.params);
                 body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), jsonStr);
             }
-
-
-
-
         }else {
             body=   getFormBody(info);
         }

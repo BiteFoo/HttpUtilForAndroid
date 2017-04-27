@@ -12,7 +12,6 @@ import com.hss01248.net.util.CollectionUtil;
 import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.util.TextUtils;
 import com.hss01248.net.wrapper.MyNetListener;
-import com.hss01248.net.wrapper.Tool;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -154,8 +153,12 @@ public class BaseNetBuilder<T> {
      * */
     public BaseNetBuilder<T> addParam(String key, String value){
 
-        if(key!=null && value!=null){
-            params.put(Tool.urlEncode(key), Tool.urlEncode(value));
+        if(key!=null){
+            if(value ==null){
+                value ="";
+            }
+            //params.put(Tool.urlEncode(key), Tool.urlEncode(value));
+            params.put(key, value);
         }
         return this;
     }
