@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.antfortune.freeline.FreelineCore;
 import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.wrapper.HttpUtil;
+import com.hss01248.notifyutil.NotifyUtil;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
 /**
@@ -23,6 +24,7 @@ public class BaseApp extends Application {
                 .addInterceptor(new ChuckInterceptor(this));
        // MyRetrofitUtil.init(getApplicaionContext());
         registCallback();
+        NotifyUtil.init(this);
 
     }
 

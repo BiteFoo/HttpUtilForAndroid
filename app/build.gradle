@@ -40,8 +40,6 @@ repositories {
 
     };
 
-
-
 }
 
 dependencies {
@@ -56,7 +54,7 @@ dependencies {
         compile 'org.greenrobot:eventbus:3.0.0'
 
         compile 'com.github.glassLake:MyVolleyPlus:1.0.0'*/
-    compile project(path: ':netwrapper2')
+    compile project(path: ':HttpUtil')
     compile 'com.github.orhanobut:logger:1.12'
     compile 'com.mylhyl:acp:1.0.0'
     debugCompile 'com.antfortune.freeline:runtime:0.8.4'
@@ -66,4 +64,5 @@ dependencies {
     compile files('libs/ProxyUtils-1.0.0.jar')
     debugCompile 'com.readystatesoftware.chuck:library:1.0.4'
     releaseCompile 'com.readystatesoftware.chuck:library-no-op:1.0.4'
+    compile 'com.github.hss01248:NotifyUtil:1.0.0'
 }

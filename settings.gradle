@@ -1,1 +1,1 @@
-include ':app', ':netwrapper2'
+include ':app', ':HttpUtil', ':openuri'

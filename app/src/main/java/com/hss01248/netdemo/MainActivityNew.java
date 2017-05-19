@@ -392,9 +392,10 @@ public class MainActivityNew extends Activity {
                             }
 
                             @Override
-                            public void onProgressChange(long fileSize, long downloadedSize) {
-                                super.onProgressChange(fileSize, downloadedSize);
+                            public void onProgressChange(long downloadedSize, long fileSize) {
+                                super.onProgressChange(downloadedSize, fileSize);
                                 Logger.e("progress:"+downloadedSize+"--filesize:"+fileSize);
+
                             }
 
                             @Override
@@ -431,7 +432,7 @@ public class MainActivityNew extends Activity {
 
                                             @Override
                                             public void onProgressChange(long downloadedSize, long fileSize) {
-                                                super.onProgressChange(fileSize, downloadedSize);
+                                                super.onProgressChange(downloadedSize, fileSize);
                                                 Logger.e("upload onProgressChange:"+downloadedSize + "  total:"+ fileSize +"  progress:"+downloadedSize*100/fileSize);
                                             }
                                         }));
