@@ -7,8 +7,6 @@ import android.os.Bundle;
 import com.antfortune.freeline.FreelineCore;
 import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.wrapper.HttpUtil;
-import com.hss01248.notifyutil.NotifyUtil;
-import com.readystatesoftware.chuck.ChuckInterceptor;
 
 /**
  * Created by Administrator on 2016/9/4.
@@ -20,11 +18,11 @@ public class BaseApp extends Application {
         FreelineCore.init(this);//要第一行
         super.onCreate();
         HttpUtil.init(this,"http://www.qxinli.com:8080/")
-                .openLog("httputil")
-                .addInterceptor(new ChuckInterceptor(this));
+                .openLog("httputil");
+                //.addInterceptor(new ChuckInterceptor(this));//注:会影响上传下载的实时进度显示,调试上传下载时,关闭此拦截器
        // MyRetrofitUtil.init(getApplicaionContext());
         registCallback();
-        NotifyUtil.init(this);
+
 
     }
 

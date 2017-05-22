@@ -19,7 +19,7 @@ public class OpenUri {
 
     public static Uri fromFile(Context context,File file){
         Uri uri;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
             uri =  FileProvider.getUriForFile(context, context.getPackageName()+".fileprovider", file);
         }else {
             uri = Uri.fromFile(file);

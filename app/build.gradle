@@ -64,5 +64,5 @@ dependencies {
     compile files('libs/ProxyUtils-1.0.0.jar')
     debugCompile 'com.readystatesoftware.chuck:library:1.0.4'
     releaseCompile 'com.readystatesoftware.chuck:library-no-op:1.0.4'
-    compile 'com.github.hss01248:NotifyUtil:1.0.0'
+    //compile 'com.github.hss01248:NotifyUtil:1.0.0'
 }

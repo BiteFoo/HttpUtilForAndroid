@@ -1,8 +1,10 @@
 package com.hss01248.net.wrapper;
 
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
@@ -62,14 +64,32 @@ public class Tool {
         if(!info.isShowNotify){
             return;
         }
-        HttpUtil.context.getResources().getIdentifier("imageName", "drawable", "ic_launcher");
+       // HttpUtil.context.getResources().getIdentifier("imageName", "drawable", "ic_launcher");
 
 
         if(progress<max){
             NotifyUtil.buildProgress(info.hashCode(), R.drawable.ic_launcher,info.loadingMsg,(int)progress,(int)max)
                     .show();
         }else {
-            NotifyUtil.buildProgress(info.hashCode(), R.drawable.ic_launcher,"完成",(int)progress,(int)max)
+            PendingIntent pendingIntent = null;
+            if(info.isOpenAfterSuccess){
+               // FileUtils.openFile(HttpUtil.context,new File(info.filePath));
+            }else {
+                Intent intent = FileUtils.getFileOpenIntent(HttpUtil.context,info.filePath,new File(info.filePath));
+                if(intent !=null){
+                     pendingIntent = PendingIntent.getActivity(HttpUtil.context,33,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+                }
+
+            }
+            String msg = "";
+            if(info.type == ConfigInfo.TYPE_DOWNLOAD){
+                msg="下载完成";
+            }else if(info.type == ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS){
+                msg = "上传完成";
+            }
+            NotifyUtil.buildProgress(info.hashCode(), R.drawable.ic_launcher,msg,(int)progress,(int)max)
+                    .setContentIntent(pendingIntent)
+                    .setTicker(msg)
                     .show();
         }
 
@@ -111,7 +131,7 @@ public class Tool {
                     //MyLog.d( "file download: " + fileSizeDownloaded + " of " + fileSize);//todo 控制频率
 
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime - oldTime > 300 || fileSizeDownloaded == fileSizeDownloaded) {//每300ms更新一次进度
+                    if (currentTime - oldTime > 100 || fileSizeDownloaded == fileSizeDownloaded) {//每300ms更新一次进度
                         oldTime = currentTime;
                         final long finalFileSizeDownloaded = fileSizeDownloaded;
                         callbackOnMainThread(new Runnable() {

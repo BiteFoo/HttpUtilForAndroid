@@ -12,6 +12,7 @@ import com.hss01248.net.builder.StringRequestBuilder;
 import com.hss01248.net.builder.UploadRequestBuilder;
 import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.okhttp.OkClient;
+import com.hss01248.notifyutil.NotifyUtil;
 
 import okhttp3.OkHttpClient;
 
@@ -42,6 +43,7 @@ public class HttpUtil {
         HttpUtil.context = context;
         globalConfig = GlobalConfig.get();
         globalConfig.setBaseUrl(baseUrl);
+        NotifyUtil.init(context);
         return globalConfig;
     }
 

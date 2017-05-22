@@ -7,11 +7,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.interfaces.HttpMethod;
+import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.MyNetListener;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,7 +30,7 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
 
     public String savedPath;
 
-
+    public    int cacheMode = CacheStrategy.NO_CACHE;
 
 
 
@@ -41,7 +44,10 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
     public boolean isVerify = false;//是否校驗文件
     public String verifyStr;
     public boolean verfyByMd5OrShar1 = false;
-
+    public DownloadBuilder setCacheMode(int cacheMode) {
+        this.cacheMode = cacheMode;
+        return this;
+    }
 
     public DownloadBuilder<T> setNotifyMediaCenter(boolean notifyMediaCenter) {
         isNotifyMediaCenter = notifyMediaCenter;
@@ -99,12 +105,13 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
         if(TextUtils.isEmpty(fileName)){
             fileName = UUID.randomUUID().toString();
         }
-       File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"retrofit");
+       File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"httputil");
         if(!dir.exists()){
-            dir.mkdirs();
+          boolean success =   dir.mkdirs();
+            MyLog.e("dirs create success:"+success +"--"+dir.getAbsolutePath());
         }
         File file = new File(dir,fileName);
-       /* if(file.exists()){
+        if(file.exists()){
             file.delete();
         }else {
             try {
@@ -112,7 +119,7 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }*/
+        }
 
         return file.getAbsolutePath();
     }

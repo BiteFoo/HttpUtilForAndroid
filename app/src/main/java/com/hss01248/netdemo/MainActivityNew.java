@@ -134,8 +134,21 @@ public class MainActivityNew extends Activity {
                 .postAsync(listener);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        PermissionUtils.askExternalStorage(new PermissionUtils.PermissionListener() {
+            @Override
+            public void onGranted() {
 
+            }
 
+            @Override
+            public void onDenied(List<String> permissions) {
+
+            }
+        });
+    }
 
     @OnClick({R.id.get_string, R.id.post_string, R.id.get_json, R.id.post_json, R.id.get_standard_json,
             R.id.post_standard_json, R.id.download, R.id.upload,R.id.postbyjson,R.id.testvoice,R.id.testvoice2})
@@ -374,9 +387,9 @@ public class MainActivityNew extends Activity {
                 String url = "https://travel.12306.cn/imgs/resources/uploadfiles/images/fed7d5b4-37d3-4f32-bacc-e9b942cb721d_product_W572_H370.jpg";
                 String url2 = "http://www.qxinli.com/download/qxinli.apk";
                 HttpUtil.buildDownloadRequest(url2)
-                        .showLoadingDialog()//显示下载进度dialog
+                        //.showLoadingDialog()//显示下载进度dialog
                         //.savedPath(path)
-                        .setOpenAfterSuccess()//下载完成后打开
+                        //.setOpenAfterSuccess()//下载完成后打开
                         .setHideFile()//隐藏该文件
                         .setNotifyMediaCenter(false)
                         .verifyShar1("76DAB206AE43FB81A15E9E54CAC87EA94BB5B384")//下载完后校验md5,如果djso8d89dsjd9s7dsfj

@@ -2,6 +2,10 @@
 
 # update
 
+## 2017.05.22
+* 上传下载进度更新时可选择显示notification
+* 下载缓存bug处理
+
 ## 2017.04.27
 
 * 取消post体的urlencode,只对get请求的参数进行urlencode

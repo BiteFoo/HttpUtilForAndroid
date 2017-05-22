@@ -243,13 +243,19 @@ public class OkClient extends IClient {
      * @param <E>
      */
     private <E> void cacheControl(Request.Builder builder, ConfigInfo<E> info) {
-        if(info.cacheMode != CacheStrategy.DEFAULT){
+
+        if(info.cacheMode == CacheStrategy.DEFAULT){
+            final CacheControl.Builder cacheBuilder = new CacheControl.Builder();
+            cacheBuilder.maxAge((int) info.cacheMaxAge, TimeUnit.MILLISECONDS);
+            CacheControl cache = cacheBuilder.build();
+            builder.cacheControl(cache);
             return;
+        }else {
+            final CacheControl.Builder cacheBuilder = new CacheControl.Builder();
+            cacheBuilder.noCache();
+            builder.cacheControl(cacheBuilder.build());
         }
-        final CacheControl.Builder cacheBuilder = new CacheControl.Builder();
-        cacheBuilder.maxAge((int) info.cacheMaxAge, TimeUnit.MILLISECONDS);
-        CacheControl cache = cacheBuilder.build();
-        builder.cacheControl(cache);
+
 
     }
 
@@ -277,6 +283,7 @@ public class OkClient extends IClient {
         String url = Tool.generateUrlOfGET(info);
         builder.url(url);
         addHeaders(builder,info.headers);
+        cacheControl(builder,info);
         //info.listener.registEventBus();
         requestAndHandleResoponse(info, builder, new ISuccessResponse() {
             public void handleSuccess(Call call, Response response) throws IOException {

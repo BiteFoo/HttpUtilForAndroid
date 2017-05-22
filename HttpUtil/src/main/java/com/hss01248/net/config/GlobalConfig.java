@@ -45,11 +45,8 @@ public class GlobalConfig {
         return commonHeaders;
     }
 
-    public List<Interceptor> commonInterceptors;
+    public List<Interceptor> commonInterceptors = new ArrayList<>();
     public GlobalConfig addInterceptor(Interceptor interceptor) {
-        if(commonInterceptors ==null){
-            commonInterceptors = new ArrayList<>();
-        }
         commonInterceptors.add(interceptor);
         return this;
     }

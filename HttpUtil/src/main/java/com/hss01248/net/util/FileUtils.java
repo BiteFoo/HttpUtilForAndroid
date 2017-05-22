@@ -150,58 +150,67 @@ public class FileUtils {
     }
 
     public static void openFile(Context context,File currentPath){
-        if(currentPath!=null&&currentPath.isFile())
-        {
+        if(currentPath!=null&&currentPath.isFile()) {
             String fileName = currentPath.toString();
-            Intent intent;
-            if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingImage))){
-                intent = FileOpenIntents.getImageFileIntent(currentPath);
-                context.startActivity(intent);
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingWebText))){
-                intent = FileOpenIntents.getHtmlFileIntent(currentPath);
-                context.startActivity(intent);
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingPackage))){
-                intent = FileOpenIntents.getApkFileIntent(currentPath);
-                context.startActivity(intent);
-
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingAudio))){
-                intent = FileOpenIntents.getAudioFileIntent(currentPath);
-                context.startActivity(intent);
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingVideo))){
-                intent = FileOpenIntents.getVideoFileIntent(currentPath);
-                context.startActivity(intent);
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingText))){
-                intent = FileOpenIntents.getTextFileIntent(currentPath);
-                context.startActivity(intent);
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingPdf))){
-                intent = FileOpenIntents.getPdfFileIntent(currentPath);
-                context.startActivity(intent);
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingWord))){
-                intent = FileOpenIntents.getWordFileIntent(currentPath);
-                context.startActivity(intent);
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingExcel))){
-                intent = FileOpenIntents.getExcelFileIntent(currentPath);
-                context.startActivity(intent);
-            }else if(checkEndsWithInStringArray(fileName, context.getResources().
-                    getStringArray(R.array.fileEndingPPT))){
-                intent = FileOpenIntents.getPPTFileIntent(currentPath);
-                context.startActivity(intent);
-            }else {
+            Intent intent  = getFileOpenIntent(context,fileName,currentPath);
+            if(intent ==null){
                 showMessage("无法打开，请安装相应的软件！",context);
+            }else {
+                context.startActivity(intent);
             }
+
         }else {
             showMessage("对不起，这不是文件！",context);
        }
 
+    }
+
+    public static Intent getFileOpenIntent(Context context, String fileName, File currentPath) {
+
+        Intent intent = null;
+        if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingImage))){
+            intent = FileOpenIntents.getImageFileIntent(currentPath);
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingWebText))){
+            intent = FileOpenIntents.getHtmlFileIntent(currentPath);
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingPackage))){
+            intent = FileOpenIntents.getApkFileIntent(currentPath);
+
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingAudio))){
+            intent = FileOpenIntents.getAudioFileIntent(currentPath);
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingVideo))){
+            intent = FileOpenIntents.getVideoFileIntent(currentPath);
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingText))){
+            intent = FileOpenIntents.getTextFileIntent(currentPath);
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingPdf))){
+            intent = FileOpenIntents.getPdfFileIntent(currentPath);
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingWord))){
+            intent = FileOpenIntents.getWordFileIntent(currentPath);
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingExcel))){
+            intent = FileOpenIntents.getExcelFileIntent(currentPath);
+
+        }else if(checkEndsWithInStringArray(fileName, context.getResources().
+                getStringArray(R.array.fileEndingPPT))){
+            intent = FileOpenIntents.getPPTFileIntent(currentPath);
+
+        }
+        return intent;
     }
 
     private static void showMessage(String s, Context context) {

@@ -203,6 +203,13 @@ public class ConfigInfo<T> {
                     }
                 });
             }
+        }else {//不显示dialog,就自动显示notification
+            isShowNotify = true;
+            if(type == TYPE_DOWNLOAD){
+                loadingMsg="下载中";
+            }else if(type == TYPE_UPLOAD_WITH_PROGRESS){
+                loadingMsg = "上传中";
+            }
         }
 
 
@@ -530,6 +537,7 @@ public class ConfigInfo<T> {
 
         this.updateProgress = builder.updateProgress;
         this.isLoadingDialogHorizontal = builder.isLoadingDialogHorizontal;
+        this.cacheMode = builder.cacheMode;
 
         start();
 
