@@ -74,6 +74,7 @@ public class Tool {
             PendingIntent pendingIntent = null;
             if(info.isOpenAfterSuccess){
                // FileUtils.openFile(HttpUtil.context,new File(info.filePath));
+                NotifyUtil.cancel(info.hashCode());
             }else {
                 Intent intent = FileUtils.getFileOpenIntent(HttpUtil.context,info.filePath,new File(info.filePath));
                 if(intent !=null){
