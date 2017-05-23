@@ -14,7 +14,6 @@ import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.MyNetListener;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -104,14 +103,20 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
         String fileName =  URLUtil.guessFileName(url,"","");
         if(TextUtils.isEmpty(fileName)){
             fileName = UUID.randomUUID().toString();
+        }else {
+            //android 系统,不允许文件名中有冒号
+            fileName = fileName.replace("?","-");
+            fileName = fileName.replace(":","-");
+            fileName = fileName.replace("：","-");
         }
+
        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"httputil");
         if(!dir.exists()){
           boolean success =   dir.mkdirs();
             MyLog.e("dirs create success:"+success +"--"+dir.getAbsolutePath());
         }
         File file = new File(dir,fileName);
-        if(file.exists()){
+        /*if(file.exists()){
             file.delete();
         }else {
             try {
@@ -119,7 +124,7 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         return file.getAbsolutePath();
     }
