@@ -20,6 +20,7 @@ import com.hss01248.net.util.FileUtils;
 import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.util.TextUtils;
 import com.hss01248.notifyutil.NotifyUtil;
+import com.hss01248.notifyutil.builder.ProgressBuilder;
 
 import org.json.JSONObject;
 
@@ -72,27 +73,36 @@ public class Tool {
                     .show();
         }else {
             PendingIntent pendingIntent = null;
-            if(info.isOpenAfterSuccess){
-               // FileUtils.openFile(HttpUtil.context,new File(info.filePath));
-                NotifyUtil.cancel(info.hashCode());
-                return;
-            }else {
-                Intent intent = FileUtils.getFileOpenIntent(HttpUtil.context,info.filePath,new File(info.filePath));
-                if(intent !=null){
-                     pendingIntent = PendingIntent.getActivity(HttpUtil.context,33,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+
+            if(info.type== ConfigInfo.TYPE_DOWNLOAD){
+                if(info.isOpenAfterSuccess){
+                    NotifyUtil.cancel(info.hashCode());
+                    return;
+                }else {
+                    Intent intent = FileUtils.getFileOpenIntent(HttpUtil.context,info.filePath,new File(info.filePath));
+                    if(intent !=null){
+                        pendingIntent = PendingIntent.getActivity(HttpUtil.context,33,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+                    }
                 }
+            }else {
 
             }
+
+
             String msg = "";
             if(info.type == ConfigInfo.TYPE_DOWNLOAD){
-                msg="下载完成";
+                msg="文件下载完成";
             }else if(info.type == ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS){
-                msg = "上传完成";
+                msg = "文件上传完成";
             }
-            NotifyUtil.buildProgress(info.hashCode(), R.drawable.ic_launcher,msg,(int)progress,(int)max)
-                    .setContentIntent(pendingIntent)
-                    .setTicker(msg)
-                    .show();
+            ProgressBuilder builder =
+            NotifyUtil.buildProgress(info.hashCode(), R.drawable.ic_launcher,msg,(int)progress,(int)max);
+            if(pendingIntent!=null){
+                builder.setContentIntent(pendingIntent);
+            }
+            builder
+            .setTicker(msg)
+            .show();
         }
 
 
