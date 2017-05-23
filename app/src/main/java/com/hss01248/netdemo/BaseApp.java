@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-import com.antfortune.freeline.FreelineCore;
 import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.wrapper.HttpUtil;
 
@@ -15,7 +14,7 @@ public class BaseApp extends Application {
 
     @Override
     public void onCreate() {
-        FreelineCore.init(this);//要第一行
+        //FreelineCore.init(this);//要第一行
         super.onCreate();
         HttpUtil.init(this,"http://www.qxinli.com:8080/")
                 .openLog("httputil");
