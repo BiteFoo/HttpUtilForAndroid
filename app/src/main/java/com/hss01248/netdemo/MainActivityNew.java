@@ -387,7 +387,7 @@ public class MainActivityNew extends Activity {
                 String url = "https://travel.12306.cn/imgs/resources/uploadfiles/images/fed7d5b4-37d3-4f32-bacc-e9b942cb721d_product_W572_H370.jpg";
                 String url2 = "http://www.qxinli.com/download/qxinli.apk";
                 HttpUtil.buildDownloadRequest(url2)
-                        //.showLoadingDialog()//显示下载进度dialog
+                        .showLoadingDialog()//显示下载进度dialog
                         //.savedPath(path)
                         //.setOpenAfterSuccess()//下载完成后打开
                         .setHideFile()//隐藏该文件
