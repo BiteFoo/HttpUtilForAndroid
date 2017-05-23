@@ -194,11 +194,26 @@ public class ConfigInfo<T> {
 
             if(isWithProgress){
                 ProgressDialog dialog = (ProgressDialog) loadingDialog;
-                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "后台下载", new DialogInterface.OnClickListener() {
+                String str = "操作";
+                if(type == TYPE_DOWNLOAD){
+                    str="下载";
+                }else if(type == TYPE_UPLOAD_WITH_PROGRESS){
+                    str = "上传";
+                }
+                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "后台"+str, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         isShowNotify = true;
+
+                    }
+                });
+                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消"+str, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        //isShowNotify = true;
+                        HttpUtil.cancelRquest(tagForCancle);
 
                     }
                 });

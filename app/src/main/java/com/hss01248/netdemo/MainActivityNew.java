@@ -426,8 +426,8 @@ public class MainActivityNew extends Activity {
             case R.id.upload:
 
 
-                HttpUtil.buildUpLoadRequest("http://192.168.1.100:8080/gm/file/q_uploadAndroidApk.do","uploadFile","/storage/emulated/0/qxinli.apk")
-                        .addFile("uploadFile","/storage/emulated/0/Download/retrofit/qxinli.apk")
+                HttpUtil.buildUpLoadRequest("http://test.qxinli.com:80/gm/file/q_uploadAndroidApk.do","uploadFile","/storage/emulated/0/qxinli.apk")
+                        .addFile("uploadFile","/storage/emulated/0/Download/httputil/qxinli.apk")
                         .addParam("uploadFile555","1474363536041.jpg")
                         .addParam("api_secret777","898767hjk")
                         .showLoadingDialog()

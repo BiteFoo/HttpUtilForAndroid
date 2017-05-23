@@ -143,7 +143,7 @@ public class Tool {
                     //MyLog.d( "file download: " + fileSizeDownloaded + " of " + fileSize);//todo 控制频率
 
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime - oldTime > 100 || fileSizeDownloaded == fileSizeDownloaded) {//每300ms更新一次进度
+                    if (currentTime - oldTime > 300 || fileSizeDownloaded == fileSizeDownloaded) {//每300ms更新一次进度
                         oldTime = currentTime;
                         final long finalFileSizeDownloaded = fileSizeDownloaded;
                         callbackOnMainThread(new Runnable() {
