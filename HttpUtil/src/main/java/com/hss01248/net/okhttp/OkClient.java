@@ -379,7 +379,6 @@ public class OkClient extends IClient {
 
     private <E> void addUploadBody(Request.Builder builder0, ConfigInfo<E> configInfo) {
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-
         if (configInfo.params != null && configInfo.params.size() >0){
             Map<String,String> params = configInfo.params;
             int count = params.size();
@@ -397,7 +396,6 @@ public class OkClient extends IClient {
             Map<String,String> files = configInfo.files;
             int count = files.size();
             int index=0;
-
             if (count>0){
                 Set<Map.Entry<String,String>> set = files.entrySet();
                 for (Map.Entry<String,String> entry : set){

@@ -65,11 +65,11 @@ public class Tool {
         if(!info.isShowNotify){
             return;
         }
-       // HttpUtil.context.getResources().getIdentifier("imageName", "drawable", "ic_launcher");
+       // HttpUtil.context.getResources().getIdentifier("imageName", "drawable", "icon_launcher");
 
 
         if(progress<max){
-            NotifyUtil.buildProgress(info.hashCode(), R.drawable.ic_launcher,info.loadingMsg,(int)progress,(int)max)
+            NotifyUtil.buildProgress(info.hashCode(), R.drawable.icon_launcher,info.loadingMsg,(int)progress,(int)max)
                     .show();
         }else {
             PendingIntent pendingIntent = null;
@@ -84,8 +84,9 @@ public class Tool {
                         pendingIntent = PendingIntent.getActivity(HttpUtil.context,33,intent,PendingIntent.FLAG_CANCEL_CURRENT);
                     }
                 }
-            }else {
-
+            }else if(info.type == ConfigInfo.TYPE_UPLOAD_WITH_PROGRESS){
+                NotifyUtil.cancel(info.hashCode());
+                return;
             }
 
 
@@ -96,7 +97,7 @@ public class Tool {
                 msg = "文件上传完成";
             }
             ProgressBuilder builder =
-            NotifyUtil.buildProgress(info.hashCode(), R.drawable.ic_launcher,msg,(int)progress,(int)max);
+            NotifyUtil.buildProgress(info.hashCode(), R.drawable.icon_launcher,msg,(int)progress,(int)max);
             if(pendingIntent!=null){
                 builder.setContentIntent(pendingIntent);
             }
@@ -109,6 +110,9 @@ public class Tool {
     }
 
     public static void updateProgress(ConfigInfo info,long progress,long max){
+        if(info.isSilently){
+            return;
+        }
         updateNotify(info,progress,max);
         if(info.loadingDialog instanceof ProgressDialog && info.loadingDialog.isShowing()){
             ProgressDialog dialog = (ProgressDialog) info.loadingDialog;

@@ -110,6 +110,7 @@ public class ConfigInfo<T> {
     boolean isWithProgress ;
     public boolean isShowNotify;
     public String loadingMsg;
+    public boolean isSilently;
     /**
      * 参数逻辑校验
      */
@@ -177,55 +178,62 @@ public class ConfigInfo<T> {
 
         //todo dialog的取消网络请求
         //Tool.(loadingDialog)
-        if(loadingDialog!=null ){
-            if(tagForCancle ==null){
-                tagForCancle = UUID.randomUUID().toString();
-            }
+        if(isSilently){
+            loadingDialog =null;
+            isShowNotify = false;
 
-            loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    //MyLog.i("取消请求中.......");
-                    HttpUtil.cancelRquest(tagForCancle);
-
+        }else {
+            if(loadingDialog!=null ){
+                if(tagForCancle ==null){
+                    tagForCancle = UUID.randomUUID().toString();
                 }
-            });
-            forceMinTime = true;
 
-            if(isWithProgress){
-                ProgressDialog dialog = (ProgressDialog) loadingDialog;
-                String str = "操作";
-                if(type == TYPE_DOWNLOAD){
-                    str="下载";
-                }else if(type == TYPE_UPLOAD_WITH_PROGRESS){
-                    str = "上传";
-                }
-                dialog.setButton(DialogInterface.BUTTON_POSITIVE, "后台"+str, new DialogInterface.OnClickListener() {
+                loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        isShowNotify = true;
-
-                    }
-                });
-                dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消"+str, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        //isShowNotify = true;
+                    public void onCancel(DialogInterface dialog) {
+                        //MyLog.i("取消请求中.......");
                         HttpUtil.cancelRquest(tagForCancle);
 
                     }
                 });
-            }
-        }else {//不显示dialog,就自动显示notification
-            isShowNotify = true;
-            if(type == TYPE_DOWNLOAD){
-                loadingMsg="下载中";
-            }else if(type == TYPE_UPLOAD_WITH_PROGRESS){
-                loadingMsg = "上传中";
+                forceMinTime = true;
+
+                if(isWithProgress){
+                    ProgressDialog dialog = (ProgressDialog) loadingDialog;
+                    String str = "操作";
+                    if(type == TYPE_DOWNLOAD){
+                        str="下载";
+                    }else if(type == TYPE_UPLOAD_WITH_PROGRESS){
+                        str = "上传";
+                    }
+                    dialog.setButton(DialogInterface.BUTTON_POSITIVE, "后台"+str, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            isShowNotify = true;
+
+                        }
+                    });
+                    dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "取消"+str, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            //isShowNotify = true;
+                            HttpUtil.cancelRquest(tagForCancle);
+
+                        }
+                    });
+                }
+            }else {//不显示dialog,就自动显示notification
+                isShowNotify = true;
+                if(type == TYPE_DOWNLOAD){
+                    loadingMsg="下载中";
+                }else if(type == TYPE_UPLOAD_WITH_PROGRESS){
+                    loadingMsg = "上传中";
+                }
             }
         }
+
 
 
 
@@ -553,6 +561,7 @@ public class ConfigInfo<T> {
         this.updateProgress = builder.updateProgress;
         this.isLoadingDialogHorizontal = builder.isLoadingDialogHorizontal;
         this.cacheMode = builder.cacheMode;
+        this.isSilently = builder.isSilently;
 
         start();
 
@@ -563,7 +572,7 @@ public class ConfigInfo<T> {
 
         this.updateProgress = builder.updateProgress;
         this.isLoadingDialogHorizontal = builder.isLoadingDialogHorizontal;
-
+        this.isSilently = builder.isSilently;
 
         start();
     }

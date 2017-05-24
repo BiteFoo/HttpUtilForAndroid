@@ -233,4 +233,9 @@ public class DownloadBuilder <T> extends ProgressBaseBuilder{
     public DownloadBuilder setAppendCommonParams(boolean appendCommonParams) {
         return (DownloadBuilder) super.setAppendCommonParams(appendCommonParams);
     }
+
+    @Override
+    public DownloadBuilder setSilently(boolean silently) {
+        return (DownloadBuilder) super.setSilently(silently);
+    }
 }

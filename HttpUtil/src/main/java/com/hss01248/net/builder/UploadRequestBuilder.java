@@ -151,4 +151,11 @@ public class UploadRequestBuilder<T> extends ProgressBaseBuilder{
     public UploadRequestBuilder setAppendCommonParams(boolean appendCommonParams) {
         return (UploadRequestBuilder) super.setAppendCommonParams(appendCommonParams);
     }
+
+    @Override
+    public UploadRequestBuilder setSilently(boolean silently) {
+        return (UploadRequestBuilder) super.setSilently(silently);
+    }
+
+
 }

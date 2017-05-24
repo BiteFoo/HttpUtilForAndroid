@@ -10,6 +10,13 @@ public class ProgressBaseBuilder<T> extends BaseNetBuilder {
     public boolean isLoadingDialogHorizontal;
     public boolean updateProgress ;
 
+    public ProgressBaseBuilder setSilently(boolean silently) {
+        isSilently = silently;
+        return this;
+    }
+
+    public boolean isSilently;
+
     public ProgressBaseBuilder(){
         super();
         isLoadingDialogHorizontal = true;
