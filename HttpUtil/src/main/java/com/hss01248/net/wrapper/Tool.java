@@ -97,7 +97,7 @@ public class Tool {
                 msg = "文件上传完成";
             }
             ProgressBuilder builder =
-            NotifyUtil.buildProgress(info.hashCode(), R.drawable.icon_launcher,msg,(int)progress,(int)max);
+                    NotifyUtil.buildProgress(info.hashCode(), R.drawable.icon_launcher,info.loadingMsg,(int)progress/1024,(int)max/1024,"进度:%dkb/%dkb");
             if(pendingIntent!=null){
                 builder.setContentIntent(pendingIntent);
             }
