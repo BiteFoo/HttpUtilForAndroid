@@ -53,5 +53,5 @@ dependencies {
     // compile 'io.reactivex:rxandroid:1.2.1'
     // compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
     compile project(':openuri')
-    compile 'com.github.hss01248:NotifyUtil:1.0.0'
+    compile 'com.github.hss01248:NotifyUtil:1.0.1'
 }

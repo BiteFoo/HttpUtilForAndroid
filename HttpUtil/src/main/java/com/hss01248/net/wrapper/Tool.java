@@ -69,7 +69,7 @@ public class Tool {
 
 
         if(progress<max){
-            NotifyUtil.buildProgress(info.hashCode(), R.drawable.icon_launcher,info.loadingMsg,(int)progress,(int)max)
+            NotifyUtil.buildProgress(info.hashCode(), R.drawable.icon_launcher,info.loadingMsg,(int)progress/1024,(int)max/1024,"进度:%dkb/%dkb")
                     .show();
         }else {
             PendingIntent pendingIntent = null;
