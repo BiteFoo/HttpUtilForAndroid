@@ -2,6 +2,7 @@ package com.hss01248.net.wrapper;
 
 
 import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.interfaces.NetState;
 
 import java.util.List;
 
@@ -13,6 +14,23 @@ public abstract class MyNetListener<T>  {
 
     public String url;
     public ConfigInfo configInfo;
+
+    public void setNetState(int netState) {
+        this.netState = netState;
+    }
+
+    public int netState;
+
+    public int getNetState(){
+        return netState;
+    }
+
+    public boolean isNeting(){
+        return netState == NetState.LOADING;
+    }
+
+
+
 
 
 
@@ -29,7 +47,6 @@ public abstract class MyNetListener<T>  {
      * @return
      */
     public void onPreExecute() {
-
     }
 
     /**
@@ -77,7 +94,9 @@ public abstract class MyNetListener<T>  {
      * Callback method that an error has been occurred with the
      * provided error code and optional user-readable message.
      */
-    public void onError(String msgCanShow) {}
+    public void onError(String msgCanShow) {
+
+    }
 
 
     /**

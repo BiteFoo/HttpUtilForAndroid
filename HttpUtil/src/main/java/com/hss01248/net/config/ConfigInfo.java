@@ -1,8 +1,10 @@
 package com.hss01248.net.config;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 
 import com.hss01248.net.builder.BaseNetBuilder;
@@ -15,6 +17,7 @@ import com.hss01248.net.builder.UploadRequestBuilder;
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.interfaces.HttpMethod;
 import com.hss01248.net.util.CollectionUtil;
+import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.ListenerDector;
 import com.hss01248.net.wrapper.MyNetListener;
@@ -42,6 +45,7 @@ public class ConfigInfo<T> {
     public String url;
     public Map<String,String> params ;
     public String paramsStr;
+
 
 
 
@@ -190,9 +194,43 @@ public class ConfigInfo<T> {
 
                 loadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
-                    public void onCancel(DialogInterface dialog) {
-                        //MyLog.i("取消请求中.......");
-                        HttpUtil.cancelRquest(tagForCancle);
+                    public void onCancel(final DialogInterface loadingDialog) {
+
+                        Activity topActy = MyActyManager.getInstance().getCurrentActivity();
+                        if(topActy!=null){
+                            AlertDialog alertDialog = new AlertDialog.Builder(topActy)
+                                    .setTitle("请求取消确认")
+                                    .setMessage("网络请求正在执行中,是否取消该请求?")
+                                    .setPositiveButton("继续请求", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if(listener.isNeting()){
+                                                ProgressDialog dialog1 = (ProgressDialog) loadingDialog;
+                                                if(dialog1!=null && !dialog1.isShowing()){
+                                                    dialog1.show();
+                                                }
+                                            }
+                                        }
+                                    }).setNegativeButton("取消请求", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            //MyLog.i("取消请求中.......");
+                                                HttpUtil.cancelRquest(tagForCancle);
+                                        }
+                                    }).setNeutralButton("继续请求,且不显示对话框", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if(!isSilently){
+                                                if(type == TYPE_DOWNLOAD || type ==TYPE_UPLOAD_WITH_PROGRESS){
+                                                    isShowNotify = true;
+                                                }
+                                            }
+                                        }
+                                    })
+                                    .show();
+                        }
+
+
 
                     }
                 });

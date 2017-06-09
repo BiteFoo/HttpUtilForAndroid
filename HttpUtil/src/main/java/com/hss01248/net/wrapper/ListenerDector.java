@@ -1,6 +1,7 @@
 package com.hss01248.net.wrapper;
 
 import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.interfaces.NetState;
 
 import java.util.List;
 
@@ -19,10 +20,27 @@ public class ListenerDector<T> extends MyNetListener<T> {
 
 
     @Override
+    public boolean isNeting() {
+        return listener.isNeting();
+    }
+
+    @Override
+    public int getNetState() {
+        return listener.getNetState();
+    }
+
+    @Override
+    public void setNetState(int netState) {
+        listener.setNetState(netState);
+    }
+
+    @Override
     public void onSuccess(final T response, final String responseStr, final boolean isFromCache) {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                if(!isFromCache)
+                listener.setNetState(NetState.FINISHED);
                 listener.onSuccess(response, responseStr,isFromCache);
             }
         });
@@ -61,6 +79,8 @@ public class ListenerDector<T> extends MyNetListener<T> {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                if(!isFromCache)
+                    listener.setNetState(NetState.FINISHED);
                 listener.onSuccessArr(response,responseStr,isFromCache);
             }
         });
@@ -72,6 +92,8 @@ public class ListenerDector<T> extends MyNetListener<T> {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                if(!isFromCache)
+                    listener.setNetState(NetState.FINISHED);
                 listener.onSuccessArr(response,responseStr,data,code,msg,isFromCache);
             }
         });
@@ -83,6 +105,8 @@ public class ListenerDector<T> extends MyNetListener<T> {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                if(!isFromCache)
+                    listener.setNetState(NetState.FINISHED);
                 listener.onSuccessObj(response,responseStr,data,code,msg,isFromCache);
             }
         });
@@ -93,6 +117,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                listener.setNetState(NetState.FINISHED);
                 listener.onEmpty();
             }
         });
@@ -103,6 +128,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                listener.setNetState(NetState.FINISHED);
                 listener.onError(msgCanShow);
             }
         });
@@ -113,6 +139,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                listener.setNetState(NetState.FINISHED);
                 listener.onCodeError(msgCanShow,hiddenMsg,code);
             }
         });
@@ -123,6 +150,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                listener.setNetState(NetState.FINISHED);
                 listener.onCancel();
             }
         });
@@ -133,7 +161,9 @@ public class ListenerDector<T> extends MyNetListener<T> {
         postDelay(new Runnable() {
             @Override
             public void run() {
+                listener.setNetState(NetState.FINISHED);
                 listener.onCancel();
+
             }
         });
     }
@@ -144,6 +174,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
             @Override
             public void run() {
                 listener.onUnlogin();
+                listener.setNetState(NetState.FINISHED);
             }
         });
     }
@@ -154,6 +185,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
             @Override
             public void run() {
                 listener.onUnFound();
+                listener.setNetState(NetState.FINISHED);
             }
         });
     }
@@ -164,6 +196,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
             @Override
             public void run() {
                 listener.onNoNetwork();
+                listener.setNetState(NetState.FINISHED);
             }
         });
     }
@@ -181,6 +214,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
     @Override
     public void onPreExecute() {
         listener.onPreExecute();
+        listener.setNetState(NetState.LOADING);
     }
 
     @Override
