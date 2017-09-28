@@ -3,6 +3,7 @@ package com.hss01248.net.config;
 import android.text.TextUtils;
 
 import com.hss01248.net.cache.CacheStrategy;
+import com.hss01248.net.interfaces.StringParseStrategy;
 import com.hss01248.net.util.HttpsUtil;
 import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.wrapper.MyLog;
@@ -39,6 +40,9 @@ public class GlobalConfig {
     }
 
     //private  long PROGRESS_INTERMEDIATE = 300;//进度条更新间隔,默认300ms
+
+
+    public List<StringParseStrategy> parseStrategyList = new ArrayList<>();
 
 
     public Map<String, String> getCommonHeaders() {
@@ -190,6 +194,12 @@ public class GlobalConfig {
     private String key_data = "data";
     private String key_code = "code";
     private String key_msg = "msg";
+    public String key_isSuccess = "";//如果不为空,则通过这个key对应的boolean值来判断一个请求是否成功.
+    //public boolean isKeyCodeInt = true;//code对应的字段是int还是String
+    public String key_extra1 = "";//json外层额外的字段,如果为空就说明没有
+    public String key_extra2 = "";
+    public String key_extra3 = "";
+
 
     /**
      * 设置三字段json的key,默认如上
@@ -198,6 +208,24 @@ public class GlobalConfig {
         this.key_data = key_data;
         this.key_code = key_code;
         this.key_msg = key_msg;
+
+        return this;
+    }
+
+    /**
+     * 设置三字段json的key,默认如上
+     */
+    public GlobalConfig setStandardJsonExtraKeys(String key_data, String key_code, String key_msg,
+                                            String key_isSuccess,String key_extra1,String key_extra2,String key_extra3){
+        this.key_data = key_data;
+        this.key_code = key_code;
+        this.key_msg = key_msg;
+
+        this.key_isSuccess = key_isSuccess;
+        this.key_extra1 = key_extra1;
+        this.key_extra2 = key_extra2;
+        this.key_extra3 = key_extra3;
+
 
         return this;
     }

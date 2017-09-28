@@ -87,6 +87,17 @@ public abstract class MyNetListener<T>  {
     }
 
 
+    public  void onSuccessObjExtra(boolean isFromCache,T response, String responseStr, String data, int code,
+                              String msg,String extra1,String extra2,String extra3){
+        onSuccess(response,responseStr,isFromCache);
+    }
+
+    public  void onSuccessArrExtra(boolean isFromCache,List<T> response, String responseStr, String data, int code, String msg,
+                              String extra1,String extra2,String extra3){
+        onSuccessArr(response,responseStr,isFromCache);
+    }
+
+
 
 
 
@@ -110,6 +121,10 @@ public abstract class MyNetListener<T>  {
         }else {
             onError(msgCanShow);
         }
+    }
+
+    public void onCodeErrorExtra(String msgCanShow, String hiddenMsg, int code,String extra1,String extra2,String extra3) {
+
     }
 
 

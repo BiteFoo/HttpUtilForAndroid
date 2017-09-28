@@ -728,18 +728,14 @@ public class Tool {
             JSONObject object = null;
             try {
                 object = new JSONObject(string);
-            } catch (com.alibaba.fastjson.JSONException e) {
+            } catch (org.json.JSONException e) {
                 e.printStackTrace();
-
                 callbackOnMainThread(new Runnable() {
                     @Override
                     public void run() {
                         configInfo.listener.onError("json 格式异常");
                     }
                 });
-                return;
-            } catch (org.json.JSONException e) {
-                e.printStackTrace();
             }
             String key_data = TextUtils.isEmpty(configInfo.key_data) ? GlobalConfig.get().getStandardJsonKeyData() : configInfo.key_data;
             String key_code = TextUtils.isEmpty(configInfo.key_code) ? GlobalConfig.get().getStandardJsonKeyCode() : configInfo.key_code;
@@ -903,7 +899,6 @@ public class Tool {
                         configInfo.listener.onSuccess(string, string,isFromCache);
                     }
                 });
-
                 break;
             case ConfigInfo.TYPE_JSON:
                 parseCommonJson(string,configInfo,isFromCache);
@@ -911,6 +906,123 @@ public class Tool {
             case ConfigInfo.TYPE_JSON_FORMATTED:
                 parseStandJsonStr(string, configInfo,isFromCache);
                 break;
+            case ConfigInfo.TYPE_JSON_FORMATTED_EXTRA:
+                parseStandJsonStrExTra(string, configInfo,isFromCache);
+                break;
+        }
+    }
+
+    private static void parseStandJsonStrExTra(String string, final ConfigInfo configInfo, boolean isFromCache) {
+        if (isJsonEmpty(string)){//先看是否为空
+
+            callbackOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    configInfo.listener.onEmpty();
+                }
+            });
+
+        }else {
+            JSONObject object = null;
+            try {
+                object = new JSONObject(string);
+            } catch (org.json.JSONException e) {
+                e.printStackTrace();
+                callbackOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        configInfo.listener.onError("json 格式异常");
+                    }
+                });
+            }
+            String key_data = TextUtils.isEmpty(configInfo.key_data) ? GlobalConfig.get().getStandardJsonKeyData() : configInfo.key_data;
+            String key_code = TextUtils.isEmpty(configInfo.key_code) ? GlobalConfig.get().getStandardJsonKeyCode() : configInfo.key_code;
+            String key_msg = TextUtils.isEmpty(configInfo.key_msg) ? GlobalConfig.get().getStandardJsonKeyMsg() : configInfo.key_msg;
+            String key_isSuccess = TextUtils.isEmpty(configInfo.key_isSuccess) ? GlobalConfig.get().key_isSuccess : configInfo.key_isSuccess;
+            String key_extra1 = TextUtils.isEmpty(configInfo.key_extra1) ? GlobalConfig.get().key_extra1 : configInfo.key_extra1;
+            String key_extra2 = TextUtils.isEmpty(configInfo.key_extra2) ? GlobalConfig.get().key_extra2 : configInfo.key_extra2;
+            String key_extra3 = TextUtils.isEmpty(configInfo.key_extra3) ? GlobalConfig.get().key_extra3 : configInfo.key_extra3;
+
+
+           /* final String dataStr = object.optString(key_data);
+            final int code = object.optInt(key_code);
+            final String msg = object.optString(key_msg);
+            final String finalString1 = string;*/
+
+            String extra1Str = getStrByKey(key_extra1,object);
+            String extra2Str = getStrByKey(key_extra2,object);
+            String extra3Str = getStrByKey(key_extra3,object);
+            String msgStr = getStrByKey(key_msg,object);
+            String dataStr = getStrByKey(key_data,object);
+            int codeInt = -1;
+            if(!TextUtils.isEmpty(key_code)){
+                codeInt = object.optInt(key_code);
+            }
+            boolean isSuccess = true;
+            if(!TextUtils.isEmpty(key_isSuccess)){
+                isSuccess = object.optBoolean(key_isSuccess);
+            }
+
+            parseStandardJsonObjExtra(isSuccess,TextUtils.isEmpty(key_isSuccess),codeInt,TextUtils.isEmpty(key_code),
+                dataStr,msgStr,extra1Str,extra2Str,extra3Str,configInfo,isFromCache);
+
+
+
+
+
+
+
+            //parseStandardJsonObj(finalString1,dataStr,code,msg,configInfo,isFromCache);
+            //todo 将时间解析放到后面去
+
+        }
+    }
+
+    /**
+     *  @param isSuccess 请求是否成功
+     * @param doUseSuccess 是否使用isSuccess字段
+     * @param codeInt int类型的code
+     * @param doUseCode 是否使用int类型的code
+     * @param dataStr 数据
+     * @param msgStr msg
+     * @param extra1Str 额外的字段1
+     * @param extra2Str
+     * @param extra3Str
+     * @param isFromCache
+     */
+    private static <E> void parseStandardJsonObjExtra(boolean isSuccess, boolean doUseSuccess, final int codeInt,
+                                                      final boolean doUseCode, String dataStr, final String msgStr, final String extra1Str,
+                                                      final String extra2Str, final String extra3Str, final ConfigInfo<E> configInfo,
+                                                      boolean isFromCache) {
+        if(doUseSuccess){
+            if(!isSuccess){
+                callbackOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        configInfo.listener.onCodeErrorExtra(msgStr,"",doUseCode?codeInt:0,extra1Str,extra2Str,extra3Str);
+                    }
+                });
+                return;
+            }
+            //todo 解析成功的str  parseSuccess();
+            if(doUseCode){
+
+            }else {//不使用code字段,
+
+            }
+            return;
+        }
+        //todo 不使用isSuccess,而是使用code:逻辑与standjson相似,只是添加了几个字段
+
+
+
+    }
+
+    private static String getStrByKey(String key_extra1, JSONObject jsonObject) {
+        if(!TextUtils.isEmpty(key_extra1)){
+            return jsonObject.optString(key_extra1);
+        }else {
+            return "";
         }
     }
 

@@ -15,6 +15,7 @@ import com.hss01248.net.builder.StandardJsonRequestBuilder;
 import com.hss01248.net.builder.StringRequestBuilder;
 import com.hss01248.net.builder.UploadRequestBuilder;
 import com.hss01248.net.cache.CacheStrategy;
+import com.hss01248.net.interfaces.HttpCallback;
 import com.hss01248.net.interfaces.HttpMethod;
 import com.hss01248.net.util.CollectionUtil;
 import com.hss01248.net.util.MyActyManager;
@@ -46,6 +47,8 @@ public class ConfigInfo<T> {
     public Map<String,String> params ;
     public String paramsStr;
 
+    public HttpCallback callback;
+
 
 
 
@@ -62,7 +65,14 @@ public class ConfigInfo<T> {
     public String key_data = "";
     public String key_code = "";
     public String key_msg = "";
-   // public String key_isSuccess = "";
+
+    //不那么标准的json
+    public String key_isSuccess = GlobalConfig.get().key_isSuccess;
+   // public boolean isKeyCodeInt = GlobalConfig.get().isKeyCodeInt;//code对应的字段是int还是String
+    public String key_extra1 = GlobalConfig.get().key_extra1;//json外层额外的字段,如果为空就说明没有
+    public String key_extra2 = GlobalConfig.get().key_extra2;
+    public String key_extra3 = GlobalConfig.get().key_extra3;
+
 
     public int code_success;
     public int code_unlogin;
@@ -460,14 +470,14 @@ public class ConfigInfo<T> {
     public boolean isAppendCommonHeaders ;
     public boolean isAppendCommonParams ;
 
+    public static final int TYPE_DOWNLOAD = 1;
+    public static final int TYPE_UPLOAD_WITH_PROGRESS = 2;
+    public static final int TYPE_UPLOAD_NONE_PROGRESS = 3;//测试用的
 
-    public static final int TYPE_STRING = 1;//純文本,比如html
-    public static final int TYPE_JSON = 2;
-    public static final int TYPE_JSON_FORMATTED = 3;//jsonObject包含data,code,msg,數據全在data中,可能是obj,頁可能是array,也可能為空
-
-    public static final int TYPE_DOWNLOAD = 4;
-    public static final int TYPE_UPLOAD_WITH_PROGRESS = 5;
-    public static final int TYPE_UPLOAD_NONE_PROGRESS = 6;//测试用的
+    public static final int TYPE_STRING = 4;//純文本,比如html
+    public static final int TYPE_JSON = 5;
+    public static final int TYPE_JSON_FORMATTED = 6;//jsonObject包含data,code,msg,數據全在data中,可能是obj,頁可能是array,也可能為空
+    public static final int TYPE_JSON_FORMATTED_EXTRA = 7;
 
 //优先级
 
