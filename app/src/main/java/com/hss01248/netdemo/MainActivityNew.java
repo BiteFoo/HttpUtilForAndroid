@@ -53,7 +53,7 @@ public class MainActivityNew extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_new);
         ButterKnife.bind(this);
-       Logger.init("netapi");
+
         //HttpUtil.initAddHttps(R.raw.srca);//添加12306的证书
         HttpUtil.init(getApplicationContext(),"http://api.qxinli.com:9005/api/")
                 .setStandardJsonKeys("data","code","message")

@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface HttpCallback<T> {
 
-    void onError(String code,String serverMsg,String exceptionMsg);
+
+
 
     void onNoNetwork();
 
@@ -18,14 +19,25 @@ public interface HttpCallback<T> {
 
     void onUnlogin();
 
+
+
+
     void onEmpty();
 
-    void onProgressChange(long transPortedBytes, long totalBytes);
 
+
+
+    void onProgressChange(long transPortedBytes, long totalBytes);
     void onFilesUploadProgress(long transPortedBytes, long totalBytes,int fileIndex,int filesCount);
 
-    void onSuccessObj(T obj,boolean isFromCache);
 
-    void onSuccessArr(List<T> arr,boolean isFromCache);
+
+    void onSuccess(T obj,String responseStr,boolean isFromCache);
+    void onSuccessArr(List<T> arr,String responseStr,boolean isFromCache);
+
+
+    void onError(String msgCanShow);
+    void onError(String code,String serverMsg,String exceptionMsg);
+    void onCodeError(String msgCanShow, String hiddenMsg, int code);
 
 }

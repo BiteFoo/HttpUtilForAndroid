@@ -4,7 +4,6 @@ package com.hss01248.net.builder;
 import com.hss01248.net.cache.ACache;
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.ConfigInfo;
-import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.interfaces.HttpMethod;
 import com.hss01248.net.util.TextUtils;
 import com.hss01248.net.wrapper.HttpUtil;
@@ -131,10 +130,20 @@ public abstract class IClient {
                         }
                     } else {//如果拿到了缓存数据,解析,然后
                         configInfo.isFromCache = true;//给Tool.parseStringByType里面识别的
-                        Tool.parseStringByType(result, configInfo, true);
+                        try {
+                            Tool.parseStringByType(result, configInfo, true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            configInfo.isFromCacheSuccess = false;
+                        }
 
                         //todo 如何预防空指针?
-                        GlobalConfig.get().parseStrategyList.get(configInfo.type-4).parseCommonJson(result,configInfo,true);
+                        /*try {
+                            GlobalConfig.get().parseStrategyList.get(configInfo.type-4).parseCommonJson(result,configInfo,true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            configInfo.isFromCacheSuccess = false;
+                        }*/
 
                         if (configInfo.isFromCacheSuccess) {//识别在Tool.parseStringByType中,走的是成功还是失败的回调
                             if (configInfo.cacheMode == CacheStrategy.IF_NONE_CACHE_REQUEST) {//有缓存,就只读缓存,不再操作了

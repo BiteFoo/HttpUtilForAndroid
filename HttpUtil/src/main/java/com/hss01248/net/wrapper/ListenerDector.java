@@ -16,6 +16,7 @@ public class ListenerDector<T> extends MyNetListener<T> {
         this.listener = listener;
         this.configInfo = listener.configInfo;
         this.url = listener.url;
+        this.netState = listener.netState;
     }
 
 
@@ -130,6 +131,17 @@ public class ListenerDector<T> extends MyNetListener<T> {
             public void run() {
                 listener.setNetState(NetState.FINISHED);
                 listener.onError(msgCanShow);
+            }
+        });
+    }
+
+    @Override
+    public void onError(final String code, final String serverMsg, final String exceptionMsg) {
+        postDelay(new Runnable() {
+            @Override
+            public void run() {
+                listener.setNetState(NetState.FINISHED);
+                listener.onError(code,serverMsg,exceptionMsg);
             }
         });
     }

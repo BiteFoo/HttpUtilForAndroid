@@ -2,6 +2,7 @@ package com.hss01248.net.wrapper;
 
 
 import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.interfaces.HttpCallback;
 import com.hss01248.net.interfaces.NetState;
 
 import java.util.List;
@@ -10,10 +11,16 @@ import java.util.List;
  * Created by Administrator on 2016/4/15 0015.
  */
 //@MainThread
-public abstract class MyNetListener<T>  {
+public abstract class MyNetListener<T>  implements HttpCallback<T>{
 
     public String url;
+    /**
+     * 用于回调时判断是否是特定的url和参数发出的请求.
+     */
     public ConfigInfo configInfo;
+
+    public Object extra1;
+    public Object extra2;
 
     public void setNetState(int netState) {
         this.netState = netState;
@@ -71,6 +78,7 @@ public abstract class MyNetListener<T>  {
 
 
 
+
     /** Called when response success. */
     public abstract void onSuccess(T response,String responseStr,boolean isFromCache);
 
@@ -87,7 +95,7 @@ public abstract class MyNetListener<T>  {
     }
 
 
-    public  void onSuccessObjExtra(boolean isFromCache,T response, String responseStr, String data, int code,
+   /* public  void onSuccessObjExtra(boolean isFromCache,T response, String responseStr, String data, int code,
                               String msg,String extra1,String extra2,String extra3){
         onSuccess(response,responseStr,isFromCache);
     }
@@ -95,7 +103,7 @@ public abstract class MyNetListener<T>  {
     public  void onSuccessArrExtra(boolean isFromCache,List<T> response, String responseStr, String data, int code, String msg,
                               String extra1,String extra2,String extra3){
         onSuccessArr(response,responseStr,isFromCache);
-    }
+    }*/
 
 
 
@@ -123,9 +131,14 @@ public abstract class MyNetListener<T>  {
         }
     }
 
-    public void onCodeErrorExtra(String msgCanShow, String hiddenMsg, int code,String extra1,String extra2,String extra3) {
-
+    @Override
+    public void onError(String code, String serverMsg, String exceptionMsg) {
+        onError(serverMsg);
     }
+
+    /*public void onCodeErrorExtra(String msgCanShow, String hiddenMsg, int code,String extra1,String extra2,String extra3) {
+
+    }*/
 
 
     public void onCancel() {

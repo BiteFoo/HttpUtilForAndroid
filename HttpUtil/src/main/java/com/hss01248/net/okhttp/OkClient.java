@@ -425,17 +425,23 @@ public class OkClient extends IClient {
                /* if("gzip".equals(type)){
                     str = GZipUtil.uncompress(str);
                 }*/
-                String str = response.body().string();
-                if(info.cacheMode== CacheStrategy.DEFAULT){
-                    if(response.cacheResponse()==null || response.cacheResponse().body()==null
-                            || TextUtils.isEmpty(response.cacheResponse().body().string())){
-                        Tool.parseStringByType(str,info,false);//说明不是从缓存来的
-                    }else {
-                        Tool.parseStringByType(str,info,true);//说明是从缓存来的
-                    }
-                }else {
-                    Tool.parseStringByType(str,info,false);
-                }
+               //todo 逻辑优化
+               try {
+                   String str = response.body().string();
+                   if(info.cacheMode== CacheStrategy.DEFAULT){
+                       if(response.cacheResponse()==null || response.cacheResponse().body()==null
+                           || TextUtils.isEmpty(response.cacheResponse().body().string())){
+                           Tool.parseStringByType(str,info,false);//说明不是从缓存来的
+                       }else {
+                           Tool.parseStringByType(str,info,true);//说明是从缓存来的
+                       }
+                   }else {
+                       Tool.parseStringByType(str,info,false);
+                   }
+               }catch (Exception e){
+                   info.listener.onError(e.getMessage());
+               }
+
 
                // Tool.dismiss(info.loadingDialog);
             }

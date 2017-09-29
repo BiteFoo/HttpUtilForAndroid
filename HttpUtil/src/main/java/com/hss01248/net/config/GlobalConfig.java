@@ -4,6 +4,9 @@ import android.text.TextUtils;
 
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.interfaces.StringParseStrategy;
+import com.hss01248.net.parsestring.CommonJsonStrategy;
+import com.hss01248.net.parsestring.SimpleStringParser;
+import com.hss01248.net.parsestring.StandardJsonParseStrategy;
 import com.hss01248.net.util.HttpsUtil;
 import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.wrapper.MyLog;
@@ -42,7 +45,28 @@ public class GlobalConfig {
     //private  long PROGRESS_INTERMEDIATE = 300;//进度条更新间隔,默认300ms
 
 
-    public List<StringParseStrategy> parseStrategyList = new ArrayList<>();
+    public Map<Integer, StringParseStrategy> getParseStrategyList() {
+        return parseStrategyList;
+    }
+
+    public Map<Integer,StringParseStrategy> parseStrategyList = initStrategyList();
+    public int customJsonType;
+
+    private Map<Integer, StringParseStrategy> initStrategyList() {
+        parseStrategyList = new HashMap<>();
+        parseStrategyList.put(ConfigInfo.TYPE_STRING,new SimpleStringParser());
+        parseStrategyList.put(ConfigInfo.TYPE_JSON,new CommonJsonStrategy());
+        parseStrategyList.put(ConfigInfo.TYPE_JSON_FORMATTED,new StandardJsonParseStrategy());
+        return parseStrategyList;
+    }
+
+    public GlobalConfig addJsonParseStragegy(int customJsonType,StringParseStrategy stringParseStrategy){
+        this.customJsonType = customJsonType;
+        parseStrategyList.put(customJsonType,stringParseStrategy);
+        return this;
+    }
+
+
 
 
     public Map<String, String> getCommonHeaders() {

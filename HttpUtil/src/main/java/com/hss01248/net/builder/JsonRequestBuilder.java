@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 
 import com.hss01248.net.config.ConfigInfo;
+import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.wrapper.MyNetListener;
 
 import java.util.Map;
@@ -25,6 +26,13 @@ public class JsonRequestBuilder<T> extends StringRequestBuilder{
         this.clazz = clazz;
         return this;
     }
+
+    public JsonRequestBuilder<T> setIsCustomJsonType() {
+        this.type = GlobalConfig.get().customJsonType;
+        return this;
+    }
+
+
 
 
     //TODO 预期的响应是否为arr

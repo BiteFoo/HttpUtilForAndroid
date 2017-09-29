@@ -13,9 +13,9 @@ import android.webkit.MimeTypeMap;
 
 import com.hss01248.net.R;
 import com.hss01248.net.cache.ACache;
-import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
+import com.hss01248.net.interfaces.StringParseStrategy;
 import com.hss01248.net.util.FileUtils;
 import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.util.TextUtils;
@@ -641,8 +641,19 @@ public class Tool {
 
 
 
-    private static void cacheResponse(final String string, final ConfigInfo configInfo) {
-        if (configInfo.shouldCacheResponse && !configInfo.isFromCache && configInfo.cacheMaxAge >0){
+    public static void cacheResponseIfFromNet(final String string, final ConfigInfo configInfo) {
+        if(!configInfo.isFromCache){
+            if (configInfo.shouldCacheResponse  && configInfo.cacheMaxAge >0){
+                HttpUtil.getClient().getExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        ACache.get(HttpUtil.context).put(getCacheKey(configInfo),string, (int) configInfo.cacheMaxAge);
+                        MyLog.d("key is "+getCacheKey(configInfo)+ "---caching resonse:\n"+string);
+                    }
+                });
+            }
+        }
+        /*if (configInfo.shouldCacheResponse && !configInfo.isFromCache && configInfo.cacheMaxAge >0){
 
             HttpUtil.getClient().getExecutor().execute(new Runnable() {
                 @Override
@@ -652,11 +663,14 @@ public class Tool {
                 }
             });
         }else {
-            configInfo.isFromCacheSuccess = true;
+            if(configInfo.isFromCache){
+                configInfo.isFromCacheSuccess = true;
+            }
+
             if(configInfo.cacheMode== CacheStrategy.IF_NONE_CACHE_REQUEST){
                 //dismiss(configInfo.loadingDialog);
             }
-        }
+        }*/
     }
 
 
@@ -797,7 +811,8 @@ public class Tool {
                         });
 
 
-                        cacheResponse(response, configInfo);
+                        cacheResponseIfFromNet(response, configInfo);
+                        setReadCacheSuccessIfIsCache(configInfo);
                     }else if (data.startsWith("[")){
                         final List<E> beans =  MyJson.parseArray(data,configInfo.clazz);
                         callbackOnMainThread(new Runnable() {
@@ -809,7 +824,8 @@ public class Tool {
 
 
 
-                        cacheResponse(response, configInfo);
+                        cacheResponseIfFromNet(response, configInfo);
+                        setReadCacheSuccessIfIsCache(configInfo);
                     }else {//如果data的值是一个字符串,而不是标准json,那么直接返回
                         if (String.class.equals(configInfo.clazz) ){//此时,E也是String类型.如果有误,会抛出到下面catch里
                             callbackOnMainThread(new Runnable() {
@@ -886,19 +902,16 @@ public class Tool {
         }
     }
 
-    public static  void parseStringByType(final String string, final ConfigInfo configInfo,final boolean isFromCache) {
-        switch (configInfo.type){
+    public static  void parseStringByType(final String string, final ConfigInfo configInfo,final boolean isFromCache) throws Exception{
+        StringParseStrategy strategy = GlobalConfig.get().getParseStrategyList().get(configInfo.type);
+        strategy.parseCommonJson(string,configInfo,isFromCache);
+        /*switch (configInfo.type){
             case ConfigInfo.TYPE_STRING:
-                //缓存
-                cacheResponse(string, configInfo);
-
                 //处理结果
-                callbackOnMainThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        configInfo.listener.onSuccess(string, string,isFromCache);
-                    }
-                });
+                configInfo.listener.onSuccess(string, string,isFromCache);
+                //缓存
+                cacheResponseIfFromNet(string, configInfo);
+                setReadCacheSuccessIfIsCache(configInfo);
                 break;
             case ConfigInfo.TYPE_JSON:
                 parseCommonJson(string,configInfo,isFromCache);
@@ -907,9 +920,15 @@ public class Tool {
                 parseStandJsonStr(string, configInfo,isFromCache);
                 break;
             case ConfigInfo.TYPE_JSON_FORMATTED_EXTRA:
-                parseStandJsonStrExTra(string, configInfo,isFromCache);
+                //parseStandJsonStrExTra(string, configInfo,isFromCache);
+                try {
+                    GlobalConfig.get().parseStrategyList.get(0).parseCommonJson(string,configInfo,true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    configInfo.isFromCacheSuccess = false;
+                }
                 break;
-        }
+        }*/
     }
 
     private static void parseStandJsonStrExTra(String string, final ConfigInfo configInfo, boolean isFromCache) {
@@ -963,8 +982,8 @@ public class Tool {
                 isSuccess = object.optBoolean(key_isSuccess);
             }
 
-            parseStandardJsonObjExtra(isSuccess,TextUtils.isEmpty(key_isSuccess),codeInt,TextUtils.isEmpty(key_code),
-                dataStr,msgStr,extra1Str,extra2Str,extra3Str,configInfo,isFromCache);
+            /*parseStandardJsonObjExtra(isSuccess,TextUtils.isEmpty(key_isSuccess),codeInt,TextUtils.isEmpty(key_code),
+                dataStr,msgStr,extra1Str,extra2Str,extra3Str,configInfo,isFromCache);*/
 
 
 
@@ -978,19 +997,8 @@ public class Tool {
         }
     }
 
-    /**
-     *  @param isSuccess 请求是否成功
-     * @param doUseSuccess 是否使用isSuccess字段
-     * @param codeInt int类型的code
-     * @param doUseCode 是否使用int类型的code
-     * @param dataStr 数据
-     * @param msgStr msg
-     * @param extra1Str 额外的字段1
-     * @param extra2Str
-     * @param extra3Str
-     * @param isFromCache
-     */
-    private static <E> void parseStandardJsonObjExtra(boolean isSuccess, boolean doUseSuccess, final int codeInt,
+
+    /*private static <E> void parseStandardJsonObjExtra(boolean isSuccess, boolean doUseSuccess, final int codeInt,
                                                       final boolean doUseCode, String dataStr, final String msgStr, final String extra1Str,
                                                       final String extra2Str, final String extra3Str, final ConfigInfo<E> configInfo,
                                                       boolean isFromCache) {
@@ -1016,7 +1024,7 @@ public class Tool {
 
 
 
-    }
+    }*/
 
     private static String getStrByKey(String key_extra1, JSONObject jsonObject) {
         if(!TextUtils.isEmpty(key_extra1)){
@@ -1042,7 +1050,7 @@ public class Tool {
 
     }
 
-    private static <E> void parseCommonJson(final String string, final ConfigInfo<E> configInfo, final boolean isFromCache) {
+    public static <E> void parseCommonJson(final String string, final ConfigInfo<E> configInfo, final boolean isFromCache) {
         if (isJsonEmpty(string)){
             callbackOnMainThread(new Runnable() {
                 @Override
@@ -1062,7 +1070,8 @@ public class Tool {
                         }
                     });
 
-                    cacheResponse(string, configInfo);
+                    cacheResponseIfFromNet(string, configInfo);
+                    setReadCacheSuccessIfIsCache(configInfo);
                 }else if (string.startsWith("[")){
                     final List<E> beans =  MyJson.parseArray(string,configInfo.clazz);
 
@@ -1071,7 +1080,8 @@ public class Tool {
                         public void run() {
                             if(beans!=null && beans.size()>0){
                                 configInfo.listener.onSuccessArr(beans,string,string,0,"",isFromCache);
-                                cacheResponse(string, configInfo);
+                                cacheResponseIfFromNet(string, configInfo);
+                                setReadCacheSuccessIfIsCache(configInfo);
                             }else {
                                 configInfo.listener.onEmpty();
                             }
@@ -1103,6 +1113,13 @@ public class Tool {
                 });
             }
         }
+    }
+
+    public static <E> void setReadCacheSuccessIfIsCache(ConfigInfo<E> configInfo) {
+        if(configInfo.isFromCache){
+            configInfo.isFromCacheSuccess = true;
+        }
+
     }
 
     public static <T> MyNetListener cloneListener(ConfigInfo info) {

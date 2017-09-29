@@ -41,6 +41,9 @@ public class ConfigInfo<T> {
     }
     public Object request;//跟具体client有关的请求对象
     public Object extraTag;
+    public Object responseExtra1;
+    public Object responseExtra2;
+    public Object responseExtra3;
     //核心参数
     public int method = HttpMethod.GET;
     public String url;

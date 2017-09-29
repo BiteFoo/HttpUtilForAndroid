@@ -8,8 +8,15 @@ import com.hss01248.net.config.ConfigInfo;
 
 public interface StringParseStrategy {
 
-    void parseCommonJson(String response, ConfigInfo configInfo, boolean isFromCache);
+    <T> void parseCommonJson(String response, ConfigInfo<T> configInfo, boolean isFromCache) throws Exception;
 
-    boolean isCallOnEmpty(String response,ConfigInfo configInfo);
+
+    /**
+     * 判定一个json string什么时候为空
+     * @param response
+     * @param configInfo
+     * @return
+     */
+    boolean isCallOnEmpty(String response,ConfigInfo configInfo) throws Exception;
 
 }

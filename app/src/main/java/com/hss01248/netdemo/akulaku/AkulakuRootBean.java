@@ -1,4 +1,4 @@
-package com.hss01248.net.akulaku;
+package com.hss01248.netdemo.akulaku;
 
 /**
  * Created by huangshuisheng on 2017/9/28.

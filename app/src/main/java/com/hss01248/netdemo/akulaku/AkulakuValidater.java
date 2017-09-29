@@ -1,4 +1,4 @@
-package com.hss01248.net.akulaku;
+package com.hss01248.netdemo.akulaku;
 
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.interfaces.ValidateStrategy;
