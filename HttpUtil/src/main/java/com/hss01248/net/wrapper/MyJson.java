@@ -18,6 +18,7 @@ public class MyJson {
 
     public static <T> T  parseObject(String str,Class<T> clazz){
        // return new Gson().fromJson(str,clazz);
+
          return JSON.parseObject(str,clazz);
     }
 

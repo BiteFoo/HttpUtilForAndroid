@@ -9,7 +9,7 @@ import android.widget.Button;
 
 import com.hss01248.netdemo.akulaku.AkulakuActy;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -19,9 +19,9 @@ import butterknife.OnClick;
 
 public class SplashActy extends Activity {
 
-    @Bind(R.id.button_qxinli)
+    @BindView(R.id.button_qxinli)
     Button buttonQxinli;
-    @Bind(R.id.button4_akulaku)
+    @BindView(R.id.button4_akulaku)
     Button button4Akulaku;
 
     @Override

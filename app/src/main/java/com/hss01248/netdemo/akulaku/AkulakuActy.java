@@ -7,16 +7,30 @@ import android.view.View;
 import android.widget.Button;
 
 import com.hss01248.net.config.GlobalConfig;
+import com.hss01248.net.oldapi.BaseNetBean;
+import com.hss01248.net.retrofit.ApiRxService;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyJson;
+import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.net.wrapper.MyNetListener;
 import com.hss01248.netdemo.R;
 import com.hss01248.netdemo.akulaku.bean.CommonConfig;
 import com.orhanobut.logger.Logger;
 
-import butterknife.Bind;
+import java.util.HashMap;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by huangshuisheng on 2017/9/29.
@@ -24,29 +38,29 @@ import butterknife.OnClick;
 
 public class AkulakuActy extends Activity {
 
-    @Bind(R.id.get_string)
+    @BindView(R.id.get_string)
     Button getString;
-    @Bind(R.id.post_string)
+    @BindView(R.id.post_string)
     Button postString;
-    @Bind(R.id.get_json)
+    @BindView(R.id.get_json)
     Button getJson;
-    @Bind(R.id.post_json)
+    @BindView(R.id.post_json)
     Button postJson;
-    @Bind(R.id.get_standard_json)
+    @BindView(R.id.get_standard_json)
     Button getStandardJson;
-    @Bind(R.id.post_standard_json)
+    @BindView(R.id.post_standard_json)
     Button postStandardJson;
-    @Bind(R.id.download)
+    @BindView(R.id.download)
     Button download;
-    @Bind(R.id.upload)
+    @BindView(R.id.upload)
     Button upload;
-    @Bind(R.id.postbyjson)
+    @BindView(R.id.postbyjson)
     Button postbyjson;
-    @Bind(R.id.testvoice)
+    @BindView(R.id.testvoice)
     Button testvoice;
-    @Bind(R.id.testvoice2)
+    @BindView(R.id.testvoice2)
     Button testvoice2;
-    @Bind(R.id.unbind)
+    @BindView(R.id.unbind)
     Button unbind;
 
     @Override
@@ -62,7 +76,9 @@ public class AkulakuActy extends Activity {
         R.id.post_standard_json, R.id.download, R.id.upload, R.id.postbyjson, R.id.testvoice, R.id.testvoice2, R.id.unbind})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.get_string:
+            case R.id.get_string:{
+                getByRetrofit();
+            }
                 break;
             case R.id.post_string:
                 break;
@@ -76,11 +92,17 @@ public class AkulakuActy extends Activity {
                     .addHeader("dt","4")
                     .addHeader("vc","112")
                     .addParam("countryId",2+"")
+                    .showLoadingDialog(this,"正在获取个人信息")
                     .getAsync(new MyNetListener<CommonConfig>() {
                         @Override
                         public void onSuccess(CommonConfig response, String responseStr, boolean isFromCache) {
                             Logger.json(MyJson.toJsonStr(response));
                             Logger.e("systime:"+configInfo.responseExtra1);
+                        }
+
+                        @Override
+                        public void onError(String code, String serverMsg, String exceptionMsg) {
+                            super.onError(code, serverMsg, exceptionMsg);
                         }
                     });
                 break;
@@ -95,14 +117,15 @@ public class AkulakuActy extends Activity {
                     .addParam("city","67")
                     .addParam("street","78")
                     .addParam("roomNumber","6")
-                    .postAsync(new AkulakuCallBack() {
+                    .postAsync(new AkulakuCallBack<String>() {
                         @Override
                         public void onError(String code, String serverMsg, String exceptionMsg) {
                             Logger.e("code:"+code+"--servermsg:"+serverMsg+"---exceptionmsg:"+exceptionMsg);
                         }
 
                         @Override
-                        public void onSuccess(Object response, String responseStr, boolean isFromCache) {
+                        public void onSuccess(String response, String responseStr, boolean isFromCache) {
+                            MyLog.json(response);
 
                         }
 
@@ -133,6 +156,56 @@ public class AkulakuActy extends Activity {
                 break;
             case R.id.unbind:
                 break;
+            default:break;
         }
+    }
+
+    private void getByRetrofit() {
+
+        try {
+            Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://api.qxinli.com:9005/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+
+            ApiRxService rxService = retrofit.create(ApiRxService.class);
+            rxService.executGet("version/latestVersion/v1.json",new HashMap<String, String>(),new HashMap<String, String>())
+                .subscribeOn(Schedulers.io())
+                .doOnNext(new Consumer<BaseNetBean>() {
+                    @Override
+                    public void accept(BaseNetBean baseNetBean) throws Exception {
+                        MyLog.e("doOnNext  accept");
+                        MyLog.json(baseNetBean);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<BaseNetBean>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        MyLog.e("onSubscribe");
+                    }
+
+                    @Override
+                    public void onNext(@NonNull BaseNetBean baseNetBean) {
+                        MyLog.e("onnext");
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                        MyLog.e("onError");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        MyLog.e("onComplete");
+                    }
+                });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
     }
 }

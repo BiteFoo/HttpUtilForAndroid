@@ -174,10 +174,10 @@ public class BaseNetBuilder<T> {
     }
 
     @Deprecated
-    public ConfigInfo<T> getSync(){
+    public T getSync(){
         method = HttpMethod.GET;
         //client.start(this);
-        return   execute();
+        return   null;
 
     }
 
@@ -198,10 +198,10 @@ public class BaseNetBuilder<T> {
 
     }
     @Deprecated
-    public ConfigInfo<T> postSync(){
+    public T postSync(){
         method = HttpMethod.POST;
         // client.start(this);
-        return  execute();
+        return  null;
 
     }
 

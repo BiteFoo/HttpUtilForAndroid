@@ -51,6 +51,8 @@ import okhttp3.Response;
 public class OkClient extends IClient {
     private static OkClient instance;
 
+
+
     /**
      * 获取到一个client,以便与图片框架共享
      * @return

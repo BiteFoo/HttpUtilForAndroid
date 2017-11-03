@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.wrapper.HttpUtil;
+import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.netdemo.akulaku.AkulakuParser;
 import com.orhanobut.logger.Logger;
 import com.readystatesoftware.chuck.ChuckInterceptor;
@@ -26,6 +27,7 @@ public class BaseApp extends Application {
        // MyRetrofitUtil.init(getApplicaionContext());
         registCallback();
         Logger.init("netapi");
+        MyLog.setIsLog(true);
 
 
     }

@@ -3,10 +3,11 @@ package com.hss01248.net.oldapi;
 /**
  * Created by Administrator on 2016/8/30.
  */
-public class BaseNetBean<T> {
+public class BaseNetBean {
     public int code;
     public String msg;
-    public T data;
+    public String data;
+    public boolean success;
 
     //TODO
     public static final int CODE_NONE = -1;

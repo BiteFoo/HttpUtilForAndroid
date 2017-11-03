@@ -24,28 +24,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivityNew extends Activity {
 
 
-    @Bind(R.id.get_string)
+    @BindView(R.id.get_string)
     Button getString;
-    @Bind(R.id.post_string)
+    @BindView(R.id.post_string)
     Button postString;
-    @Bind(R.id.get_json)
+    @BindView(R.id.get_json)
     Button getJson;
-    @Bind(R.id.post_json)
+    @BindView(R.id.post_json)
     Button postJson;
-    @Bind(R.id.get_standard_json)
+    @BindView(R.id.get_standard_json)
     Button getStandardJson;
-    @Bind(R.id.post_standard_json)
+    @BindView(R.id.post_standard_json)
     Button postStandardJson;
-    @Bind(R.id.download)
+    @BindView(R.id.download)
     Button download;
-    @Bind(R.id.upload)
+    @BindView(R.id.upload)
     Button upload;
 
     @Override
@@ -65,7 +65,6 @@ public class MainActivityNew extends Activity {
                 .setLoginManager(new LoginManager() {
                     @Override
                     public void autoLogin(@Nullable final MyNetListener listener) {
-
                         //注意: 应从sp中读取,加密存取,加密传输.这里的demo省略了这些安全性措施
                         login("15989366579965", "123456", new MyNetListener<UserInfo>() {
                             @Override
@@ -593,6 +592,8 @@ public class MainActivityNew extends Activity {
 
 
                 break;
+
+            default:break;
 
 
         }

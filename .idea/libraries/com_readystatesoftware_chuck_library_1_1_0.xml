@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="com.readystatesoftware.chuck:library-1.1.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.1.0.aar/ef89aeab890d2b98e6534b05681efd8e/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/library-1.1.0.aar/ef89aeab890d2b98e6534b05681efd8e/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

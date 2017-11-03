@@ -17,69 +17,81 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="get String"
+            android:textAllCaps="false"
         android:id="@+id/get_string"/>
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="post String"
         android:id="@+id/post_string"/>
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="get json"
         android:id="@+id/get_json"/>
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="post json"
         android:id="@+id/post_json"/>
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="get standard json"
-        android:id="@+id/get_standard_json"/>
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="get standard json"
+            android:id="@+id/get_standard_json" />
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="post standard json"
         android:id="@+id/post_standard_json"/>
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="download"
         android:id="@+id/download"/>
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="upload"
         android:id="@+id/upload"/>
 
     <Button
+            android:textAllCaps="false"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="post by json"
     android:id="@+id/postbyjson"/>
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="force read cache"
         android:id="@+id/testvoice"/>
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="bind"
         android:id="@+id/testvoice2"/>
 
     <Button
+            android:textAllCaps="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="unbind"
