@@ -29,7 +29,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Call;
@@ -466,13 +465,25 @@ public class OkClient extends IClient {
         info.request = call;
         if(info.isSync){//同步请求
             try {
+                MyLog.e("net work thread1:"+Thread.currentThread().getName());
               final Response response =   call.execute();
+                MyLog.e("net work thread2:"+Thread.currentThread().getName());
                 if(response.isSuccessful()){
                     successResponse.handleSuccess(call,response);
+                    //successResponse.handleSuccess(call,response);
+                    if(tempClients.contains(theClient)){//将临时client移除
+                        tempClients.remove(theClient);
+                    }
                 }else if(call.isCanceled()){
                     info.listener.onCancel();
                 }else {
-                    info.listener.onCodeError("http错误码:"+response.code(),response.message(),response.code());
+                    if(info.cacheMode == CacheStrategy.REQUEST_FAILED_READ_CACHE){
+                        info.shouldReadCache = true;
+                        start(info);
+                    }else {
+                        // Tool.dismiss(info.loadingDialog);
+                        info.listener.onCodeError("http错误码:"+response.code(),response.message(),response.code());
+                    }
                 }
 
             } catch (IOException e) {
@@ -519,11 +530,10 @@ public class OkClient extends IClient {
                 }
                 if(response.isSuccessful()){
                     successResponse.handleSuccess(call,response);
-                }else {
+                } else {
                     Tool.callbackOnMainThread(new Runnable() {
                         @Override
                         public void run() {
-
                             if(info.cacheMode == CacheStrategy.REQUEST_FAILED_READ_CACHE){
                                 info.shouldReadCache = true;
                                 start(info);
@@ -531,15 +541,27 @@ public class OkClient extends IClient {
                                // Tool.dismiss(info.loadingDialog);
                                 info.listener.onCodeError("http错误码:"+response.code(),response.message(),response.code());
                             }
-
-
-
                         }
                     });
 
                 }
             }
         });
+    }
+
+    private <E> void handleSuccessSync(ConfigInfo<E> info, Request.Builder builder, Response response, Call call) {
+        if(info.type == ConfigInfo.TYPE_STRING || info.type == ConfigInfo.TYPE_JSON || info.type == ConfigInfo.TYPE_JSON_FORMATTED){
+            try {
+                String string = response.body().string();
+                Tool.parseStringByType(string,info,false);
+            } catch (IOException e) {
+                e.printStackTrace();
+                info.listener.onCodeError(e.getMessage(),e.getMessage(),-1);
+            } catch (Exception e) {
+                e.printStackTrace();
+                info.listener.onCodeError(e.getMessage(),e.getMessage(),-1);
+            }
+        }
     }
 
     interface ISuccessResponse{

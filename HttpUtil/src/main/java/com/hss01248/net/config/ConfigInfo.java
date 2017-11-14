@@ -314,7 +314,10 @@ public class ConfigInfo<T> {
         }
 
        // MyNetListener listener = Tool.cloneListener(this);
-        listener = new ListenerDector<>(listener);
+       // if(!isSync){
+            listener = new ListenerDector<>(listener);
+       // }
+
 
 
 

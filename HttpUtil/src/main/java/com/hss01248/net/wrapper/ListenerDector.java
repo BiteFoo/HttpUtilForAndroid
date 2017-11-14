@@ -65,14 +65,33 @@ public class ListenerDector<T> extends MyNetListener<T> {
             delaytime = 0;
         }
 
+        if(configInfo!=null){
+            if(!configInfo.isSync){
+                Tool.callbackOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Tool.dismiss(configInfo.loadingDialog);
+                        runnable.run();
+                    }
+                }, delaytime);
+            }else {
+                Tool.callbackOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Tool.dismiss(configInfo.loadingDialog);
+                    }
+                }, delaytime);
 
-        Tool.callbackOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                Tool.dismiss(configInfo.loadingDialog);
-                runnable.run();
+                try {
+                    Thread.sleep(delaytime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }finally {
+                    runnable.run();//同步请求时，在本线程执行
+                }
+
             }
-        }, delaytime);
+        }
     }
 
     @Override
