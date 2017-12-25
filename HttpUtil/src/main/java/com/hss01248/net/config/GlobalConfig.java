@@ -3,6 +3,7 @@ package com.hss01248.net.config;
 import android.text.TextUtils;
 
 import com.hss01248.net.cache.CacheStrategy;
+import com.hss01248.net.interfaces.IJsonParser;
 import com.hss01248.net.interfaces.StringParseStrategy;
 import com.hss01248.net.parsestring.CommonJsonStrategy;
 import com.hss01248.net.parsestring.SimpleStringParser;
@@ -24,6 +25,16 @@ import okhttp3.Interceptor;
 
 public class GlobalConfig {
     //private static GlobalConfig instance;
+
+    public IJsonParser getIJsonParser() {
+        return mIJsonParser;
+    }
+
+    public void setIJsonParser(IJsonParser IJsonParser) {
+        mIJsonParser = IJsonParser;
+    }
+
+    private IJsonParser mIJsonParser;
 
 
     private GlobalConfig(){
@@ -185,8 +196,6 @@ public class GlobalConfig {
     public int getCacheMode(){
         return cacheMode;
     }
-
-
 
     public static final int COOKIE_NONE = 1;
     public static final int COOKIE_MEMORY = 2;

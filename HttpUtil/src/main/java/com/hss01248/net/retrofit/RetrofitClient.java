@@ -1,10 +1,11 @@
 package com.hss01248.net.retrofit;
 
 /**
+ *
+ * retrofit局限性: 缺少统一取消请求的方法
  * Created by Administrator on 2016/9/21.
  */
-public class RetrofitClient  {
-
+public class RetrofitClient   {
 
     /*Retrofit retrofit;
     ApiCallService service;
@@ -21,6 +22,43 @@ public class RetrofitClient  {
     //完全忽略证书校验的client,用于某些额外的单次请求中
     ApiCallService serviceIgnoreSSL;
     Retrofit retrofitIgnoreSSL;
+    @Override
+    public Executor getExecutor() {
+        return null;
+    }
+
+    @Override
+    protected <E> ConfigInfo<E> getString(ConfigInfo<E> info) {
+        return newCommonStringRequest(info);
+    }
+
+    @Override
+    protected <E> ConfigInfo<E> postString(ConfigInfo<E> info) {
+        return newCommonStringRequest(info);
+    }
+
+    @Override
+    protected ConfigInfo download(ConfigInfo configInfo) {
+
+        return null;
+    }
+
+    @Override
+    protected ConfigInfo upload(ConfigInfo info) {
+        return null;
+    }
+
+    @Override
+    public void cancleRequest(Object tag) {
+
+    }
+
+    @Override
+    public void cancleAllRequest() {
+
+    }
+
+
 
 
 
@@ -33,34 +71,27 @@ public class RetrofitClient  {
         OkHttpClient.Builder httpBuilder=new OkHttpClient.Builder();
 
         //https:
-        setHttps(httpBuilder);
+        HttpsUtil.setHttps(httpBuilder);
 
 
         OkHttpClient client=httpBuilder.readTimeout(15, TimeUnit.SECONDS)
-                .connectTimeout(10, TimeUnit.SECONDS).writeTimeout(15, TimeUnit.SECONDS) //设置超时
-                .retryOnConnectionFailure(true)//重试
-                //.addInterceptor(new ProgressInterceptor())//下载时更新进度
-                .addNetworkInterceptor(new NoCacheInterceptor())//request和resoponse都加上nocache,
-               // .addInterceptor(new UseragentInterceptor())
-               *//* .sslSocketFactory(new SSLCertificateSocketFactory(), new X509TrustManager() {
-                })*//*
-                .build();
+            .connectTimeout(10, TimeUnit.SECONDS).writeTimeout(15, TimeUnit.SECONDS) //设置超时
+            .retryOnConnectionFailure(true)//重试
+            //.addInterceptor(new ProgressInterceptor())//下载时更新进度
+            .addNetworkInterceptor(new NoCacheInterceptor())//request和resoponse都加上nocache,
+        .build();
 
-        retrofit = new Retrofit
-                .Builder()
-                .baseUrl(NetDefaultConfig.baseUrl)
+    retrofit = new Retrofit
+        .Builder()
+        .baseUrl(GlobalConfig.get().getBaseUrl())
                 .client(client)
-                // .addConverterFactory(GsonConverterFactory.create()) // 使用Gson作为数据转换器
+    // .addConverterFactory(GsonConverterFactory.create()) // 使用Gson作为数据转换器
                 .build();
 
-        service = retrofit.create(ApiCallService.class);
-    }
+    service = retrofit.create(ApiCallService.class);
+}
 
-    private void setHttps(OkHttpClient.Builder httpBuilder) {
-        if(HttpsConfig.certificates != null && HttpsConfig.certificates.size()>0){
-            httpBuilder.sslSocketFactory(HttpsUtil.getSSLSocketFactory(MyNetApi.context, HttpsConfig.certificates));
-        }
-    }
+
 
     private static RetrofitClient instance;
 
@@ -71,47 +102,41 @@ public class RetrofitClient  {
 
     private void initDownload() {
         OkHttpClient.Builder httpBuilder=new OkHttpClient.Builder();
-        setHttps(httpBuilder);
+        HttpsUtil.setHttps(httpBuilder);
         OkHttpClient client=httpBuilder.readTimeout(0, TimeUnit.SECONDS)
-                .connectTimeout(30, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
-                .retryOnConnectionFailure(false)//重试
-                .addInterceptor(new UseragentInterceptor())
-                .addInterceptor(new ProgressInterceptor())//下载时更新进度
-                .build();
+            .connectTimeout(30, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
+            .retryOnConnectionFailure(false)//重试
+            .addInterceptor(new UseragentInterceptor())
+            .addInterceptor(new ProgressInterceptor())//下载时更新进度
+            .build();
 
         retrofitDownload = new Retrofit
-                .Builder()
-                .baseUrl(NetDefaultConfig.baseUrl)
-                .client(client)
-                // .addConverterFactory(GsonConverterFactory.create()) // 使用Gson作为数据转换器
-                .build();
+            .Builder()
+            .baseUrl(GlobalConfig.get().getBaseUrl())
+            .client(client)
+            // .addConverterFactory(GsonConverterFactory.create()) // 使用Gson作为数据转换器
+            .build();
 
         serviceDownload = retrofitDownload.create(ApiCallService.class);
     }
 
     private void initUpload() {
         OkHttpClient.Builder httpBuilder=new OkHttpClient.Builder();
-        setHttps(httpBuilder);
+        HttpsUtil.setHttps(httpBuilder);
         OkHttpClient client=httpBuilder.readTimeout(0, TimeUnit.SECONDS)
-                .connectTimeout(0, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
-                .retryOnConnectionFailure(false)//重试
-                // .addInterceptor(new ProgressRequestInterceptor())//上传时更新进度
-                .addInterceptor(new UseragentInterceptor())
-               *//* .addNetworkInterceptor(new Interceptor() {
-                    @Override
-                    public okhttp3.Response intercept(Chain chain) throws IOException {
-                        return null;
-                    }
-                })*//*
-                .build();
+            .connectTimeout(0, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
+            .retryOnConnectionFailure(false)//重试
+            // .addInterceptor(new ProgressRequestInterceptor())//上传时更新进度
+           // .addInterceptor(new UseragentInterceptor())
+            .build();
 
-        retrofitUpload = new Retrofit
-                .Builder()
-                .baseUrl(NetDefaultConfig.baseUrl)
-                .client(client)
-                .build();
+    retrofitUpload = new Retrofit
+    .Builder()
+    .baseUrl(GlobalConfig.get().getBaseUrl())
+    .client(client)
+    .build();
 
-        serviceUpload = retrofitUpload.create(ApiCallService.class);
+    serviceUpload = retrofitUpload.create(ApiCallService.class);
     }
 
 
@@ -119,31 +144,103 @@ public class RetrofitClient  {
         OkHttpClient.Builder httpBuilder=new OkHttpClient.Builder();
         HttpsUtil.setAllCerPass(httpBuilder);
         OkHttpClient client=httpBuilder.readTimeout(0, TimeUnit.SECONDS)
-                .connectTimeout(30, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
-                .retryOnConnectionFailure(false)//重试
-                .build();
+        .connectTimeout(30, TimeUnit.SECONDS).writeTimeout(0, TimeUnit.SECONDS) //设置超时
+        .retryOnConnectionFailure(false)//重试
+        .build();
 
         retrofitIgnoreSSL = new Retrofit
-                .Builder()
-                .baseUrl(NetDefaultConfig.baseUrl)
-                .client(client)
-                .build();
+        .Builder()
+        .baseUrl(GlobalConfig.get().getBaseUrl())
+        .client(client)
+        .build();
 
         serviceIgnoreSSL = retrofitIgnoreSSL.create(ApiCallService.class);
-    }
+        }
 
 
 
     public static RetrofitClient getInstance(){
         if (instance == null){
-            synchronized (RetrofitClient.class){
-                if (instance ==  null){
-                    instance = new RetrofitClient();
+        synchronized (RetrofitClient.class){
+            if (instance ==  null){
+            instance = new RetrofitClient();
+            }
+            }
+            }
+            return  instance;
+            }
+
+
+    protected <E> ConfigInfo<E> newCommonStringRequest(final ConfigInfo<E> configInfo) {
+
+
+        ApiCallService service2 = null;
+
+        if(GlobalConfig.get().isIgnoreCertificateVerify() && configInfo.url.startsWith("https")){
+            if(serviceIgnoreSSL == null){
+                initSSLIgnore();
+            }
+            service2 = serviceIgnoreSSL;
+        }else {
+            if (service == null){
+                init();
+            }
+            service2 = service;
+        }
+
+        Call<ResponseBody> call;
+        if (configInfo.method == HttpMethod.GET){
+            call = service2.executGet(configInfo.url,configInfo.params,configInfo.headers);
+        }else if (configInfo.method == HttpMethod.POST){
+            if(configInfo.paramsAsJson){//参数在请求体以json的形式发出
+                String jsonStr = MyJson.toJsonStr(configInfo.params);
+                Log.e("dd","jsonstr request:"+jsonStr);
+                RequestBody body = RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), jsonStr);
+                call = service2.executeJsonPost(configInfo.url,body,configInfo.headers);
+            }else {
+                call = service2.executePost(configInfo.url,configInfo.params,configInfo.headers);
+            }
+        }else {
+            configInfo.listener.onError("不是get或post方法");//暂时不考虑其他方法
+            call = null;
+            return configInfo;
+        }
+        configInfo.tagForCancle = call;
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
+                String  string = null;
+                try {
+                    if(!response.isSuccessful()){
+                        configInfo.listener.onCodeError("http错误码为:"+response.code(),response.message(),response.code());
+                        return;
+                    }
+                    string = response.body().string();
+                    Tool.parseStringByType(string,configInfo,false);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-        }
-        return  instance;
-    }
+            @Override
+            public void onFailure(Call<ResponseBody> call, final Throwable t) {
+
+                Tool.handleError(t,configInfo);
+            }
+        });
+        return configInfo;
+    }*/
+
+
+    /*
+
+
+
+
+
 
 
     @Override
@@ -420,15 +517,15 @@ public class RetrofitClient  {
 
     private void handleMedia(ConfigInfo configInfo) {
         if(configInfo.isNotifyMediaCenter){
-            FileUtils.refreshMediaCenter(MyNetApi.context,configInfo.filePath);
+            DownFileHandlerUtil.refreshMediaCenter(MyNetApi.context,configInfo.filePath);
         }else {
             if(configInfo.isHideFolder){
-                FileUtils.hideFile(new File(configInfo.filePath));
+                DownFileHandlerUtil.hideFile(new File(configInfo.filePath));
             }
         }
 
         if(configInfo.isOpenAfterSuccess){
-            FileUtils.openFile(MyNetApi.context,new File(configInfo.filePath));
+            DownFileHandlerUtil.openFile(MyNetApi.context,new File(configInfo.filePath));
         }
 
     }

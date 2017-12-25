@@ -307,7 +307,7 @@ public class BaseNetBuilder<T> {
                     dialog.setTitle("");
                     dialog.setMessage(msg);
                     dialog.setProgressStyle(horizontal ? ProgressDialog.STYLE_HORIZONTAL:ProgressDialog.STYLE_SPINNER);
-                    dialog.setIndeterminate(!updateProgress);
+                    dialog.setIndeterminate(true);
                     dialog.setCancelable(true);
                     dialog.setCanceledOnTouchOutside(false);
                     isWithProgress = updateProgress;

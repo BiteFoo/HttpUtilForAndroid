@@ -18,7 +18,7 @@ import java.io.IOException;
  * Created by Administrator on 2017/1/17 0017.
  */
 
-public class FileUtils {
+public class DownFileHandlerUtil {
 
 
     public static void hideFile(File file){

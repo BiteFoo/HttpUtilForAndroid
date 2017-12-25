@@ -1,7 +1,7 @@
 package com.hss01248.net.wrapper;
 
 
-import com.alibaba.fastjson.JSON;
+import com.hss01248.net.config.GlobalConfig;
 
 import java.util.List;
 
@@ -12,24 +12,28 @@ public class MyJson {
 
     public static String toJsonStr(Object obj){
        // return new Gson().toJson(obj);
-         return JSON.toJSONString(obj);
+        // return JSON.toJSONString(obj);
+        return GlobalConfig.get().getIJsonParser().toJsonStr(obj);
     }
 
 
     public static <T> T  parseObject(String str,Class<T> clazz){
        // return new Gson().fromJson(str,clazz);
 
-         return JSON.parseObject(str,clazz);
+         //return JSON.parseObject(str,clazz);
+        return GlobalConfig.get().getIJsonParser().parseObject(str,clazz);
     }
 
     public static <T> T  parse(String str,Class<T> clazz){
        // return new Gson().fromJson(str,clazz);
-         return JSON.parseObject(str,clazz);
+         //return JSON.parseObject(str,clazz);
+        return GlobalConfig.get().getIJsonParser().parse(str,clazz);
     }
 
     public static  <E> List<E> parseArray(String str,Class<E> clazz){
        // return new Gson().fromJson(str,new TypeToken<List<E>>() {}.getType());
-         return JSON.parseArray(str,clazz);
+         //return JSON.parseArray(str,clazz);
+        return GlobalConfig.get().getIJsonParser().parseArray(str,clazz);
     }
 
 

@@ -160,15 +160,15 @@ public class HttpsUtil {
     @SuppressWarnings("deprecation")
 	public static void setAllCerPass(OkHttpClient.Builder httpBuilder){
         X509TrustManager xtm = new X509TrustManager() {
-           // @Override
+            @Override
             public void checkClientTrusted(X509Certificate[] chain, String authType) {
             }
 
-           // @Override
+            @Override
             public void checkServerTrusted(X509Certificate[] chain, String authType) {
             }
 
-           // @Override
+            @Override
             public X509Certificate[] getAcceptedIssuers() {
                 X509Certificate[] x509Certificates = new X509Certificate[]{};
                 return x509Certificates;

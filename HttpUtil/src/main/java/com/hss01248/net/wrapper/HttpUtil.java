@@ -35,11 +35,13 @@ public class HttpUtil {
 
     /**
      * 全局配置的入口方法,通过GlobalConfig可以配置一系列默认情况
+     *
+     * 不要忘记设置:setIJsonParser(jsonParser)
      * @param context 传context或者application,千万不要传activity
      * @param baseUrl
      * @return
      */
-    public static GlobalConfig  init(Context context,String baseUrl ){
+    public static GlobalConfig  init(Context context, String baseUrl){
         HttpUtil.context = context;
         globalConfig = GlobalConfig.get();
         globalConfig.setBaseUrl(baseUrl);

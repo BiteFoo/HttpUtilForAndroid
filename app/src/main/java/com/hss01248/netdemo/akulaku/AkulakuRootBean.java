@@ -15,13 +15,13 @@ public class AkulakuRootBean {
      * sysTime : 1506594461539
      */
 
-    private String data;
+    private Object data;
     private boolean success;
     private String errCode;
     private String errMsg;
     private long sysTime;
 
-    public String getData() {
+    public Object getData() {
         return data;
     }
 

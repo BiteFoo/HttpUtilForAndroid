@@ -19,13 +19,26 @@ public class AkulakuParser implements StringParseStrategy {
         AkulakuRootBean rootBean = MyJson.parseObject(response,AkulakuRootBean.class);
         //todo 拿到systime,同步时间?
         configInfo.responseExtra1 = rootBean.getSysTime();
-
         if (rootBean.isSuccess()){
             MyNetListener<T> callback = configInfo.listener;
-            if(isCallOnEmpty(rootBean.getData(),configInfo)){
+            //如果不是字符串
+            if(!(rootBean.getData() instanceof String)){
+                if(rootBean.getData() ==null){
+                    if(configInfo.isTreatEmptyDataAsSuccess){
+                        callback.onSuccess(null,response,isFromCache);
+                    }else {
+                        callback.onEmpty();
+                    }
+                }else {
+                    callback.onSuccess((T) rootBean.getData(),response,isFromCache);
+                }
+                return;
+            }
+            //如果是字符串
+            if(isCallOnEmpty((String) rootBean.getData(),configInfo)){
                 callback.onEmpty();
             }else {
-                String dataStr = rootBean.getData();
+                String dataStr = (String) rootBean.getData();
                 MyLog.e("data str:"+dataStr);
                 //如果不是来自缓存,则缓存结果
                 if(configInfo.isResponseJsonArray){

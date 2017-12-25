@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.alibaba.fastjson.JSON;
+import com.hss01248.net.interfaces.IJsonParser;
 import com.hss01248.net.util.MyActyManager;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyLog;
 import com.hss01248.netdemo.akulaku.AkulakuParser;
 import com.orhanobut.logger.Logger;
 import com.readystatesoftware.chuck.ChuckInterceptor;
+
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/9/4.
@@ -23,7 +27,28 @@ public class BaseApp extends Application {
         HttpUtil.init(this,"http://www.qxinli.com:8080/")
                 .addInterceptor(new ChuckInterceptor(this))//注:会影响上传下载的实时进度显示,调试上传下载时,关闭此拦截器
                 .addJsonParseStragegy(19,new AkulakuParser())
-                .openLog("httputil");
+                .openLog("httputil")
+        .setIJsonParser(new IJsonParser() {
+            @Override
+            public String toJsonStr(Object obj) {
+                return JSON.toJSONString(obj);
+            }
+
+            @Override
+            public <T> T parseObject(String str, Class<T> clazz) {
+                return JSON.parseObject(str,clazz);
+            }
+
+            @Override
+            public <T> T parse(String str, Class<T> clazz) {
+                return JSON.parseObject(str,clazz);
+            }
+
+            @Override
+            public <E> List<E> parseArray(String str, Class<E> clazz) {
+                return JSON.parseArray(str,clazz);
+            }
+        });
        // MyRetrofitUtil.init(getApplicaionContext());
         registCallback();
         Logger.init("netapi");

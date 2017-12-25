@@ -9,14 +9,16 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.webkit.DownloadListener;
 import android.webkit.MimeTypeMap;
+import android.webkit.WebView;
 
 import com.hss01248.net.R;
 import com.hss01248.net.cache.ACache;
 import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.interfaces.StringParseStrategy;
-import com.hss01248.net.util.FileUtils;
+import com.hss01248.net.util.DownFileHandlerUtil;
 import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.util.TextUtils;
 import com.hss01248.notifyutil.NotifyUtil;
@@ -79,7 +81,7 @@ public class Tool {
                     NotifyUtil.cancel(info.hashCode());
                     return;
                 }else {
-                    Intent intent = FileUtils.getFileOpenIntent(HttpUtil.context,info.filePath,new File(info.filePath));
+                    Intent intent = DownFileHandlerUtil.getFileOpenIntent(HttpUtil.context,info.filePath,new File(info.filePath));
                     if(intent !=null){
                         pendingIntent = PendingIntent.getActivity(HttpUtil.context,33,intent,PendingIntent.FLAG_CANCEL_CURRENT);
                     }
@@ -116,8 +118,10 @@ public class Tool {
         updateNotify(info,progress,max);
         if(info.loadingDialog instanceof ProgressDialog && info.loadingDialog.isShowing()){
             ProgressDialog dialog = (ProgressDialog) info.loadingDialog;
+            dialog.setIndeterminate(false);
             dialog.setProgress((int) progress/1024);
             dialog.setMax((int) max/1024);
+
             dialog.setProgressNumberFormat("%1d kb/%2d kb");
         }
     }
@@ -147,7 +151,8 @@ public class Tool {
                     //MyLog.d( "file download: " + fileSizeDownloaded + " of " + fileSize);//todo 控制频率
 
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime - oldTime > 300 || fileSizeDownloaded == fileSizeDownloaded) {//每300ms更新一次进度
+                    if (currentTime - oldTime > 300 || fileSizeDownloaded == fileSizeDownloaded) {
+                        //每300ms更新一次进度
                         oldTime = currentTime;
                         final long finalFileSizeDownloaded = fileSizeDownloaded;
                         callbackOnMainThread(new Runnable() {
@@ -159,7 +164,7 @@ public class Tool {
 
                                 if(finalFileSizeDownloaded == fileSize){
                                     //文件校验
-                                    if(info.isVerify){
+                                    if(info.isVerify || TextUtils.isNotEmpty(info.verifyStr)){
                                         String str = "";
                                         if(info.verfyByMd5OrShar1){//md5
                                             str = fileToMD5(info.filePath);
@@ -180,21 +185,15 @@ public class Tool {
                                             info.listener.onError("文件下载失败:校验不一致");
                                         }
                                     }else {
-                                       // Tool.dismiss(info.loadingDialog);
-                                        info.listener.onSuccess(info.filePath,info.filePath,info.isFromCache);
+                                        // Tool.dismiss(info.loadingDialog);
+                                        info.listener.onSuccess(info.filePath, info.filePath, info.isFromCache);
                                         handleMedia(info);
                                     }
-
-
-
-
                                 }
                             }
                         });
 
                     }
-
-
                 }
 
                 outputStream.flush();
@@ -202,18 +201,11 @@ public class Tool {
             } catch (final IOException e) {
                 e.printStackTrace();
                 //这里如果返回socket closed,可能是取消下载,也可能是网络断了,怎么判断?还是用call来判断
-                Tool.callbackOnMainThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(call.isCanceled()){
-                            info.listener.onCancel();
-                        }else {
-                            info.listener.onError(e.getMessage());
-                        }
-
-                    }
-                });
-
+                if(call.isCanceled()){
+                    info.listener.onCancel();
+                }else {
+                    info.listener.onError(e.getMessage());
+                }
                 return false;
             } finally {
                 if (inputStream != null) {
@@ -232,23 +224,19 @@ public class Tool {
                     }
                 }
             }
-        /*} catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }*/
     }
 
     private static void handleMedia(ConfigInfo configInfo) {
         if(configInfo.isNotifyMediaCenter){
-            FileUtils.refreshMediaCenter(HttpUtil.context,configInfo.filePath);
+            DownFileHandlerUtil.refreshMediaCenter(HttpUtil.context,configInfo.filePath);
         }else {
             if(configInfo.isHideFolder){
-                FileUtils.hideFile(new File(configInfo.filePath));
+                DownFileHandlerUtil.hideFile(new File(configInfo.filePath));
             }
         }
 
         if(configInfo.isOpenAfterSuccess){
-            FileUtils.openFile(HttpUtil.context,new File(configInfo.filePath));
+            DownFileHandlerUtil.openFile(HttpUtil.context,new File(configInfo.filePath));
         }
 
     }
@@ -701,6 +689,18 @@ public class Tool {
         if (type != null || !type.isEmpty()) {
             return type;
         }
+
+        WebView webView = new WebView(null);
+        webView.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimetype, long contentLength) {
+
+            }
+        });
+
+
+
         return "file/*";
     }
 
@@ -905,126 +905,12 @@ public class Tool {
     public static  void parseStringByType(final String string, final ConfigInfo configInfo,final boolean isFromCache) throws Exception{
         StringParseStrategy strategy = GlobalConfig.get().getParseStrategyList().get(configInfo.type);
         strategy.parseCommonJson(string,configInfo,isFromCache);
-        /*switch (configInfo.type){
-            case ConfigInfo.TYPE_STRING:
-                //处理结果
-                configInfo.listener.onSuccess(string, string,isFromCache);
-                //缓存
-                cacheResponseIfFromNet(string, configInfo);
-                setReadCacheSuccessIfIsCache(configInfo);
-                break;
-            case ConfigInfo.TYPE_JSON:
-                parseCommonJson(string,configInfo,isFromCache);
-                break;
-            case ConfigInfo.TYPE_JSON_FORMATTED:
-                parseStandJsonStr(string, configInfo,isFromCache);
-                break;
-            case ConfigInfo.TYPE_JSON_FORMATTED_EXTRA:
-                //parseStandJsonStrExTra(string, configInfo,isFromCache);
-                try {
-                    GlobalConfig.get().parseStrategyList.get(0).parseCommonJson(string,configInfo,true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    configInfo.isFromCacheSuccess = false;
-                }
-                break;
-        }*/
-    }
-
-    private static void parseStandJsonStrExTra(String string, final ConfigInfo configInfo, boolean isFromCache) {
-        if (isJsonEmpty(string)){//先看是否为空
-
-            callbackOnMainThread(new Runnable() {
-                @Override
-                public void run() {
-                    configInfo.listener.onEmpty();
-                }
-            });
-
-        }else {
-            JSONObject object = null;
-            try {
-                object = new JSONObject(string);
-            } catch (org.json.JSONException e) {
-                e.printStackTrace();
-                callbackOnMainThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        configInfo.listener.onError("json 格式异常");
-                    }
-                });
-            }
-            String key_data = TextUtils.isEmpty(configInfo.key_data) ? GlobalConfig.get().getStandardJsonKeyData() : configInfo.key_data;
-            String key_code = TextUtils.isEmpty(configInfo.key_code) ? GlobalConfig.get().getStandardJsonKeyCode() : configInfo.key_code;
-            String key_msg = TextUtils.isEmpty(configInfo.key_msg) ? GlobalConfig.get().getStandardJsonKeyMsg() : configInfo.key_msg;
-            String key_isSuccess = TextUtils.isEmpty(configInfo.key_isSuccess) ? GlobalConfig.get().key_isSuccess : configInfo.key_isSuccess;
-            String key_extra1 = TextUtils.isEmpty(configInfo.key_extra1) ? GlobalConfig.get().key_extra1 : configInfo.key_extra1;
-            String key_extra2 = TextUtils.isEmpty(configInfo.key_extra2) ? GlobalConfig.get().key_extra2 : configInfo.key_extra2;
-            String key_extra3 = TextUtils.isEmpty(configInfo.key_extra3) ? GlobalConfig.get().key_extra3 : configInfo.key_extra3;
-
-
-           /* final String dataStr = object.optString(key_data);
-            final int code = object.optInt(key_code);
-            final String msg = object.optString(key_msg);
-            final String finalString1 = string;*/
-
-            String extra1Str = getStrByKey(key_extra1,object);
-            String extra2Str = getStrByKey(key_extra2,object);
-            String extra3Str = getStrByKey(key_extra3,object);
-            String msgStr = getStrByKey(key_msg,object);
-            String dataStr = getStrByKey(key_data,object);
-            int codeInt = -1;
-            if(!TextUtils.isEmpty(key_code)){
-                codeInt = object.optInt(key_code);
-            }
-            boolean isSuccess = true;
-            if(!TextUtils.isEmpty(key_isSuccess)){
-                isSuccess = object.optBoolean(key_isSuccess);
-            }
-
-            /*parseStandardJsonObjExtra(isSuccess,TextUtils.isEmpty(key_isSuccess),codeInt,TextUtils.isEmpty(key_code),
-                dataStr,msgStr,extra1Str,extra2Str,extra3Str,configInfo,isFromCache);*/
-
-
-
-
-
-
-
-            //parseStandardJsonObj(finalString1,dataStr,code,msg,configInfo,isFromCache);
-            //todo 将时间解析放到后面去
-
-        }
     }
 
 
-    /*private static <E> void parseStandardJsonObjExtra(boolean isSuccess, boolean doUseSuccess, final int codeInt,
-                                                      final boolean doUseCode, String dataStr, final String msgStr, final String extra1Str,
-                                                      final String extra2Str, final String extra3Str, final ConfigInfo<E> configInfo,
-                                                      boolean isFromCache) {
-        if(doUseSuccess){
-            if(!isSuccess){
-                callbackOnMainThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        configInfo.listener.onCodeErrorExtra(msgStr,"",doUseCode?codeInt:0,extra1Str,extra2Str,extra3Str);
-                    }
-                });
-                return;
-            }
-            //todo 解析成功的str  parseSuccess();
-            if(doUseCode){
-
-            }else {//不使用code字段,
-
-            }
-            return;
-        }
-        //todo 不使用isSuccess,而是使用code:逻辑与standjson相似,只是添加了几个字段
 
 
 
-    }*/
 
     private static String getStrByKey(String key_extra1, JSONObject jsonObject) {
         if(!TextUtils.isEmpty(key_extra1)){

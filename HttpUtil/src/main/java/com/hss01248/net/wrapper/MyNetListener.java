@@ -19,8 +19,6 @@ public abstract class MyNetListener<T>  implements HttpCallback<T>{
      */
     public ConfigInfo configInfo;
 
-    public Object extra1;
-    public Object extra2;
 
     public void setNetState(int netState) {
         this.netState = netState;
@@ -35,14 +33,6 @@ public abstract class MyNetListener<T>  implements HttpCallback<T>{
     public boolean isNeting(){
         return netState == NetState.LOADING;
     }
-
-
-
-
-
-
-
-
 
     /**
      * called when the request is success bug data is empty
@@ -66,18 +56,15 @@ public abstract class MyNetListener<T>  implements HttpCallback<T>{
     }
 
     public void onNoNetwork(){
-        onError("当前没有网络");
+        onError("no network connection");
     }
 
     public void onTimeout(){
-        onError("连接超时,请检查网络");
+        onError("connect time out,please check your network");
     }
     public boolean isResponseFromCache(){
         return configInfo.isFromCache;
     }
-
-
-
 
     /** Called when response success. */
     public abstract void onSuccess(T response,String responseStr,boolean isFromCache);
@@ -93,20 +80,6 @@ public abstract class MyNetListener<T>  implements HttpCallback<T>{
     public  void onSuccessArr(List<T> response, String responseStr, String data, int code, String msg,boolean isFromCache){
         onSuccessArr(response,responseStr,isFromCache);
     }
-
-
-   /* public  void onSuccessObjExtra(boolean isFromCache,T response, String responseStr, String data, int code,
-                              String msg,String extra1,String extra2,String extra3){
-        onSuccess(response,responseStr,isFromCache);
-    }
-
-    public  void onSuccessArrExtra(boolean isFromCache,List<T> response, String responseStr, String data, int code, String msg,
-                              String extra1,String extra2,String extra3){
-        onSuccessArr(response,responseStr,isFromCache);
-    }*/
-
-
-
 
 
     /**
@@ -136,13 +109,11 @@ public abstract class MyNetListener<T>  implements HttpCallback<T>{
         onError(serverMsg);
     }
 
-    /*public void onCodeErrorExtra(String msgCanShow, String hiddenMsg, int code,String extra1,String extra2,String extra3) {
-
-    }*/
-
-
+    /**
+     * 取消的请求走空,不要再回调到onError
+     */
     public void onCancel() {
-        onError("请求已取消");
+        //onError("请求已取消");
     }
 
     public void onUnFound() {
@@ -172,38 +143,6 @@ public abstract class MyNetListener<T>  implements HttpCallback<T>{
         MyLog.e("FilesUploadprogress:"+transPortedBytes+"--totalBytes:"+totalBytes+"--fileIndex:"+fileIndex+"-----filecount:"+filesCount);
         onProgressChange(transPortedBytes,totalBytes);
     }
-
-
-    /*public void registEventBus(){
-        EventBus.getDefault().register(this);
-    }
-
-    public void unRegistEventBus(){
-        EventBus.getDefault().unregister(this);
-    }
-
-    private long lastProgress;
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void  onMessage(ProgressEvent event){
-        if (event.url.equals(url)){
-             if(lastProgress >= event.totalBytesRead){
-                return;
-            }
-
-            lastProgress = event.totalBytesRead;
-            onProgressChange(event.totalLength,event.totalBytesRead);
-
-
-            //进度更新: 数据太会出现
-
-
-            if (event.done){
-                unRegistEventBus();
-                onFinish();
-            }
-        }
-    }*/
 
 
 }

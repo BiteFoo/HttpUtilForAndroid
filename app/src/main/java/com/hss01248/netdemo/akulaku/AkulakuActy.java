@@ -7,8 +7,6 @@ import android.view.View;
 import android.widget.Button;
 
 import com.hss01248.net.config.GlobalConfig;
-import com.hss01248.net.oldapi.BaseNetBean;
-import com.hss01248.net.retrofit.ApiRxService;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyJson;
 import com.hss01248.net.wrapper.MyLog;
@@ -17,20 +15,9 @@ import com.hss01248.netdemo.R;
 import com.hss01248.netdemo.akulaku.bean.CommonConfig;
 import com.orhanobut.logger.Logger;
 
-import java.util.HashMap;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by huangshuisheng on 2017/9/29.
@@ -162,7 +149,7 @@ public class AkulakuActy extends Activity {
 
     private void getByRetrofit() {
 
-        try {
+        /*try {
             Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://api.qxinli.com:9005/api/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -204,7 +191,7 @@ public class AkulakuActy extends Activity {
                 });
         }catch (Exception e){
             e.printStackTrace();
-        }
+        }*/
 
 
     }
