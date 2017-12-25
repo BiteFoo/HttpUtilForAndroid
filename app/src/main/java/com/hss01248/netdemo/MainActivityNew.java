@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import com.hss01248.net.cache.CacheStrategy;
 import com.hss01248.net.config.GlobalConfig;
+import com.hss01248.net.threadpool.ThreadPoolFactory;
 import com.hss01248.net.util.LoginManager;
 import com.hss01248.net.wrapper.HttpUtil;
 import com.hss01248.net.wrapper.MyJson;
@@ -184,32 +185,40 @@ public class MainActivityNew extends Activity {
                 break;
             case R.id.post_string:
 
-                HttpUtil.buildStringRequest("article/getArticleCommentList/v1.json")
-                        .addParam("pageSize","30")
-                        .addParam("articleId","1738")
-                        .setCacheMode(CacheStrategy.IF_NONE_CACHE_REQUEST)
-                        .addParam("pageIndex","1")
-                        .callback(getListener(new MyNetListener<String>() {
-                            @Override
-                            public void onSuccess(String response, String responseStr, boolean isFromCache) {
-                                Logger.e(response);
-                                if(isFromCache){
-                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
-                                }else {
-                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
-                                }
-                            }
-                            @Override
-                            public void onError(String msgCanShow) {
-                                super.onError(msgCanShow);
-                                Logger.e(msgCanShow);
-                                if(isResponseFromCache()){
-                                    MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
-                                }else {
-                                    MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
-                                }
-                            }
-                        })).postAsync();
+                ThreadPoolFactory.getDownLoadPool().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        Logger.e("net work thread:"+Thread.currentThread().getName());
+                        HttpUtil.buildStringRequest("article/getArticleCommentList/v1.json")
+                                .addParam("pageSize","30")
+                                .addParam("articleId","1738")
+                                .setCacheMode(CacheStrategy.FIRST_CACHE_THEN_REQUEST)
+                                .addParam("pageIndex","1")
+                                .callback(getListener(new MyNetListener<String>() {
+                                    @Override
+                                    public void onSuccess(String response, String responseStr, boolean isFromCache) {
+                                        Logger.e(response);
+                                        if(isFromCache){
+                                            MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                        }else {
+                                            MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                        }
+                                    }
+                                    @Override
+                                    public void onError(String msgCanShow) {
+                                        super.onError(msgCanShow);
+                                        Logger.e(msgCanShow);
+                                        if(isResponseFromCache()){
+                                            MyLog.e("---from cache-----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                        }else {
+                                            MyLog.e("---from net  -----listener: method:"+Thread.currentThread() .getStackTrace()[0].getMethodName());
+                                        }
+                                    }
+                                })).postSync();
+                    }
+                });
+
+
                 break;
             case R.id.get_json:
 

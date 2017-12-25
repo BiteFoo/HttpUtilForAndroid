@@ -174,16 +174,18 @@ public class BaseNetBuilder<T> {
     }
 
     @Deprecated
-    public T getSync(){
+    public ConfigInfo<T> getSync(){
         method = HttpMethod.GET;
         //client.start(this);
-        return   null;
+        isSync = true;
+        return   execute();
 
     }
 
     public ConfigInfo<T> getAsync(){
         method = HttpMethod.GET;
         isSync = false;
+
         //client.start(this);
         return   execute();
 
@@ -198,10 +200,11 @@ public class BaseNetBuilder<T> {
 
     }
     @Deprecated
-    public T postSync(){
+    public ConfigInfo<T> postSync(){
         method = HttpMethod.POST;
+        isSync = true;
         // client.start(this);
-        return  null;
+        return  execute();
 
     }
 

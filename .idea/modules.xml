@@ -3,9 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HttpUtil/HttpUtil.iml" filepath="$PROJECT_DIR$/HttpUtil/HttpUtil.iml" />
+      <module fileurl="file://G:\projects\android\hss01248\HttpUtilForAndroid\HttpUtil\HttpUtil.iml" filepath="G:\projects\android\hss01248\HttpUtilForAndroid\HttpUtil\HttpUtil.iml" />
       <module fileurl="file://$PROJECT_DIR$/HttpUtilForAndroid.iml" filepath="$PROJECT_DIR$/HttpUtilForAndroid.iml" />
+      <module fileurl="file://G:\projects\android\hss01248\HttpUtilForAndroid\HttpUtilForAndroid.iml" filepath="G:\projects\android\hss01248\HttpUtilForAndroid\HttpUtilForAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://G:\projects\android\hss01248\HttpUtilForAndroid\app\app.iml" filepath="G:\projects\android\hss01248\HttpUtilForAndroid\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/openuri/openuri.iml" filepath="$PROJECT_DIR$/openuri/openuri.iml" />
+      <module fileurl="file://G:\projects\android\hss01248\HttpUtilForAndroid\openuri\openuri.iml" filepath="G:\projects\android\hss01248\HttpUtilForAndroid\openuri\openuri.iml" />
     </modules>
   </component>
 </project>
