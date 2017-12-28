@@ -7,7 +7,7 @@ import com.hss01248.net.config.ConfigInfo;
 import com.hss01248.net.config.GlobalConfig;
 import com.hss01248.net.cookie.DiskCookieJar;
 import com.hss01248.net.cookie.MemoryCookieJar;
-import com.hss01248.net.okhttp.log.LogInterceptor;
+import com.hss01248.net.okhttp.log.HttpLoggingInterceptorM;
 import com.hss01248.net.okhttp.progress.UploadFileRequestBody;
 import com.hss01248.net.threadpool.ThreadPoolFactory;
 import com.hss01248.net.util.CollectionUtil;
@@ -150,7 +150,7 @@ public class OkClient extends IClient {
 
     private static void setLog(OkHttpClient.Builder builder, boolean openLog) {
         if(openLog){
-            builder.addNetworkInterceptor(new LogInterceptor());
+            builder.addNetworkInterceptor(new HttpLoggingInterceptorM().setLevel(HttpLoggingInterceptorM.Level.BODY));
         }
     }
 

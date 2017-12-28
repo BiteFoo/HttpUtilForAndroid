@@ -1,1 +1,1 @@
-include ':app', ':HttpUtil', ':openuri'
+include ':app', ':HttpUtil', ':openuri', ':retrofit'
