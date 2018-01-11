@@ -11,6 +11,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/HttpUtil" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/http" />
+            <option value="$PROJECT_DIR$/okhttp" />
             <option value="$PROJECT_DIR$/openuri" />
             <option value="$PROJECT_DIR$/retrofit" />
           </set>

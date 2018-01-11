@@ -56,6 +56,8 @@ dependencies {
 
         compile 'com.github.glassLake:MyVolleyPlus:1.0.0'*/
     compile project(path: ':HttpUtil')
+    compile project(path: ':http')
+    compile project(path: ':okhttp')
     compile 'com.github.orhanobut:logger:1.12'
     compile 'com.mylhyl:acp:1.0.0'
     //debugCompile 'com.antfortune.freeline:runtime:0.8.4'
