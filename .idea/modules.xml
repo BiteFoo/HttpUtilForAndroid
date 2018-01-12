@@ -6,7 +6,9 @@
       <module fileurl="file://$PROJECT_DIR$/HttpUtilForAndroid.iml" filepath="$PROJECT_DIR$/HttpUtilForAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/http/http.iml" filepath="$PROJECT_DIR$/http/http.iml" />
+      <module fileurl="file://D:\projects\Android\github\HttpUtilForAndroid\http\http.iml" filepath="D:\projects\Android\github\HttpUtilForAndroid\http\http.iml" />
       <module fileurl="file://$PROJECT_DIR$/okhttp/okhttp.iml" filepath="$PROJECT_DIR$/okhttp/okhttp.iml" />
+      <module fileurl="file://D:\projects\Android\github\HttpUtilForAndroid\okhttp\okhttp.iml" filepath="D:\projects\Android\github\HttpUtilForAndroid\okhttp\okhttp.iml" />
       <module fileurl="file://$PROJECT_DIR$/openuri/openuri.iml" filepath="$PROJECT_DIR$/openuri/openuri.iml" />
       <module fileurl="file://$PROJECT_DIR$/retrofit/retrofit.iml" filepath="$PROJECT_DIR$/retrofit/retrofit.iml" />
     </modules>
